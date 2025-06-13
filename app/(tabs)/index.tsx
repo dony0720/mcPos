@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-export function MenuSelection() {
+export default function MenuSelection() {
   return (
     <View>
       <Text>Menu Selection Page</Text>
