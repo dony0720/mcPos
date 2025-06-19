@@ -4,13 +4,21 @@ import { Stack } from 'expo-router';
 import React from 'react';
 
 export default function RootLayout() {
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
   return (
-    <Stack>
-      <Stack.Screen name='index' options={{ headerShown: false }} />
+    <Stack
+      screenOptions={{
+        headerShown: false, // 모든 화면의 헤더를 숨김
+        gestureEnabled: false, // 제스처 비활성화
+      }}
+    >
+      <Stack.Screen
+        name='(tabs)'
+        options={{
+          headerShown: false,
+          gestureEnabled: false,
+          headerBackVisible: false,
+        }}
+      />
       {/* <Stack.Screen name="Details" component={DetailsScreen} /> */}
     </Stack>
   );
