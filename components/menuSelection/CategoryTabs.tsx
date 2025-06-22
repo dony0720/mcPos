@@ -10,6 +10,7 @@ export default function CategoryTabs() {
       <View className="h-[45px] flex flex-row relative">
         {categories.map((category) => (
           <Pressable
+            role="tablist"
             key={category}
             onPress={() => setSelectedCategory(category)}
             className="flex-1 py-3 flex justify-center items-center"

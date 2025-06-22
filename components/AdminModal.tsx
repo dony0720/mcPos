@@ -53,6 +53,7 @@ export default function AdminModal({
           {/* 버튼들 */}
           <View className="flex-row gap-3">
             <Pressable
+              role="button"
               className="flex-1 p-3 border border-gray-300 rounded-lg"
               onPress={handleClose}
             >
@@ -62,6 +63,7 @@ export default function AdminModal({
             </Pressable>
 
             <Pressable
+              role="button"
               className="flex-1 p-3 bg-primaryGreen rounded-lg"
               onPress={handleConfirm}
               disabled={!password.trim()}

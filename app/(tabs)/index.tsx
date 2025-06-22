@@ -39,6 +39,7 @@ export default function MenuSelection() {
       <View className='w-full h-[80px] box-border px-[5%] mt-[25px] flex flex-row justify-between items-center '>
         <McPosLogo width={150} height={150} />
         <Pressable
+          role="button"
           onPressIn={adminAnimation.onPressIn}
           onPressOut={adminAnimation.onPressOut}
           onPress={handleAdminPress}
