@@ -1,10 +1,12 @@
 import React from "react";
 import { View, Text, ScrollView, Pressable, Animated } from "react-native";
+import { useRouter } from "expo-router";
 import OrderItem from "./OrderItem";
 import { useButtonAnimation } from "../../hooks/useButtonAnimation";
 
 export default function OrderSection() {
   const paymentAnimation = useButtonAnimation();
+  const router = useRouter();
 
   // 임시 주문 데이터
   const orderItems = [
@@ -50,6 +52,10 @@ export default function OrderSection() {
     console.log("Remove item:", id);
   };
 
+  const handlePaymentPress = () => {
+    router.push("/payment");
+  };
+
   return (
     <View className="w-full h-[20%] box-border px-[5%] py-2 flex flex-col gap-2">
       <View className="w-full h-full box-border py-4 flex flex-row gap-2">
@@ -83,6 +89,7 @@ export default function OrderSection() {
               className="w-full h-[90px]"
               onPressIn={paymentAnimation.onPressIn}
               onPressOut={paymentAnimation.onPressOut}
+              onPress={handlePaymentPress}
             >
               <Animated.View
                 className="w-full h-full bg-primaryGreen rounded-lg flex items-center justify-center"
