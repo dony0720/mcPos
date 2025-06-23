@@ -1,8 +1,10 @@
-import React from "react";
-import { View, Text, Image } from "react-native";
+import React, { useState } from "react";
+import { View } from "react-native";
 import PaginationButtons from "./menuSelction";
+import MenuItem from "./MenuItem";
+import MenuDetailModal from "./MenuDetailModal";
 
-interface MenuItem {
+interface MenuItemType {
   id: number;
   name: string;
   price: string;
@@ -18,6 +20,12 @@ export default function MenuGrid() {
       price: "1,500원",
     }));
 
+  // 모달 상태 관리
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItemType | null>(
+    null
+  );
+
   const handleUpPress = () => {
     // 위쪽 페이지네이션 로직
     console.log("Up button pressed");
@@ -27,28 +35,28 @@ export default function MenuGrid() {
     // 아래쪽 페이지네이션 로직
     console.log("Down button pressed");
   };
+
+  const handleMenuItemPress = (item: MenuItemType) => {
+    setSelectedMenuItem(item);
+    setModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setModalVisible(false);
+    setSelectedMenuItem(null);
+  };
   return (
     <View className="flex flex-row w-full h-[65%] box-border px-[5%] py-[3%] items-center">
       <View className="flex-1 h-full">
         <View className="flex-row flex-wrap h-full justify-between content-between">
           {menuItems.map((item) => (
-            <View key={item.id} className="w-1/4 pr-3 pl-0 box-border">
-              <View className="w-full flex flex-col rounded-lg gap-2">
-                <View className="overflow-hidden rounded-lg aspect-square">
-                  <Image
-                    source={require("../../assets/images/coffeeTest.png")}
-                    className="w-full h-full"
-                    resizeMode="cover"
-                  />
-                </View>
-                <View className="px-1">
-                  <Text className="font-medium text-base">{item.name}</Text>
-                  <Text className="text-gray-600 text-sm mt-1">
-                    {item.price}
-                  </Text>
-                </View>
-              </View>
-            </View>
+            <MenuItem
+              key={item.id}
+              id={item.id}
+              name={item.name}
+              price={item.price}
+              onPress={() => handleMenuItemPress(item)}
+            />
           ))}
         </View>
       </View>
@@ -56,6 +64,13 @@ export default function MenuGrid() {
       <PaginationButtons
         onUpPress={handleUpPress}
         onDownPress={handleDownPress}
+      />
+
+      {/* 메뉴 상세 모달 */}
+      <MenuDetailModal
+        visible={modalVisible}
+        onClose={handleModalClose}
+        menuItem={selectedMenuItem}
       />
     </View>
   );
