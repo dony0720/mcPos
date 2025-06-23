@@ -4,16 +4,22 @@ import { ThemeProvider, DefaultTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
   return (
-    <ThemeProvider value={DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="payment" options={{ presentation: "modal" }} />
-      </Stack>
-    </ThemeProvider>
+    <Stack
+      screenOptions={{
+        headerShown: false, // 모든 화면의 헤더를 숨김
+        gestureEnabled: false, // 제스처 비활성화
+      }}
+    >
+      <Stack.Screen
+        name="(tabs)"
+        options={{
+          headerShown: false,
+          gestureEnabled: false,
+          headerBackVisible: false,
+        }}
+      />
+      {/* <Stack.Screen name="Details" component={DetailsScreen} /> */}
+    </Stack>
   );
 }

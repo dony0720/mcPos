@@ -1,21 +1,29 @@
 import React from "react";
 import { Tabs } from "expo-router";
-import { Text } from "react-native";
-
+import { View, Text } from "react-native";
 export default function TabLayout() {
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        headerShown: false, // 모든 탭의 헤더를 숨김
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Tab One",
-          headerRight: () => <Text>Hello</Text>,
+          title: "메뉴",
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="ledger"
         options={{
-          title: "Tab Two",
+          title: "시재관리",
+        }}
+      />
+      <Tabs.Screen
+        name="cash"
+        options={{
+          title: "현금",
         }}
       />
     </Tabs>
