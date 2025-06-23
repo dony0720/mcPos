@@ -13,8 +13,8 @@ export default function OptionsSelector({
   const options = ["샷추가", "시럽추가", "휘핑크림"];
 
   return (
-    <View className="mb-6">
-      <Text className="text-base font-semibold mb-3">기타 옵션</Text>
+    <View>
+      <Text className="text-xl font-semibold mb-3">기타 옵션</Text>
       <View className="flex-row flex-wrap gap-5">
         {options.map((option) => {
           const isSelected = selectedOptions.includes(option);
@@ -30,7 +30,7 @@ export default function OptionsSelector({
                   setSelectedOptions([...selectedOptions, option]);
                 }
               }}
-              className={`px-4 py-2 rounded-lg border flex-[0_0_45%] ${
+              className={`h-[70px] flex items-center justify-center rounded-lg border flex-[0_0_45%] ${
                 isSelected
                   ? "bg-[#475569] border-[#475569]"
                   : "bg-white border-gray-300"

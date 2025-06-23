@@ -14,13 +14,13 @@ export default function TemperatureSelector({
 
   return (
     <View className="mb-6">
-      <Text className="text-base font-semibold mb-3">온도</Text>
+      <Text className="text-xl font-semibold mb-3">온도</Text>
       <View className="flex-row flex-wrap gap-5">
         {temperatures.map((temp) => (
           <TouchableOpacity
             key={temp}
             onPress={() => setSelectedTemperature(temp)}
-            className={`px-4 py-2 rounded-lg border flex-[0_0_45%] ${
+            className={`h-[70px] flex items-center justify-center rounded-lg border flex-[0_0_45%] ${
               selectedTemperature === temp
                 ? "bg-[#475569] border-[#475569]"
                 : "bg-white border-gray-300"
