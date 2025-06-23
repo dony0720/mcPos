@@ -45,7 +45,7 @@ export default function MenuDetailModal({
       onRequestClose={onClose}
     >
       <View className="flex-1 w-full h-full box-border px-[20%] justify-center items-center bg-black/50">
-        <View className="bg-white rounded-lg w-full h-[50%] p-6">
+        <View className="bg-white rounded-lg w-full h-[50%] box-border p-6">
           {/* 헤더 */}
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-xl font-bold">메뉴 옵션 선택</Text>
