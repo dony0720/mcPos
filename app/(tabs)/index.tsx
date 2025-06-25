@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Pressable, Text, View, Animated } from 'react-native';
+import { Animated, Pressable, Text, View } from 'react-native';
 
+import McPosLogo from '../../assets/icon/mcPosLogo.svg';
+import AdminModal from '../../components/AdminModal';
 import CategoryTabs from '../../components/menuSelection/CategoryTabs';
 import MenuGrid from '../../components/menuSelection/MenuGrid';
-import McPosLogo from '../../assets/icon/mcPosLogo.svg';
 import OrderSection from '../../components/order/OrderSection';
-import AdminModal from '../../components/AdminModal';
 import { useButtonAnimation } from '../../hooks/useButtonAnimation';
 
 export default function MenuSelection() {
@@ -39,7 +39,7 @@ export default function MenuSelection() {
       <View className='w-full h-[80px] box-border px-[5%] mt-[25px] flex flex-row justify-between items-center '>
         <McPosLogo width={150} height={150} />
         <Pressable
-          role="button"
+          role='button'
           onPressIn={adminAnimation.onPressIn}
           onPressOut={adminAnimation.onPressOut}
           onPress={handleAdminPress}

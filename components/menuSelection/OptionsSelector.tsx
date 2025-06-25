@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 interface OptionsSelectorProps {
   selectedOptions: string[];
@@ -10,13 +10,13 @@ export default function OptionsSelector({
   selectedOptions,
   setSelectedOptions,
 }: OptionsSelectorProps) {
-  const options = ["샷추가", "시럽추가", "휘핑크림"];
+  const options = ['샷추가', '시럽추가', '휘핑크림'];
 
   return (
     <View>
-      <Text className="text-xl font-semibold mb-3">기타 옵션</Text>
-      <View className="flex-row flex-wrap gap-5">
-        {options.map((option) => {
+      <Text className='text-xl font-semibold mb-3'>기타 옵션</Text>
+      <View className='flex-row flex-wrap gap-5'>
+        {options.map(option => {
           const isSelected = selectedOptions.includes(option);
           return (
             <TouchableOpacity
@@ -24,7 +24,7 @@ export default function OptionsSelector({
               onPress={() => {
                 if (isSelected) {
                   setSelectedOptions(
-                    selectedOptions.filter((item) => item !== option)
+                    selectedOptions.filter(item => item !== option)
                   );
                 } else {
                   setSelectedOptions([...selectedOptions, option]);
@@ -32,18 +32,18 @@ export default function OptionsSelector({
               }}
               className={`h-[70px] flex items-center justify-center rounded-lg border flex-[0_0_45%] ${
                 isSelected
-                  ? "bg-[#475569] border-[#475569]"
-                  : "bg-white border-gray-300"
+                  ? 'bg-[#475569] border-[#475569]'
+                  : 'bg-white border-gray-300'
               }`}
             >
-              <View className="flex items-center gap-2">
+              <View className='flex items-center gap-2'>
                 <Text
-                  className={`${isSelected ? "text-white" : "text-gray-700"}`}
+                  className={`${isSelected ? 'text-white' : 'text-gray-700'}`}
                 >
                   {option}
                 </Text>
                 <Text
-                  className={`${isSelected ? "text-white" : "text-gray-700"}`}
+                  className={`${isSelected ? 'text-white' : 'text-gray-700'}`}
                 >
                   +500원
                 </Text>

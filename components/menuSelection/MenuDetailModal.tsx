@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { View, Text, Modal, ScrollView, TouchableOpacity } from "react-native";
-import MenuInfoCard from "./MenuInfoCard";
-import TemperatureSelector from "./TemperatureSelector";
-import OptionsSelector from "./OptionsSelector";
-import ActionButtons from "./ActionButtons";
+import React, { useState } from 'react';
+import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+
+import ActionButtons from './ActionButtons';
+import MenuInfoCard from './MenuInfoCard';
+import OptionsSelector from './OptionsSelector';
+import TemperatureSelector from './TemperatureSelector';
 
 interface MenuDetailModalProps {
   visible: boolean;
@@ -21,12 +22,12 @@ export default function MenuDetailModal({
   menuItem,
 }: MenuDetailModalProps) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [selectedTemperature, setSelectedTemperature] = useState("Hot");
+  const [selectedTemperature, setSelectedTemperature] = useState('Hot');
   const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = () => {
     // 장바구니에 추가하는 로직
-    console.log("Added to cart:", {
+    console.log('Added to cart:', {
       item: menuItem,
       options: selectedOptions,
       temperature: selectedTemperature,
@@ -39,18 +40,18 @@ export default function MenuDetailModal({
 
   return (
     <Modal
-      animationType="slide"
+      animationType='slide'
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
     >
-      <View className="flex-1 w-full h-full box-border px-[20%] justify-center items-center bg-black/50">
-        <View className="bg-white rounded-lg w-full h-[50%] box-border p-6">
+      <View className='flex-1 w-full h-full box-border px-[20%] justify-center items-center bg-black/50'>
+        <View className='bg-white rounded-lg w-full h-[50%] box-border p-6'>
           {/* 헤더 */}
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-xl font-bold">메뉴 옵션 선택</Text>
+          <View className='flex-row justify-between items-center mb-4'>
+            <Text className='text-xl font-bold'>메뉴 옵션 선택</Text>
             <TouchableOpacity onPress={onClose}>
-              <Text className="text-gray-500 text-lg">✕</Text>
+              <Text className='text-gray-500 text-lg'>✕</Text>
             </TouchableOpacity>
           </View>
 

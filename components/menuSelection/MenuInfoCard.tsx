@@ -1,6 +1,7 @@
-import React from "react";
-import { View, Text, Image } from "react-native";
-import QuantitySelector from "./QuantitySelector";
+import React from 'react';
+import { Image, Text, View } from 'react-native';
+
+import QuantitySelector from './QuantitySelector';
 
 interface MenuInfoCardProps {
   menuItem: {
@@ -18,18 +19,18 @@ export default function MenuInfoCard({
   setQuantity,
 }: MenuInfoCardProps) {
   return (
-    <View className="flex-row mb-6">
-      <View className="w-36 h-36 rounded-lg overflow-hidden mr-4">
+    <View className='flex-row mb-6'>
+      <View className='w-36 h-36 rounded-lg overflow-hidden mr-4'>
         <Image
-          source={require("../../assets/images/coffeeTest.png")}
-          className="w-full h-full"
-          resizeMode="cover"
+          source={require('../../assets/images/coffeeTest.png')}
+          className='w-full h-full'
+          resizeMode='cover'
         />
       </View>
-      <View className="flex-1 justify-between">
-        <View className="flex-1 gap-3">
-          <Text className="text-xl font-semibold">{menuItem.name}</Text>
-          <Text className="text-gray-600 text-lg">{menuItem.price}</Text>
+      <View className='flex-1 justify-between'>
+        <View className='flex-1 gap-3'>
+          <Text className='text-xl font-semibold'>{menuItem.name}</Text>
+          <Text className='text-gray-600 text-lg'>{menuItem.price}</Text>
         </View>
         <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
       </View>

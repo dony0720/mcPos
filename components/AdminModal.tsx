@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Modal, Pressable, Text, View, TextInput } from "react-native";
+import React, { useState } from 'react';
+import { Modal, Pressable, Text, TextInput, View } from 'react-native';
 
 interface AdminModalProps {
   visible: boolean;
@@ -12,38 +12,38 @@ export default function AdminModal({
   onClose,
   onConfirm,
 }: AdminModalProps) {
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState('');
 
   const handleConfirm = () => {
     onConfirm(password);
-    setPassword(""); // 비밀번호 초기화
+    setPassword(''); // 비밀번호 초기화
   };
 
   const handleClose = () => {
-    setPassword(""); // 비밀번호 초기화
+    setPassword(''); // 비밀번호 초기화
     onClose();
   };
 
   return (
     <Modal
-      animationType="fade"
+      animationType='fade'
       transparent={true}
       visible={visible}
       onRequestClose={handleClose}
     >
-      <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="bg-white rounded-2xl p-6 w-4/5 max-w-md">
-          <Text className="text-xl font-bold text-center mb-4">
+      <View className='flex-1 justify-center items-center bg-black/50'>
+        <View className='bg-white rounded-2xl p-6 w-4/5 max-w-md'>
+          <Text className='text-xl font-bold text-center mb-4'>
             관리자 인증
           </Text>
-          <Text className="text-gray-600 text-center mb-6">
+          <Text className='text-gray-600 text-center mb-6'>
             관리자 권한이 필요한 작업을 수행할 수 있습니다.
           </Text>
 
           {/* 비밀번호 입력창 */}
           <TextInput
-            className="border border-gray-300 rounded-lg px-4 py-3 mb-4"
-            placeholder="비밀번호를 입력하세요"
+            className='border border-gray-300 rounded-lg px-4 py-3 mb-4'
+            placeholder='비밀번호를 입력하세요'
             secureTextEntry={true}
             value={password}
             onChangeText={setPassword}
@@ -51,24 +51,24 @@ export default function AdminModal({
           />
 
           {/* 버튼들 */}
-          <View className="flex-row gap-3">
+          <View className='flex-row gap-3'>
             <Pressable
-              role="button"
-              className="flex-1 p-3 border border-gray-300 rounded-lg"
+              role='button'
+              className='flex-1 p-3 border border-gray-300 rounded-lg'
               onPress={handleClose}
             >
-              <Text className="text-gray-600 text-center font-semibold">
+              <Text className='text-gray-600 text-center font-semibold'>
                 취소
               </Text>
             </Pressable>
 
             <Pressable
-              role="button"
-              className="flex-1 p-3 bg-primaryGreen rounded-lg"
+              role='button'
+              className='flex-1 p-3 bg-primaryGreen rounded-lg'
               onPress={handleConfirm}
               disabled={!password.trim()}
             >
-              <Text className="text-white text-center font-semibold">확인</Text>
+              <Text className='text-white text-center font-semibold'>확인</Text>
             </Pressable>
           </View>
         </View>

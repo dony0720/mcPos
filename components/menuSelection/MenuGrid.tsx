@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { View } from "react-native";
-import PaginationButtons from "./menuSelction";
-import MenuItem from "./MenuItem";
-import MenuDetailModal from "./MenuDetailModal";
+import React, { useState } from 'react';
+import { View } from 'react-native';
+
+import MenuDetailModal from './MenuDetailModal';
+import MenuItem from './MenuItem';
+import PaginationButtons from './menuSelction';
 
 interface MenuItemType {
   id: number;
@@ -16,8 +17,8 @@ export default function MenuGrid() {
     .fill(null)
     .map((_, index) => ({
       id: index,
-      name: "아메리카노",
-      price: "1,500원",
+      name: '아메리카노',
+      price: '1,500원',
     }));
 
   // 모달 상태 관리
@@ -28,12 +29,12 @@ export default function MenuGrid() {
 
   const handleUpPress = () => {
     // 위쪽 페이지네이션 로직
-    console.log("Up button pressed");
+    console.log('Up button pressed');
   };
 
   const handleDownPress = () => {
     // 아래쪽 페이지네이션 로직
-    console.log("Down button pressed");
+    console.log('Down button pressed');
   };
 
   const handleMenuItemPress = (item: MenuItemType) => {
@@ -46,10 +47,10 @@ export default function MenuGrid() {
     setSelectedMenuItem(null);
   };
   return (
-    <View className="flex flex-row w-full h-[65%] box-border px-[5%] py-[3%] items-center">
-      <View className="flex-1 h-full">
-        <View className="flex-row flex-wrap h-full justify-between content-between">
-          {menuItems.map((item) => (
+    <View className='flex flex-row w-full h-[65%] box-border px-[5%] py-[3%] items-center'>
+      <View className='flex-1 h-full'>
+        <View className='flex-row flex-wrap h-full justify-between content-between'>
+          {menuItems.map(item => (
             <MenuItem
               key={item.id}
               id={item.id}
