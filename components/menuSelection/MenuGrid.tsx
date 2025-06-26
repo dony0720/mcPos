@@ -5,6 +5,13 @@ import MenuDetailModal from './MenuDetailModal';
 import MenuItem from './MenuItem';
 import PaginationButtons from './menuSelction';
 
+/**
+ * 메뉴 그리드 컴포넌트
+ * - 선택된 카테고리의 메뉴 아이템들을 그리드 형태로 표시
+ * - 페이지네이션 및 메뉴 상세 모달 기능 포함
+ */
+
+// 메뉴 아이템 타입 정의
 interface MenuItemType {
   id: number;
   name: string;
@@ -12,6 +19,7 @@ interface MenuItemType {
 }
 
 export default function MenuGrid() {
+  // 메뉴 데이터 관리
   // 임시 메뉴 데이터
   const menuItems = Array(12)
     .fill(null)
@@ -27,27 +35,42 @@ export default function MenuGrid() {
     null
   );
 
+  // 이벤트 핸들러
+  /**
+   * 위쪽 페이지네이션 버튼 핸들러
+   */
   const handleUpPress = () => {
     // 위쪽 페이지네이션 로직
     console.log('Up button pressed');
   };
 
+  /**
+   * 아래쪽 페이지네이션 버튼 핸들러
+   */
   const handleDownPress = () => {
     // 아래쪽 페이지네이션 로직
     console.log('Down button pressed');
   };
 
+  /**
+   * 메뉴 아이템 클릭 핸들러
+   */
   const handleMenuItemPress = (item: MenuItemType) => {
     setSelectedMenuItem(item);
     setModalVisible(true);
   };
 
+  /**
+   * 모달 닫기 핸들러
+   */
   const handleModalClose = () => {
     setModalVisible(false);
     setSelectedMenuItem(null);
   };
+
   return (
     <View className='flex flex-row w-full h-[65%] box-border px-[5%] py-[3%] items-center'>
+      {/* 메뉴 그리드 섹션 */}
       <View className='flex-1 h-full'>
         <View className='flex-row flex-wrap h-full justify-between content-between'>
           {menuItems.map(item => (
@@ -61,13 +84,14 @@ export default function MenuGrid() {
           ))}
         </View>
       </View>
-      {/* 페이지네이션 버튼 */}
+
+      {/* 페이지네이션 버튼 섹션 */}
       <PaginationButtons
         onUpPress={handleUpPress}
         onDownPress={handleDownPress}
       />
 
-      {/* 메뉴 상세 모달 */}
+      {/* 모달 섹션 - 메뉴 상세 모달 */}
       <MenuDetailModal
         visible={modalVisible}
         onClose={handleModalClose}
