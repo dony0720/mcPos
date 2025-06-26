@@ -7,6 +7,7 @@ interface PaymentMethodSelectorProps {
   onPaymentMethodPress: (methodId: string) => void;
 }
 
+// 결제 수단 옵션 데이터 - 현금, 카드, 쿠폰, 장부 결제
 const paymentMethods = [
   { id: "cash", name: "현금", icon: "cash-outline" },
   { id: "transfer", name: "이체", icon: "card-outline" },
@@ -19,8 +20,12 @@ export default function PaymentMethodSelector({
   onPaymentMethodPress,
 }: PaymentMethodSelectorProps) {
   return (
+    // 결제 방법 선택 섹션 - 현금, 이체, 쿠폰, 장부 중 선택
     <View>
+      {/* 섹션 제목 */}
       <Text className="text-3xl font-medium mt-6 mb-6">결제수단</Text>
+
+      {/* 결제 방법 선택 버튼들 */}
       <View className="w-full flex flex-row gap-4">
         {paymentMethods.map((method) => (
           <Pressable

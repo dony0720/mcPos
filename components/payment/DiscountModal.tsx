@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+// 할인 항목 정보를 정의하는 인터페이스
 interface Discount {
   id: string;
   name: string;
@@ -16,12 +17,14 @@ interface Discount {
   description?: string;
 }
 
+// 할인 모달 컴포넌트의 props 타입 정의
 interface DiscountModalProps {
   visible: boolean;
   onClose: () => void;
   onSelectDiscount: (discount: Discount) => void;
 }
 
+// 할인 옵션 데이터 - 각종 할인 혜택 정보
 const discountOptions: Discount[] = [
   {
     id: "senior",
@@ -66,27 +69,24 @@ export default function DiscountModal({
   onClose,
   onSelectDiscount,
 }: DiscountModalProps) {
+  // 할인 항목 선택 처리 - 선택 후 모달 닫기
   const handleDiscountSelect = (discount: Discount) => {
     onSelectDiscount(discount);
     onClose();
   };
 
+  // 할인 금액 표시 형식 처리 - 천 단위 콤마와 원 단위 표시
   const formatDiscountDisplay = (discount: Discount) => {
     return `${discount.value.toLocaleString()}원`;
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent={true} onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View className="flex-1 bg-black/50 justify-center items-center p-4">
           <TouchableWithoutFeedback>
             <View className="bg-white rounded-2xl w-full max-w-md h-[600px]">
-              {/* Header */}
+              {/* 모달 헤더 섹션 - 제목과 닫기 버튼 */}
               <View className="flex-row items-center justify-between p-6 border-b border-gray-200">
                 <Text className="text-2xl font-bold text-gray-900">
                   할인 선택
@@ -99,7 +99,7 @@ export default function DiscountModal({
                 </Pressable>
               </View>
 
-              {/* Discount Options */}
+              {/* 할인 옵션 목록 섹션 - 스크롤 가능한 할인 항목들 */}
               <ScrollView
                 className="flex-1"
                 showsVerticalScrollIndicator={false}
@@ -145,7 +145,7 @@ export default function DiscountModal({
                 </View>
               </ScrollView>
 
-              {/* Footer */}
+              {/* 모달 푸터 섹션 - 취소 버튼 */}
               <View className="p-4 border-t border-gray-200">
                 <Pressable
                   onPress={onClose}
