@@ -23,8 +23,9 @@ export default function PaymentMenuItem({
   const deleteAnimation = useButtonAnimation();
 
   return (
+    // 결제 메뉴 아이템 섹션 - 개별 메뉴 정보 표시 및 관리
     <View className="w-full h-[120px] box-border p-4 border border-gray-300 rounded-lg flex flex-row items-center justify-between gap-7 ">
-      {/* 체크박스 */}
+      {/* 체크박스 - 개별 아이템 선택 */}
       <Pressable onPress={onCheckboxPress}>
         <View
           className={`w-6 h-6 rounded flex items-center justify-center ${
@@ -35,8 +36,9 @@ export default function PaymentMenuItem({
         </View>
       </Pressable>
 
+      {/* 메뉴 정보 섹션 - 이미지, 이름, 옵션 */}
       <View className="w-[70%] flex flex-row items-center gap-7 ">
-        {/* 이미지 */}
+        {/* 메뉴 이미지 */}
         <View className="w-[100px] h-[100px] rounded-lg overflow-hidden">
           <Image
             source={require("../../assets/images/coffeeTest.png")}
@@ -44,18 +46,20 @@ export default function PaymentMenuItem({
             resizeMode="cover"
           />
         </View>
-        {/* 메뉴 이름 및 옵션  */}
+
+        {/* 메뉴 이름 및 옵션 */}
         <View className="flex-1 gap-2">
           <Text className="text-2xl font-medium">{menuName}</Text>
           <Text className="text-gray-600 text-lg">{options}</Text>
         </View>
       </View>
 
-      {/* 수량 및 가격 */}
+      {/* 가격 및 삭제 버튼 섹션 */}
       <View className="flex flex-row items-center justify-center gap-5">
+        {/* 가격 표시 */}
         <Text className="text-gray-600 text-2xl">{price}</Text>
 
-        {/* 삭제 아이콘 */}
+        {/* 삭제 버튼 - 메뉴 아이템 제거 */}
         <Pressable
           onPressIn={deleteAnimation.onPressIn}
           onPressOut={deleteAnimation.onPressOut}
