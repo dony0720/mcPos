@@ -17,13 +17,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="ledger"
         options={{
-          title: "시재관리",
+          title: "장부관리",
         }}
       />
       <Tabs.Screen
         name="cash"
         options={{
-          title: "현금",
+          title: "시재관리",
         }}
       />
     </Tabs>
