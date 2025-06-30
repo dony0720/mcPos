@@ -25,7 +25,7 @@ export default function PaymentMenuItem({
 
   return (
     // 결제 메뉴 아이템 섹션 - 개별 메뉴 정보 표시 및 관리
-    <View className='w-full h-[120px] box-border p-4 border border-gray-300 rounded-lg flex flex-row items-center justify-between gap-7 '>
+    <View className='w-full h-[120px] box-border px-5 py-4 border border-gray-300 rounded-lg flex flex-row items-center justify-between gap-6 '>
       {/* 체크박스 - 개별 아이템 선택 */}
       <Pressable onPress={onCheckboxPress}>
         <View

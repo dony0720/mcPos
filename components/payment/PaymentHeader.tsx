@@ -14,7 +14,7 @@ export default function PaymentHeader({ onBackPress }: PaymentHeaderProps) {
 
   return (
     // 상단 헤더 섹션 - 뒤로가기 버튼과 로고
-    <View className='w-full h-[80px] px-[5%] box-border mt-[25px] flex flex-row justify-between items-center'>
+    <View className='w-full h-[80px] px-6 box-border mt-[25px] flex flex-row justify-between items-center'>
       {/* 뒤로가기 버튼과 로고 */}
       <View className='flex-row items-center gap-4'>
         {/* 뒤로가기 버튼 */}

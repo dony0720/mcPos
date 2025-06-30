@@ -35,7 +35,7 @@ export default function OrderMethodSelector({
           <Pressable
             key={method.id}
             onPress={() => onOrderMethodPress(method.id)}
-            className={`flex-1 h-[100px] rounded-lg border flex items-center justify-center gap-2 ${
+            className={`flex-1 h-24 rounded-lg border flex items-center justify-center gap-2 ${
               selectedOrderMethod === method.id
                 ? 'border-black bg-gray-100'
                 : 'border-gray-300 bg-white'
@@ -43,7 +43,7 @@ export default function OrderMethodSelector({
           >
             <Ionicons
               name={method.icon as any}
-              size={32}
+              size={24}
               color={selectedOrderMethod === method.id ? '#000000' : '#6B7280'}
             />
             <Text

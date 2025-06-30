@@ -31,7 +31,7 @@ export default function PaymentMethodSelector({
           <Pressable
             key={method.id}
             onPress={() => onPaymentMethodPress(method.id)}
-            className={`flex-1 h-[100px] rounded-lg border flex items-center justify-center gap-2 ${
+            className={`flex-1 h-24 rounded-lg border flex items-center justify-center gap-2 ${
               selectedPaymentMethod === method.id
                 ? 'border-black bg-gray-100'
                 : 'border-gray-300 bg-white'
@@ -39,7 +39,7 @@ export default function PaymentMethodSelector({
           >
             <Ionicons
               name={method.icon as any}
-              size={32}
+              size={24}
               color={
                 selectedPaymentMethod === method.id ? '#000000' : '#6B7280'
               }
