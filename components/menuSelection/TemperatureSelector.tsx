@@ -30,7 +30,7 @@ export default function TemperatureSelector({
           <TouchableOpacity
             key={temp}
             onPress={() => setSelectedTemperature(temp)}
-            className={`h-[70px] flex items-center justify-center rounded-lg border flex-[0_0_45%] ${
+            className={`h-[70px] w-[48%] flex items-center justify-center rounded-lg border ${
               selectedTemperature === temp
                 ? 'bg-[#475569] border-[#475569]'
                 : 'bg-white border-gray-300'

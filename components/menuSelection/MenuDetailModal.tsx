@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-
-import ActionButtons from './ActionButtons';
+import { View, Text, Modal, ScrollView, TouchableOpacity } from 'react-native';
 import MenuInfoCard from './MenuInfoCard';
-import OptionsSelector from './OptionsSelector';
 import TemperatureSelector from './TemperatureSelector';
+import OptionsSelector from './OptionsSelector';
+import ActionButtons from './ActionButtons';
 
 /**
  * 메뉴 상세 모달 컴포넌트
  * - 선택된 메뉴의 상세 정보와 옵션 선택 기능을 제공하는 모달
  */
 
-// Props 인터페이스
 interface MenuDetailModalProps {
   visible: boolean;
   onClose: () => void;
@@ -68,7 +66,7 @@ export default function MenuDetailModal({
           </View>
 
           {/* 모달 콘텐츠 */}
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
             {/* 메뉴 정보 카드 - 이미지, 이름, 가격, 수량 선택 */}
             <MenuInfoCard
               menuItem={menuItem}
@@ -76,6 +74,7 @@ export default function MenuDetailModal({
               setQuantity={setQuantity}
             />
 
+            {/* 온도 선택 섹션 */}
             {/* 온도 선택 섹션 */}
             <TemperatureSelector
               selectedTemperature={selectedTemperature}
