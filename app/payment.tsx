@@ -1,26 +1,24 @@
 // payment.tsx - SOLID 원칙이 적용된 결제 페이지
 
 import React from 'react';
-import { View, ScrollView, Text, Pressable, Animated } from 'react-native';
+import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 
-// 컴포넌트 임포트 (ISP: 각 컴포넌트는 필요한 props만 받음)
-import PaymentMenuItem from '../components/payment/PaymentMenuItem';
-import PaymentHeader from '../components/payment/PaymentHeader';
-import SelectAllCheckbox from '../components/payment/SelectAllCheckbox';
-import PaymentMethodSelector from '../components/payment/PaymentMethodSelector';
-import OrderMethodSelector from '../components/payment/OrderMethodSelector';
 import DiscountSection from '../components/payment/DiscountSection';
 import NumberInputModal from '../components/payment/NumberInputModal';
-
+import OrderMethodSelector from '../components/payment/OrderMethodSelector';
+import PaymentHeader from '../components/payment/PaymentHeader';
+// 컴포넌트 임포트 (ISP: 각 컴포넌트는 필요한 props만 받음)
+import PaymentMenuItem from '../components/payment/PaymentMenuItem';
+import PaymentMethodSelector from '../components/payment/PaymentMethodSelector';
+import SelectAllCheckbox from '../components/payment/SelectAllCheckbox';
 // 훅 임포트 (SRP: 각 훅은 하나의 책임만 가짐)
 import { useButtonAnimation } from '../hooks/useButtonAnimation';
-import { usePaymentState } from '../hooks/usePaymentState';
 import { usePaymentLogic } from '../hooks/usePaymentLogic';
-
+import { usePaymentState } from '../hooks/usePaymentState';
 // 서비스 임포트 (DIP: 추상화에 의존)
 import {
-  DefaultOrderService,
   DefaultDiscountService,
+  DefaultOrderService,
 } from '../services/PaymentService';
 
 /**

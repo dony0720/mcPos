@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, ScrollView, TouchableOpacity } from 'react-native';
-import MenuInfoCard from './MenuInfoCard';
-import TemperatureSelector from './TemperatureSelector';
-import OptionsSelector from './OptionsSelector';
+import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+
 import ActionButtons from './ActionButtons';
+import MenuInfoCard from './MenuInfoCard';
+import OptionsSelector from './OptionsSelector';
+import TemperatureSelector from './TemperatureSelector';
 
 /**
  * 메뉴 상세 모달 컴포넌트
