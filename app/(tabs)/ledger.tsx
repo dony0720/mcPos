@@ -103,6 +103,10 @@ export default function LedgerManagement() {
     setSelectedCustomer(null);
   };
 
+  const handleDeleteTransaction = (transactionId: string) => {
+    console.log('거래 내역 삭제:', transactionId);
+  };
+
   return (
     <View className='h-full w-full bg-white flex flex-col box-border px-[5%]'>
       <PageHeader />
