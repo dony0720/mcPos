@@ -7,7 +7,6 @@ interface ActionButtonsProps {
   item: LedgerData;
   onCharge: (item: LedgerData) => void;
   onHistory: (item: LedgerData) => void;
-  onEdit: (item: LedgerData) => void;
   onDelete: (item: LedgerData) => void;
 }
 
@@ -15,11 +14,10 @@ export default function ActionButtons({
   item,
   onCharge,
   onHistory,
-  onEdit,
   onDelete,
 }: ActionButtonsProps) {
   return (
-    <View className="w-[50%] py-3 flex flex-row items-center justify-between gap-2">
+    <View className="w-[40%] py-3 flex flex-row items-center justify-between gap-2">
       {/* 충전 버튼 */}
       <Pressable
         onPress={() => onCharge(item)}
@@ -36,15 +34,6 @@ export default function ActionButtons({
       >
         <Ionicons name="receipt" size={14} color="white" />
         <Text className="text-white font-semibold text-base">내역</Text>
-      </Pressable>
-
-      {/* 수정 버튼 */}
-      <Pressable
-        onPress={() => onEdit(item)}
-        className="flex-1 h-12 max-h-12 flex-row items-center justify-center gap-1 bg-orange-500 rounded-lg"
-      >
-        <Ionicons name="pencil" size={14} color="white" />
-        <Text className="text-white font-semibold text-base">수정</Text>
       </Pressable>
 
       {/* 삭제 버튼 */}

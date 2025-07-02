@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 interface HistoryModalProps {
   visible: boolean;
   onClose: () => void;
+  onDeleteTransaction: (transactionId: string) => void;
   customerInfo: {
     name: string;
     memberNumber: string;
@@ -15,6 +16,7 @@ interface HistoryModalProps {
 export default function HistoryModal({
   visible,
   onClose,
+  onDeleteTransaction,
   customerInfo,
 }: HistoryModalProps) {
   // 임의의 거래 내역 데이터 (고객별로 다른 데이터)
@@ -265,7 +267,7 @@ export default function HistoryModal({
                       key={transaction.id}
                       className="mb-4 p-4 border border-gray-200 rounded-lg bg-white shadow-sm"
                     >
-                      {/* 거래 헤더 */}
+                      {/* 거래 헤더 - 거래 타입과 X 버튼 */}
                       <View className="flex-row items-center justify-between mb-3">
                         <View className="flex-row items-center">
                           <Ionicons
@@ -277,14 +279,23 @@ export default function HistoryModal({
                             {transaction.type}
                           </Text>
                         </View>
-                        <Text className="text-sm text-gray-500">
-                          {transaction.date}
-                        </Text>
+                        <Pressable
+                          onPress={() => onDeleteTransaction(transaction.id)}
+                          className="w-6 h-6 bg-gray-200 rounded-full items-center justify-center"
+                        >
+                          <Ionicons name="close" size={14} color="#666" />
+                        </Pressable>
                       </View>
 
                       {/* 거래 정보 */}
-                      <View className="flex flex-col gap-2">
-                        <View className="flex-row justify-between">
+                      <View className="flex flex-col gap-4">
+                        <View className="flex-row gap-2">
+                          <Text className="text-gray-600">날짜:</Text>
+                          <Text className="text-gray-800">
+                            {transaction.date}
+                          </Text>
+                        </View>
+                        <View className="flex-row gap-4">
                           <Text className="text-gray-600">금액:</Text>
                           <Text
                             className={`font-semibold ${
@@ -299,13 +310,13 @@ export default function HistoryModal({
                             {transaction.amount}
                           </Text>
                         </View>
-                        <View className="flex-row justify-between">
+                        <View className="flex-row gap-4">
                           <Text className="text-gray-600">접수자:</Text>
                           <Text className="text-gray-800">
                             {transaction.receptionist}
                           </Text>
                         </View>
-                        <View className="flex-row justify-between">
+                        <View className="flex-row gap-4">
                           <Text className="text-gray-600">결제수단:</Text>
                           <Text className="text-gray-800">
                             {transaction.paymentMethod}
