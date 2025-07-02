@@ -128,10 +128,10 @@ export default function NumberInputModal({
               (index + 1).toString()
             ).map(renderNumberButton)}
 
-            {/* 하단 액션 버튼들: 클리어, 0, 삭제 */}
-            {renderActionButton('클리어', handleClear)}
+            {/* 하단 액션 버튼들: 초기화, 0, 삭제 */}
+            {renderActionButton('초기화', handleClear)}
             {renderNumberButton('0')}
-            {renderActionButton('삭제', handleBackspace, true)}
+            {renderActionButton('지우기', handleBackspace, true)}
           </View>
 
           {/* 하단 확인/취소 버튼 섹션 */}

@@ -21,6 +21,7 @@ export default function Payment() {
     useState<string>('store');
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<'phone' | 'pickup'>('pickup');
+  const [isLedgerFirstStep, setIsLedgerFirstStep] = useState(false);
 
   const paymentButtonAnimation = useButtonAnimation();
 
@@ -44,16 +45,27 @@ export default function Payment() {
   const handlePaymentPress = () => {
     if (selectedPaymentMethod === 'ledger') {
       setModalType('phone');
+      setIsLedgerFirstStep(true);
       setShowModal(true);
     } else {
       setModalType('pickup');
+      setIsLedgerFirstStep(false);
       setShowModal(true);
     }
   };
 
   const handleModalConfirm = (number: string) => {
-    console.log('입력된 번호:', number);
-    setShowModal(false);
+    if (isLedgerFirstStep) {
+      // 장부 번호 입력 완료 → 픽업 번호 입력으로 이동
+      console.log('장부 번호:', number);
+      setIsLedgerFirstStep(false);
+      setModalType('pickup');
+      // 첫 번째 단계 완료 후 모달 상태 유지하여 바로 픽업 번호 입력으로 이동
+    } else {
+      // 픽업 번호 입력 완료 또는 일반 결제 완료
+      console.log('픽업 번호:', number);
+      setShowModal(false);
+    }
   };
 
   // 목업 데이터
@@ -166,7 +178,11 @@ export default function Payment() {
         {/* 단일 모달 - props 간소화 */}
         <NumberInputModal
           visible={showModal}
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            if (!isLedgerFirstStep) {
+              setShowModal(false);
+            }
+          }}
           onConfirm={handleModalConfirm}
           type={modalType}
         />
