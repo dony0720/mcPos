@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import LedgerRegistrationModal from '../../components/LedgerRegistrationModal';
 import ChargeModal from '../../components/ChargeModal';
-import EditModal from '../../components/EditModal';
 import HistoryModal from '../../components/HistoryModal';
 import PageHeader from '../../components/ledger/PageHeader';
 import LedgerHeader from '../../components/ledger/LedgerHeader';
@@ -12,14 +11,13 @@ import { LedgerData } from '../../components/ledger/types';
 export default function LedgerManagement() {
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showChargeModal, setShowChargeModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<LedgerData | null>(
     null
   );
 
-  // 샘플 장부 데이터
-  const [ledgerData, setLedgerData] = useState<LedgerData[]>([
+  // 샘플 장부 데이터 (퍼블리싱용 정적 데이터)
+  const ledgerData: LedgerData[] = [
     {
       id: 1,
       memberNumber: 'M001',
@@ -65,92 +63,17 @@ export default function LedgerManagement() {
       chargeAmount: '75,000원',
       paymentMethod: '현금',
     },
-  ]);
+  ];
 
-  // 모달 핸들러 함수들
+  // 단순화된 핸들러 함수들 (퍼블리싱용)
   const handleRegistrationConfirm = (data: any) => {
-    // 새로운 회원번호 생성
-    const newMemberNumber = `M${String(ledgerData.length + 1).padStart(3, '0')}`;
-
-    // 새로운 장부 데이터 생성
-    const newLedgerData: LedgerData = {
-      id: ledgerData.length + 1,
-      memberNumber: newMemberNumber,
-      name: data.name,
-      phoneNumber: data.phoneNumber,
-      receptionist: data.receptionist,
-      chargeAmount: `${data.initialAmount}원`,
-      paymentMethod: data.paymentMethod,
-    };
-
-    // 장부 데이터에 추가
-    setLedgerData(prev => [...prev, newLedgerData]);
+    console.log('장부 등록:', data);
     setShowRegistrationModal(false);
-
-    console.log('새 장부 등록:', newLedgerData);
   };
 
-  // 충전 모달 핸들러
   const handleChargeConfirm = (chargeData: any) => {
-    if (selectedCustomer) {
-      // 기존 충전 금액에서 숫자만 추출
-      const currentAmount = parseInt(
-        selectedCustomer.chargeAmount.replace(/[^\d]/g, '')
-      );
-      // 새로운 충전 금액 추출
-      const newChargeAmount = parseInt(
-        chargeData.chargeAmount.replace(/[^\d]/g, '')
-      );
-      // 총 금액 계산
-      const totalAmount = currentAmount + newChargeAmount;
-
-      // 장부 데이터 업데이트
-      setLedgerData(prev =>
-        prev.map(item =>
-          item.id === selectedCustomer.id
-            ? { ...item, chargeAmount: `${totalAmount.toLocaleString()}원` }
-            : item
-        )
-      );
-
-      console.log('충전 완료:', {
-        customer: selectedCustomer.name,
-        chargeAmount: chargeData.chargeAmount,
-        receptionist: chargeData.receptionist,
-        paymentMethod: chargeData.paymentMethod,
-        totalAmount: `${totalAmount.toLocaleString()}원`,
-      });
-    }
-
+    console.log('충전:', chargeData);
     setShowChargeModal(false);
-    setSelectedCustomer(null);
-  };
-
-  // 수정 모달 핸들러
-  const handleEditConfirm = (editData: any) => {
-    if (selectedCustomer) {
-      // 새로운 금액으로 업데이트
-      const newAmount = parseInt(editData.newAmount.replace(/[^\d]/g, ''));
-
-      // 장부 데이터 업데이트
-      setLedgerData(prev =>
-        prev.map(item =>
-          item.id === selectedCustomer.id
-            ? { ...item, chargeAmount: `${newAmount.toLocaleString()}원` }
-            : item
-        )
-      );
-
-      console.log('수정 완료:', {
-        customer: selectedCustomer.name,
-        newAmount: editData.newAmount,
-        receptionist: editData.receptionist,
-        paymentMethod: editData.paymentMethod,
-        totalAmount: `${newAmount.toLocaleString()}원`,
-      });
-    }
-
-    setShowEditModal(false);
     setSelectedCustomer(null);
   };
 
@@ -165,13 +88,12 @@ export default function LedgerManagement() {
     setShowHistoryModal(true);
   };
 
-  const handleEdit = (item: LedgerData) => {
-    setSelectedCustomer(item);
-    setShowEditModal(true);
+  const handleDelete = (item: LedgerData) => {
+    console.log('삭제:', item);
   };
 
-  const handleDelete = (item: any) => {
-    console.log('삭제:', item);
+  const handleDeleteTransaction = (transactionId: string) => {
+    console.log('거래 내역 삭제:', transactionId);
   };
 
   return (
@@ -186,7 +108,6 @@ export default function LedgerManagement() {
         ledgerData={ledgerData}
         onCharge={handleCharge}
         onHistory={handleHistory}
-        onEdit={handleEdit}
         onDelete={handleDelete}
       />
 
@@ -198,7 +119,7 @@ export default function LedgerManagement() {
       />
 
       {/* 장부 충전 모달 */}
-      {selectedCustomer && showChargeModal && (
+      {selectedCustomer && (
         <ChargeModal
           visible={showChargeModal}
           onClose={() => {
@@ -214,32 +135,15 @@ export default function LedgerManagement() {
         />
       )}
 
-      {/* 장부 수정 모달 */}
-      {selectedCustomer && showEditModal && (
-        <EditModal
-          visible={showEditModal}
-          onClose={() => {
-            setShowEditModal(false);
-            setSelectedCustomer(null);
-          }}
-          onConfirm={handleEditConfirm}
-          customerInfo={{
-            name: selectedCustomer.name,
-            memberNumber: selectedCustomer.memberNumber,
-            phoneNumber: selectedCustomer.phoneNumber,
-            currentAmount: selectedCustomer.chargeAmount,
-          }}
-        />
-      )}
-
       {/* 거래 내역 모달 */}
-      {selectedCustomer && showHistoryModal && (
+      {selectedCustomer && (
         <HistoryModal
           visible={showHistoryModal}
           onClose={() => {
             setShowHistoryModal(false);
             setSelectedCustomer(null);
           }}
+          onDeleteTransaction={handleDeleteTransaction}
           customerInfo={{
             name: selectedCustomer.name,
             memberNumber: selectedCustomer.memberNumber,

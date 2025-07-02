@@ -8,7 +8,6 @@ interface LedgerTableProps {
   ledgerData: LedgerData[];
   onCharge: (item: LedgerData) => void;
   onHistory: (item: LedgerData) => void;
-  onEdit: (item: LedgerData) => void;
   onDelete: (item: LedgerData) => void;
 }
 
@@ -16,7 +15,6 @@ export default function LedgerTable({
   ledgerData,
   onCharge,
   onHistory,
-  onEdit,
   onDelete,
 }: LedgerTableProps) {
   return (
@@ -36,7 +34,6 @@ export default function LedgerTable({
             item={item}
             onCharge={onCharge}
             onHistory={onHistory}
-            onEdit={onEdit}
             onDelete={onDelete}
           />
         ))}
