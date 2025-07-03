@@ -26,11 +26,11 @@ export default function Payment() {
   const paymentButtonAnimation = useButtonAnimation();
 
   // 간단한 핸들러들
-  const handleBackPress = () => {
+  const handleBack = () => {
     console.log('뒤로가기');
   };
 
-  const handleDeletePress = () => {
+  const handleDelete = () => {
     console.log('삭제');
   };
 
@@ -107,7 +107,7 @@ export default function Payment() {
   return (
     <View className='h-full w-full box-border bg-white flex flex-col'>
       {/* 상단 헤더 섹션 */}
-      <PaymentHeader onBackPress={handleBackPress} />
+      <PaymentHeader onBack={handleBack} />
 
       {/* 전체 선택 체크박스 섹션 */}
       <SelectAllCheckbox
@@ -130,7 +130,7 @@ export default function Payment() {
             menuName={item.name}
             options={item.options.join(', ')}
             price={`${item.price.toLocaleString()}원`}
-            onDeletePress={handleDeletePress}
+            onDeletePress={handleDelete}
           />
         ))}
       </ScrollView>
