@@ -10,7 +10,7 @@ import PaymentHeader from '../components/payment/PaymentHeader';
 import PaymentMenuItem from '../components/payment/PaymentMenuItem';
 import PaymentMethodSelector from '../components/payment/PaymentMethodSelector';
 import SelectAllCheckbox from '../components/payment/SelectAllCheckbox';
-import { useButtonAnimation } from '../hooks/useButtonAnimation';
+import { useButtonAnimation } from '../hooks';
 
 export default function Payment() {
   // 간단한 상태 관리

@@ -3,7 +3,7 @@ import React from 'react';
 import { Animated, Pressable, View } from 'react-native';
 
 import McPosLogo from '../../assets/icon/mcPosLogo.svg';
-import { useButtonAnimation } from '../../hooks/useButtonAnimation';
+import { useButtonAnimation } from '../../hooks';
 
 interface PaymentHeaderProps {
   onBackPress: () => void;

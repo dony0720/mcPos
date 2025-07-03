@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { Animated, Image, Pressable, Text, View } from 'react-native';
 
-import { useButtonAnimation } from '../../hooks/useButtonAnimation';
+import { useButtonAnimation } from '../../hooks';
 
 interface PaymentMenuItemProps {
   isChecked: boolean;
