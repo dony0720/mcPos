@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -35,11 +36,13 @@ export default function OrderMethodSelector({
           <Pressable
             key={method.id}
             onPress={() => onOrderMethodPress(method.id)}
-            className={`flex-1 h-24 rounded-lg border flex items-center justify-center gap-2 ${
-              selectedOrderMethod === method.id
-                ? 'border-black bg-gray-100'
-                : 'border-gray-300 bg-white'
-            }`}
+            className={clsx(
+              'flex-1 h-24 rounded-lg border flex items-center justify-center gap-2',
+              {
+                'border-black bg-gray-100': selectedOrderMethod === method.id,
+                'border-gray-300 bg-white': selectedOrderMethod !== method.id,
+              }
+            )}
           >
             <Ionicons
               name={method.icon as any}
@@ -47,11 +50,10 @@ export default function OrderMethodSelector({
               color={selectedOrderMethod === method.id ? '#000000' : '#6B7280'}
             />
             <Text
-              className={`text-lg font-medium ${
-                selectedOrderMethod === method.id
-                  ? 'text-black'
-                  : 'text-gray-500'
-              }`}
+              className={clsx('text-lg font-medium', {
+                'text-black': selectedOrderMethod === method.id,
+                'text-gray-500': selectedOrderMethod !== method.id,
+              })}
             >
               {method.name}
             </Text>

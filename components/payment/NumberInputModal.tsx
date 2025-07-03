@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 
@@ -57,7 +58,7 @@ export default function NumberInputModal({
     onClose();
   };
 
-  const renderNumberButton = (number: string) => {
+  const NumberButton = (number: string) => {
     return (
       <Pressable
         key={number}
@@ -71,7 +72,7 @@ export default function NumberInputModal({
     );
   };
 
-  const renderActionButton = (
+  const ActionButton = (
     text: string,
     onPress: () => void,
     isDelete = false
@@ -79,17 +80,24 @@ export default function NumberInputModal({
     return (
       <Pressable onPress={onPress} className='w-[28%] aspect-square'>
         <View
-          className={`w-full h-full rounded-lg border-2 flex items-center justify-center ${
-            isDelete
-              ? 'bg-red-500 border-red-500'
-              : 'bg-gray-500 border-gray-500'
-          }`}
+          className={clsx(
+            'w-full h-full rounded-lg border-2 flex items-center justify-center',
+            {
+              'bg-red-500 border-red-500': isDelete,
+              'bg-gray-500 border-gray-500': !isDelete,
+            }
+          )}
         >
           <Text className='text-white text-3xl font-bold'>{text}</Text>
         </View>
       </Pressable>
     );
   };
+
+  // 입력 유효성 검사
+  const isInputValid = fixedLength
+    ? inputNumber.length === maxLength
+    : inputNumber.length > 0;
 
   return (
     <Modal
@@ -126,12 +134,12 @@ export default function NumberInputModal({
             {/* 숫자 1-9 버튼 렌더링 */}
             {Array.from({ length: 9 }, (_, index) =>
               (index + 1).toString()
-            ).map(renderNumberButton)}
+            ).map(NumberButton)}
 
             {/* 하단 액션 버튼들: 초기화, 0, 삭제 */}
-            {renderActionButton('초기화', handleClear)}
-            {renderNumberButton('0')}
-            {renderActionButton('지우기', handleBackspace, true)}
+            {ActionButton('초기화', handleClear)}
+            {NumberButton('0')}
+            {ActionButton('지우기', handleBackspace, true)}
           </View>
 
           {/* 하단 확인/취소 버튼 섹션 */}
@@ -147,31 +155,22 @@ export default function NumberInputModal({
             <Pressable
               onPress={handleConfirm}
               className='flex-1'
-              disabled={
-                fixedLength ? inputNumber.length !== maxLength : !inputNumber
-              }
+              disabled={!isInputValid}
             >
               <View
-                className={`rounded-lg py-3 flex items-center justify-center ${
-                  (
-                    fixedLength
-                      ? inputNumber.length === maxLength
-                      : inputNumber.length > 0
-                  )
-                    ? 'bg-primaryGreen'
-                    : 'bg-gray-300'
-                }`}
+                className={clsx(
+                  'rounded-lg py-3 flex items-center justify-center',
+                  {
+                    'bg-primaryGreen': isInputValid,
+                    'bg-gray-300': !isInputValid,
+                  }
+                )}
               >
                 <Text
-                  className={`text-lg font-bold ${
-                    (
-                      fixedLength
-                        ? inputNumber.length === maxLength
-                        : inputNumber.length > 0
-                    )
-                      ? 'text-white'
-                      : 'text-gray-500'
-                  }`}
+                  className={clsx('text-lg font-bold', {
+                    'text-white': isInputValid,
+                    'text-gray-500': !isInputValid,
+                  })}
                 >
                   확인
                 </Text>

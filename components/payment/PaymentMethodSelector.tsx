@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -31,11 +32,13 @@ export default function PaymentMethodSelector({
           <Pressable
             key={method.id}
             onPress={() => onPaymentMethodPress(method.id)}
-            className={`flex-1 h-24 rounded-lg border flex items-center justify-center gap-2 ${
-              selectedPaymentMethod === method.id
-                ? 'border-black bg-gray-100'
-                : 'border-gray-300 bg-white'
-            }`}
+            className={clsx(
+              'flex-1 h-24 rounded-lg border flex items-center justify-center gap-2',
+              {
+                'border-black bg-gray-100': selectedPaymentMethod === method.id,
+                'border-gray-300 bg-white': selectedPaymentMethod !== method.id,
+              }
+            )}
           >
             <Ionicons
               name={method.icon as any}
@@ -45,11 +48,10 @@ export default function PaymentMethodSelector({
               }
             />
             <Text
-              className={`text-lg font-medium ${
-                selectedPaymentMethod === method.id
-                  ? 'text-black'
-                  : 'text-gray-500'
-              }`}
+              className={clsx('text-lg font-medium', {
+                'text-black': selectedPaymentMethod === method.id,
+                'text-gray-500': selectedPaymentMethod !== method.id,
+              })}
             >
               {method.name}
             </Text>

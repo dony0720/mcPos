@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import clsx from 'clsx';
 import React from 'react';
 import { Animated, Image, Pressable, Text, View } from 'react-native';
 
@@ -29,9 +30,10 @@ export default function PaymentMenuItem({
       {/* 체크박스 - 개별 아이템 선택 */}
       <Pressable onPress={onCheckboxPress}>
         <View
-          className={`w-6 h-6 rounded flex items-center justify-center ${
-            isChecked ? 'bg-black' : 'bg-white border-2 border-gray-400'
-          }`}
+          className={clsx('w-6 h-6 rounded flex items-center justify-center', {
+            'bg-black': isChecked,
+            'bg-white border-2 border-gray-400': !isChecked,
+          })}
         >
           {isChecked && <Ionicons name='checkmark' size={16} color='white' />}
         </View>
