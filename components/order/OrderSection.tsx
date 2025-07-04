@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 
-import { useButtonAnimation } from '../../hooks/useButtonAnimation';
+import { useButtonAnimation } from '../../hooks';
 import OrderItem from './OrderItem';
 
 export default function OrderSection() {

@@ -40,7 +40,9 @@ export default function OptionsSelector({
                   setSelectedOptions([...selectedOptions, option]);
                 }
               }}
-              className={`h-[70px] flex items-center justify-center rounded-lg border flex-[0_0_45%] ${
+              className={`h-[70px] w-[48%] flex items-center justify-center rounded-lg border ${
+                index < 2 ? 'mb-3' : ''
+              } ${
                 isSelected
                   ? 'bg-[#475569] border-[#475569]'
                   : 'bg-white border-gray-300'
