@@ -6,10 +6,10 @@ import McPosLogo from '../../assets/icon/mcPosLogo.svg';
 import { useButtonAnimation } from '../../hooks';
 
 interface PaymentHeaderProps {
-  onBackPress: () => void;
+  onBack: () => void;
 }
 
-export default function PaymentHeader({ onBackPress }: PaymentHeaderProps) {
+export default function PaymentHeader({ onBack }: PaymentHeaderProps) {
   const backAnimation = useButtonAnimation();
 
   return (
@@ -21,7 +21,7 @@ export default function PaymentHeader({ onBackPress }: PaymentHeaderProps) {
         <Pressable
           onPressIn={backAnimation.onPressIn}
           onPressOut={backAnimation.onPressOut}
-          onPress={onBackPress}
+          onPress={onBack}
         >
           <Animated.View
             className='w-[50px] h-[50px] bg-gray-100 rounded-lg flex items-center justify-center'
