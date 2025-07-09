@@ -1,8 +1,9 @@
-import React from "react";
-import { View, Text, ScrollView } from "react-native";
-import LedgerTableHeader from "./LedgerTableHeader";
-import LedgerTableRow from "./LedgerTableRow";
-import { LedgerData } from "./types";
+import React from 'react';
+import { ScrollView, Text, View } from 'react-native';
+
+import LedgerTableHeader from './LedgerTableHeader';
+import LedgerTableRow from './LedgerTableRow';
+import { LedgerData } from './types';
 
 interface LedgerTableProps {
   ledgerData: LedgerData[];
@@ -18,17 +19,17 @@ export default function LedgerTable({
   onDelete,
 }: LedgerTableProps) {
   return (
-    <View className="w-full h-[70%] mt-[20px] rounded-xl border border-gray-300 box-border p-6">
-      <Text className="text-2xl font-medium mb-4">고객 장부 목록</Text>
+    <View className='w-full h-[70%] mt-[20px] rounded-xl border border-gray-300 box-border p-6'>
+      <Text className='text-2xl font-medium mb-4'>고객 장부 목록</Text>
 
       <LedgerTableHeader />
 
       {/* 테이블 구분선 */}
-      <View className="w-full h-[1px] bg-gray-200" />
+      <View className='w-full h-[1px] bg-gray-200' />
 
       {/* 테이블 데이터 목록 */}
-      <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
-        {ledgerData.map((item) => (
+      <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
+        {ledgerData.map(item => (
           <LedgerTableRow
             key={item.id}
             item={item}
