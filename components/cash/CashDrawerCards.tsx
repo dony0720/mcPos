@@ -3,62 +3,23 @@ import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import CashDrawerCard from "./CashDrawerCard";
 
-export default function CashDrawerCards() {
-  // 권종별 현금 서랍 현황 데이터
-  const cashDrawerData = [
-    // 첫 번째 행
-    [
-      {
-        type: "지폐",
-        title: "5만원",
-        theme: "yellow" as const,
-        quantity: "8장",
-        totalAmount: "400,000원",
-      },
-      {
-        type: "지폐",
-        title: "1만원",
-        theme: "green" as const,
-        quantity: "15장",
-        totalAmount: "150,000원",
-      },
-    ],
-    // 두 번째 행
-    [
-      {
-        type: "지폐",
-        title: "5천원",
-        theme: "orange" as const,
-        quantity: "12장",
-        totalAmount: "60,000원",
-      },
-      {
-        type: "지폐",
-        title: "1천원",
-        theme: "blue" as const,
-        quantity: "25장",
-        totalAmount: "25,000원",
-      },
-    ],
-    // 세 번째 행
-    [
-      {
-        type: "동전",
-        title: "500원",
-        theme: "gray" as const,
-        quantity: "30개",
-        totalAmount: "15,000원",
-      },
-      {
-        type: "동전",
-        title: "100원",
-        theme: "gray" as const,
-        quantity: "50개",
-        totalAmount: "5,000원",
-      },
-    ],
-  ];
+// 현금 서랍 아이템 타입 정의
+interface CashDrawerItem {
+  type: string;
+  title: string;
+  theme: "yellow" | "green" | "orange" | "blue" | "gray";
+  quantity: number;
+  unitValue: number;
+}
 
+// 컴포넌트 props 타입 정의
+interface CashDrawerCardsProps {
+  cashDrawerData: CashDrawerItem[][];
+}
+
+export default function CashDrawerCards({
+  cashDrawerData,
+}: CashDrawerCardsProps) {
   const handleCashDeposit = () => {
     console.log("현금 입금");
   };
@@ -85,8 +46,8 @@ export default function CashDrawerCards() {
                     type={card.type}
                     title={card.title}
                     theme={card.theme}
-                    quantity={card.quantity}
-                    totalAmount={card.totalAmount}
+                    quantity={`${card.quantity}${card.type === "지폐" ? "장" : "개"}`}
+                    totalAmount={`${(card.quantity * card.unitValue).toLocaleString()}원`}
                   />
                 ))}
               </View>
