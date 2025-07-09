@@ -1,0 +1,493 @@
+# Cursor Rules for MCPOS (React Native + TypeScript + NativeWind + Expo Router)
+
+## Project Context
+
+This is a React Native POS (Point of Sale) application built with:
+
+- React Native 0.79.3
+- TypeScript 5.8.3
+- Expo Router 5.1.0
+- NativeWind 4.1.23 (Tailwind CSS for React Native)
+- Expo Vector Icons
+- Lottie animations
+
+## SOLID Principles for React Native
+
+### S - Single Responsibility Principle (단일 책임 원칙)
+
+- **Components**: Each component should have one reason to change
+  - ❌ Bad: `MenuItemWithCartAndModal` (handles display, cart logic, modal)
+  - ✅ Good: `MenuItem`, `CartService`, `MenuModal` (separate concerns)
+- **Hooks**: Custom hooks should handle one specific piece of logic
+  - ✅ `useButtonAnimation`, `useCartManager`, `useMenuSelection`
+- **Functions**: Each function should do one thing well
+  - ❌ `handleSubmitAndValidateAndNavigate`
+  - ✅ `validateForm`, `submitData`, `navigateToNext`
+
+### O - Open/Closed Principle (개방/폐쇄 원칙)
+
+- **Component Extension**: Use composition over inheritance
+
+```tsx
+// ✅ Good: Extensible button component
+interface BaseButtonProps {
+  onPress: () => void;
+  children: React.ReactNode;
+  variant?: "primary" | "secondary" | "danger";
+}
+
+// Can be extended without modifying original
+const IconButton = ({ icon, ...props }: BaseButtonProps & { icon: string }) => (
+  <BaseButton {...props}>
+    <Ionicons name={icon} />
+    {props.children}
+  </BaseButton>
+);
+```
+
+- **Props Interface**: Design for extension
+
+```tsx
+// ✅ Good: Extensible interfaces
+interface MenuItemProps extends Omit<TouchableOpacityProps, "onPress"> {
+  item: MenuItemType;
+  onSelect: (item: MenuItemType) => void;
+  // Allows custom styling and behavior
+}
+```
+
+### L - Liskov Substitution Principle (리스코프 치환 원칙)
+
+- **Component Substitution**: Child components should be replaceable
+
+```tsx
+// ✅ Good: All button variants follow same interface
+interface ButtonProps {
+  onPress: () => void;
+  title: string;
+  disabled?: boolean;
+}
+
+// Any of these can substitute the base Button
+const PrimaryButton: React.FC<ButtonProps> = (props) => {
+  /* */
+};
+const SecondaryButton: React.FC<ButtonProps> = (props) => {
+  /* */
+};
+const DangerButton: React.FC<ButtonProps> = (props) => {
+  /* */
+};
+```
+
+- **Service Interfaces**: Implementations should be interchangeable
+
+```tsx
+interface PaymentService {
+  processPayment(amount: number): Promise<PaymentResult>;
+}
+
+class CashPayment implements PaymentService {
+  /* */
+}
+class CardPayment implements PaymentService {
+  /* */
+}
+// Both can be used wherever PaymentService is expected
+```
+
+### I - Interface Segregation Principle (인터페이스 분리 원칙)
+
+- **Props Interfaces**: Don't force components to depend on unused props
+
+```tsx
+// ❌ Bad: Fat interface
+interface MenuItemProps {
+  item: MenuItemType;
+  onSelect: (item: MenuItemType) => void;
+  onEdit: (item: MenuItemType) => void; // Not all consumers need this
+  onDelete: (item: MenuItemType) => void; // Not all consumers need this
+  showAdmin: boolean; // Not all consumers need this
+}
+
+// ✅ Good: Segregated interfaces
+interface BaseMenuItemProps {
+  item: MenuItemType;
+  onSelect: (item: MenuItemType) => void;
+}
+
+interface AdminMenuItemProps extends BaseMenuItemProps {
+  onEdit: (item: MenuItemType) => void;
+  onDelete: (item: MenuItemType) => void;
+}
+```
+
+- **Hook Interfaces**: Specific hooks for specific needs
+
+```tsx
+// ✅ Good: Focused hooks
+const useMenuSelection = () => ({ selectedItems, addItem, removeItem });
+const useMenuAdmin = () => ({ editItem, deleteItem, createItem });
+const useMenuDisplay = () => ({ items, categories, filters });
+```
+
+### D - Dependency Inversion Principle (의존성 역전 원칙)
+
+- **Service Injection**: Depend on abstractions, not concretions
+
+```tsx
+// ✅ Good: Dependency injection
+interface OrderService {
+  submitOrder(order: Order): Promise<void>;
+}
+
+const OrderForm = ({ orderService }: { orderService: OrderService }) => {
+  // Component depends on abstraction, not concrete implementation
+};
+
+// Different implementations
+const ApiOrderService: OrderService = {
+  /* */
+};
+const MockOrderService: OrderService = {
+  /* */
+};
+```
+
+- **Context/Provider Pattern**: Invert control flow
+
+```tsx
+// ✅ Good: Provider pattern for dependency injection
+const PaymentProvider = ({
+  children,
+  paymentService,
+}: {
+  children: React.ReactNode;
+  paymentService: PaymentService;
+}) => (
+  <PaymentContext.Provider value={paymentService}>
+    {children}
+  </PaymentContext.Provider>
+);
+```
+
+## SOLID-Based Architecture Patterns
+
+### Component Hierarchy
+
+```
+App
+├── Providers (Dependency Injection)
+│   ├── PaymentProvider
+│   ├── OrderProvider
+│   └── UserProvider
+├── Screens (Single Responsibility)
+│   ├── MenuScreen
+│   ├── OrderScreen
+│   └── LedgerScreen
+├── Components (Open/Closed)
+│   ├── Base Components (Button, Input, Modal)
+│   ├── Business Components (MenuItem, OrderItem)
+│   └── Layout Components (Header, TabBar)
+└── Services (Interface Segregation)
+    ├── PaymentService
+    ├── OrderService
+    └── LedgerService
+```
+
+### Service Layer Pattern
+
+```tsx
+// ✅ Good: Abstract service interfaces
+interface DataService<T> {
+  getAll(): Promise<T[]>;
+  getById(id: string): Promise<T>;
+  create(item: Omit<T, "id">): Promise<T>;
+  update(id: string, item: Partial<T>): Promise<T>;
+  delete(id: string): Promise<void>;
+}
+
+// Specific implementations
+interface MenuService extends DataService<MenuItem> {
+  getByCategory(category: string): Promise<MenuItem[]>;
+}
+
+interface LedgerService extends DataService<LedgerEntry> {
+  getByMember(memberId: string): Promise<LedgerEntry[]>;
+}
+```
+
+### Custom Hook Pattern (SRP)
+
+```tsx
+// ✅ Good: Single-purpose hooks
+const useAsyncOperation = <T>(operation: () => Promise<T>) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [data, setData] = useState<T | null>(null);
+
+  // Single responsibility: handle async operations
+};
+
+const useFormValidation = (rules: ValidationRules) => {
+  // Single responsibility: form validation
+};
+
+const useLocalStorage = <T>(key: string) => {
+  // Single responsibility: local storage management
+};
+```
+
+## Code Style & Standards
+
+### TypeScript Rules
+
+- Always use TypeScript with strict type checking
+- Define interfaces for all props and complex objects
+- Use descriptive type names (e.g., `MenuItemType`, `LedgerDataType`)
+- Avoid `any` type - use proper typing or `unknown`
+- Use const assertions where appropriate
+
+### React Native Components
+
+- Use functional components with hooks
+- Follow React Native naming conventions (PascalCase for components)
+- Import React Native components from 'react-native' package
+- Always specify key props in lists/maps
+- Use TouchableOpacity/Pressable instead of Button for custom styling
+
+### File Structure & Naming
+
+- Components: PascalCase (e.g., `MenuDetailModal.tsx`)
+- Files: camelCase for utilities, PascalCase for components
+- Directories: camelCase (e.g., `menuSelection`, `components`)
+- Use descriptive file and component names
+
+### Styling Guidelines
+
+- Use NativeWind (Tailwind) classes for styling
+- Format: `className="flex-1 bg-white rounded-lg"`
+- Prefer NativeWind over StyleSheet when possible
+- Use consistent spacing: `px-4`, `py-3`, `gap-2`, `mb-4`
+- Color system: `bg-primaryGreen`, `text-gray-700`, `border-gray-300`
+- Responsive: Use percentage widths `w-[50%]` for flexible layouts
+
+### Component Structure
+
+- Add Korean comments for component descriptions
+- Structure order:
+  1. Imports
+  2. Type definitions/interfaces
+  3. Component function
+  4. Internal functions/handlers
+  5. Return JSX
+
+### Comment Style
+
+- Use Korean comments for component descriptions and complex logic
+- Use `{/* */}` for JSX comments
+- Add section comments: `{/* 헤더 섹션 */}`, `{/* 버튼 그룹 */}`
+
+### Navigation (Expo Router)
+
+- Use `useRouter()` hook for navigation
+- File-based routing: `app/(tabs)/index.tsx`
+- Use `router.push()`, `router.replace()` for navigation
+
+### State Management
+
+- Use useState for local component state
+- Descriptive state variable names
+- Initialize state with proper types
+
+### Event Handlers
+
+- Prefix with `handle`: `handlePress`, `handleSubmit`
+- Use arrow functions for inline handlers
+- Extract complex handlers to separate functions
+
+### Icon Usage
+
+- Use Expo Vector Icons (Ionicons preferred)
+- Consistent icon sizes: 14px (small), 18px (medium), 24px (large)
+- Always specify color prop
+
+### Modal Patterns
+
+- Use React Native Modal component
+- Include backdrop overlay with opacity
+- Proper close handlers and animations
+- Responsive sizing for different screen sizes
+
+### List Rendering
+
+- Always include unique `key` props
+- Use ScrollView for small lists, FlatList for large datasets
+- Hide scroll indicators: `showsVerticalScrollIndicator={false}`
+
+### Button Patterns
+
+- Consistent button heights: `h-[32px]`, `h-[40px]`, `h-[48px]`
+- Use flex layouts: `flex-row items-center gap-2`
+- Color coding: green (positive), blue (info), orange (warning), red (danger)
+
+### Error Handling
+
+- Wrap text in <Text> components (React Native requirement)
+- Handle null/undefined props gracefully
+- Use conditional rendering: `{item && <Component />}`
+
+### Performance
+
+- Use React.memo for expensive components
+- Minimize re-renders with proper dependency arrays
+- Optimize images with appropriate resizeMode
+
+## Specific Project Patterns
+
+### Menu Components
+
+- MenuGrid: 4-column grid layout with pagination
+- MenuItem: Image + text card format
+- MenuDetailModal: Options selection with quantity picker
+
+### Table Components
+
+- Use flex layouts with percentage widths
+- Consistent header/data row structure
+- Action buttons with icons and text
+
+### Forms & Inputs
+
+- Controlled components with state
+- Validation before submission
+- Clear visual feedback for user actions
+
+## Common Code Patterns
+
+### Component Template (Following SOLID)
+
+```tsx
+import React, { useState } from "react";
+import { View, Text, Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
+/**
+ * 컴포넌트 설명
+ * - 주요 기능 설명
+ * - SRP: 단일 책임을 가진 컴포넌트
+ */
+
+// Props 인터페이스 (ISP: 필요한 props만 정의)
+interface ComponentProps {
+  // props 정의
+}
+
+// 의존성 주입을 위한 서비스 인터페이스 (DIP)
+interface ComponentService {
+  performAction(): Promise<void>;
+}
+
+export default function ComponentName({
+  service,
+  ...props
+}: ComponentProps & { service: ComponentService }) {
+  // 상태 관리 (SRP: 상태 관리만 담당)
+  const [state, setState] = useState(initialValue);
+
+  // 이벤트 핸들러 (SRP: 각 핸들러는 하나의 책임)
+  const handleAction = async () => {
+    try {
+      await service.performAction(); // DIP: 추상화에 의존
+    } catch (error) {
+      // 에러 처리
+    }
+  };
+
+  return (
+    <View className="container-styles">
+      {/* 섹션 주석 */}
+      <ComponentContent />
+    </View>
+  );
+}
+```
+
+### Service Pattern (DIP)
+
+```tsx
+// 추상화 정의
+interface PaymentService {
+  processPayment(amount: number): Promise<PaymentResult>;
+}
+
+// 구체적 구현
+class CashPaymentService implements PaymentService {
+  async processPayment(amount: number): Promise<PaymentResult> {
+    // 현금 결제 로직
+  }
+}
+
+// 컴포넌트에서 사용 (DIP)
+const PaymentForm = ({
+  paymentService,
+}: {
+  paymentService: PaymentService;
+}) => {
+  // 추상화에 의존, 구체적 구현에 의존하지 않음
+};
+```
+
+### Button Pattern (OCP)
+
+```tsx
+// 기본 버튼 (OCP: 확장에 열려있음)
+interface BaseButtonProps {
+  onPress: () => void;
+  children: React.ReactNode;
+  variant?: "primary" | "secondary" | "danger";
+}
+
+const BaseButton = ({ variant = "primary", ...props }: BaseButtonProps) => (
+  <Pressable
+    onPress={props.onPress}
+    className={`h-[40px] px-4 flex-row items-center gap-2 rounded-lg ${getVariantStyles(variant)}`}
+  >
+    {props.children}
+  </Pressable>
+);
+
+// 확장된 버튼들 (OCP: 기존 코드 수정 없이 확장)
+const IconButton = ({ icon, ...props }: BaseButtonProps & { icon: string }) => (
+  <BaseButton {...props}>
+    <Ionicons name={icon} size={18} color="white" />
+    <Text className="text-white font-semibold">{props.children}</Text>
+  </BaseButton>
+);
+```
+
+## Things to Avoid
+
+- Don't violate SRP by mixing UI logic with business logic
+- Don't create fat interfaces that force unused dependencies (ISP)
+- Don't depend on concrete implementations in components (DIP)
+- Don't modify existing code for new features (OCP)
+- Don't use StyleSheet unless NativeWind doesn't support the style
+- Don't use px values for responsive design (use percentages/flex)
+- Don't forget key props in mapped lists
+- Don't use bare text outside <Text> components
+- Don't use console.log in production code
+- Don't use hardcoded values (use constants or props)
+
+## AI Assistant Guidelines
+
+- Always consider SOLID principles when suggesting code
+- Recommend service abstractions for business logic
+- Suggest component composition over complex inheritance
+- Encourage dependency injection patterns
+- Always consider mobile UX patterns
+- Suggest performance optimizations
+- Recommend accessibility improvements
+- Provide Korean comments when requested
+- Follow established patterns in the codebase
+- Consider cross-platform compatibility (iOS/Android)

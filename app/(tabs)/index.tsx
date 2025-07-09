@@ -6,7 +6,7 @@ import AdminModal from '../../components/AdminModal';
 import CategoryTabs from '../../components/menuSelection/CategoryTabs';
 import MenuGrid from '../../components/menuSelection/MenuGrid';
 import OrderSection from '../../components/order/OrderSection';
-import { useButtonAnimation } from '../../hooks/useButtonAnimation';
+import { useButtonAnimation } from '../../hooks';
 
 /**
  * 메뉴 선택 메인 화면 컴포넌트
