@@ -20,67 +20,56 @@ export default function CashManagement() {
     useState(false);
 
   // 권종별 현금 서랍 현황 데이터 상태
-  const [cashDrawerData, setCashDrawerData] = useState<CashDrawerItem[][]>([
-    // 첫 번째 행
-    [
-      {
-        type: '지폐',
-        title: '5만원',
-        theme: 'yellow' as const,
-        quantity: 8,
-        unitValue: 50000,
-      },
-      {
-        type: '지폐',
-        title: '1만원',
-        theme: 'green' as const,
-        quantity: 15,
-        unitValue: 10000,
-      },
-    ],
-    // 두 번째 행
-    [
-      {
-        type: '지폐',
-        title: '5천원',
-        theme: 'orange' as const,
-        quantity: 12,
-        unitValue: 5000,
-      },
-      {
-        type: '지폐',
-        title: '1천원',
-        theme: 'blue' as const,
-        quantity: 25,
-        unitValue: 1000,
-      },
-    ],
-    // 세 번째 행
-    [
-      {
-        type: '동전',
-        title: '500원',
-        theme: 'gray' as const,
-        quantity: 30,
-        unitValue: 500,
-      },
-      {
-        type: '동전',
-        title: '100원',
-        theme: 'gray' as const,
-        quantity: 50,
-        unitValue: 100,
-      },
-    ],
-    [
-      {
-        type: '쿠폰',
-        title: '쿠폰',
-        theme: 'gray' as const,
-        quantity: 30,
-        unitValue: 2000,
-      },
-    ],
+  const [cashDrawerData, setCashDrawerData] = useState<CashDrawerItem[]>([
+    {
+      type: '지폐',
+      title: '5만원',
+      theme: 'yellow' as const,
+      quantity: 8,
+      unitValue: 50000,
+    },
+    {
+      type: '지폐',
+      title: '1만원',
+      theme: 'green' as const,
+      quantity: 15,
+      unitValue: 10000,
+    },
+    {
+      type: '지폐',
+      title: '5천원',
+      theme: 'orange' as const,
+      quantity: 12,
+      unitValue: 5000,
+    },
+    {
+      type: '지폐',
+      title: '1천원',
+      theme: 'blue' as const,
+      quantity: 25,
+      unitValue: 1000,
+    },
+    {
+      type: '동전',
+      title: '500원',
+      theme: 'gray' as const,
+      quantity: 30,
+      unitValue: 500,
+    },
+    {
+      type: '동전',
+      title: '100원',
+      theme: 'gray' as const,
+      quantity: 50,
+      unitValue: 100,
+    },
+    {
+      type: '쿠폰',
+      title: '쿠폰',
+      theme: 'gray' as const,
+      quantity: 30,
+      unitValue: 2000,
+    },
   ]);
 
   const handleInspection = () => {
@@ -91,7 +80,7 @@ export default function CashManagement() {
     setIsInspectionModalVisible(true);
   };
 
-  const handleInspectionConfirm = (updatedData: CashDrawerItem[][]) => {
+  const handleInspectionConfirm = (updatedData: CashDrawerItem[]) => {
     setCashDrawerData(updatedData);
     console.log('시재 점검 완료:', updatedData);
   };

@@ -28,6 +28,42 @@ const createColoredCardStyle = (color: keyof typeof colorPalette) => ({
   amountColor: `text-${color}-900`,
 });
 
+// 부드러운 blue 테마 스타일 생성 함수
+const createSoftBlueCardStyle = () => ({
+  bg: "bg-blue-50",
+  border: "border-blue-200",
+  iconColor: colorPalette.blue,
+  titleColor: "text-blue-600",
+  amountColor: "text-blue-900",
+});
+
+// 5만원권 전용 노란색 테마 스타일
+const createYellowCardStyle = () => ({
+  bg: "bg-yellow-100",
+  border: "border-yellow-300",
+  iconColor: colorPalette.yellow,
+  titleColor: "text-yellow-700",
+  amountColor: "text-yellow-900",
+});
+
+// 1만원권 전용 초록색 테마 스타일
+const createGreenCardStyle = () => ({
+  bg: "bg-green-100",
+  border: "border-green-300",
+  iconColor: colorPalette.green,
+  titleColor: "text-green-700",
+  amountColor: "text-green-900",
+});
+
+// 5천원권 전용 오렌지색 테마 스타일
+const createOrangeCardStyle = () => ({
+  bg: "bg-orange-100",
+  border: "border-orange-300",
+  iconColor: colorPalette.orange,
+  titleColor: "text-orange-700",
+  amountColor: "text-orange-900",
+});
+
 // 기본 카드 스타일 (흰색 배경 + 컬러 아이콘)
 const createBaseCardStyleWithColor = (color: keyof typeof colorPalette) => ({
   ...createBaseCardStyle(),
@@ -37,14 +73,14 @@ const createBaseCardStyleWithColor = (color: keyof typeof colorPalette) => ({
 // 일반 카드 테마 - 일부는 컬러 배경, 일부는 흰색 배경
 export const cardThemeStyles = {
   gray: createBaseCardStyleWithColor("gray"),
-  blue: createColoredCardStyle("blue"),
-  green: createColoredCardStyle("green"),
+  blue: createSoftBlueCardStyle(),
+  green: createGreenCardStyle(),
   purple: createBaseCardStyleWithColor("purple"),
-  orange: createColoredCardStyle("orange"),
+  orange: createOrangeCardStyle(),
   indigo: createBaseCardStyleWithColor("indigo"),
   emerald: createBaseCardStyleWithColor("emerald"),
   red: createBaseCardStyleWithColor("red"),
-  yellow: createColoredCardStyle("yellow"),
+  yellow: createYellowCardStyle(),
 } as const;
 
 // 매출 정보 카드 전용 테마 - 모든 테마가 흰색 배경 + 컬러 아이콘

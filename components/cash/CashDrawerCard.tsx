@@ -23,7 +23,7 @@ export default function CashDrawerCard({
 
   return (
     <View
-      className={`w-1/2 ${styles.bg} border ${styles.border} rounded-xl p-6 min-h-[90px] justify-center`}
+      className={`w-full ${styles.bg} border ${styles.border} rounded-xl p-5 max-h-[130px] justify-center`}
     >
       <View className="flex flex-row items-center justify-between">
         <Text className={`text-2xl font-bold ${styles.titleColor}`}>

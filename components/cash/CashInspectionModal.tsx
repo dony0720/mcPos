@@ -23,8 +23,8 @@ interface CashDrawerItem {
 interface CashInspectionModalProps {
   visible: boolean;
   onClose: () => void;
-  onConfirm: (updatedData: CashDrawerItem[][]) => void;
-  initialData: CashDrawerItem[][];
+  onConfirm: (updatedData: CashDrawerItem[]) => void;
+  initialData: CashDrawerItem[];
 }
 
 export default function CashInspectionModal({
@@ -33,7 +33,7 @@ export default function CashInspectionModal({
   onConfirm,
   initialData,
 }: CashInspectionModalProps) {
-  const [cashData, setCashData] = useState<CashDrawerItem[][]>([]);
+  const [cashData, setCashData] = useState<CashDrawerItem[]>([]);
 
   // 모달이 열릴 때 초기 데이터 설정
   useEffect(() => {
@@ -43,15 +43,11 @@ export default function CashInspectionModal({
   }, [visible, initialData]);
 
   // 수량 변경 핸들러
-  const handleQuantityChange = (
-    rowIndex: number,
-    cardIndex: number,
-    newQuantity: string
-  ) => {
+  const handleQuantityChange = (index: number, newQuantity: string) => {
     const quantity = parseInt(newQuantity) || 0;
     const newCashData = [...cashData];
-    newCashData[rowIndex][cardIndex] = {
-      ...newCashData[rowIndex][cardIndex],
+    newCashData[index] = {
+      ...newCashData[index],
       quantity,
     };
     setCashData(newCashData);
@@ -76,7 +72,6 @@ export default function CashInspectionModal({
   // 전체 금액 계산
   const getTotalAmount = () => {
     return cashData
-      .flat()
       .reduce((total, item) => total + item.quantity * item.unitValue, 0)
       .toLocaleString();
   };
@@ -101,74 +96,87 @@ export default function CashInspectionModal({
               </View>
 
               {/* 모달 내용 */}
-              <ScrollView className="flex-1 p-6">
+              <View className="flex-1 p-6">
                 <Text className="text-lg font-medium text-gray-700 mb-4">
                   현재 현금 서랍 현황을 확인하고 수정하세요
                 </Text>
 
                 {/* 현금 서랍 현황 수정 */}
-                <View className="flex-1 gap-5">
-                  {cashData.map((row, rowIndex) => (
-                    <View key={rowIndex} className="flex-row gap-4">
-                      {row.map((item, cardIndex) => (
-                        <View
-                          key={cardIndex}
-                          className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-4"
-                        >
-                          {/* 권종 정보 */}
-                          <View className="flex-row items-center justify-between mb-3">
-                            <Text className="text-xl font-bold text-gray-800">
-                              {item.title}
-                            </Text>
-                            <View className="flex-row items-center gap-1">
-                              <View className="w-2 h-2 rounded-full bg-gray-400"></View>
-                              <Text className="text-sm font-medium text-gray-500 uppercase">
-                                {item.type}
-                              </Text>
-                            </View>
-                          </View>
-
-                          {/* 수량 입력 */}
-                          <View className="mb-3">
-                            <Text className="text-sm font-medium text-gray-600 mb-1">
-                              수량
-                            </Text>
-                            <TextInput
-                              className="border border-gray-300 rounded-lg px-3 py-2 text-center text-lg font-medium"
-                              value={item.quantity.toString()}
-                              onChangeText={(text) =>
-                                handleQuantityChange(rowIndex, cardIndex, text)
-                              }
-                              keyboardType="numeric"
-                              placeholder="0"
-                            />
-                          </View>
-
-                          {/* 금액 표시 */}
-                          <View className="flex-row justify-between items-center">
-                            <Text className="text-sm text-gray-600">금액</Text>
-                            <Text className="text-lg font-bold text-gray-800">
-                              {formatAmount(item.quantity, item.unitValue)}원
+                <ScrollView
+                  className="flex-1 max-h-full"
+                  showsVerticalScrollIndicator={true}
+                  nestedScrollEnabled={true}
+                >
+                  <View className="flex-row flex-wrap gap-4 justify-between">
+                    {cashData.map((item, index) => (
+                      <View
+                        key={index}
+                        className="bg-gray-50 border border-gray-200 rounded-xl p-4 my-2 w-[48%] max-w-[350px]"
+                      >
+                        {/* 권종 정보 */}
+                        <View className="flex-row items-center justify-between mb-3">
+                          <Text className="text-xl font-bold text-gray-800">
+                            {item.title}
+                          </Text>
+                          <View className="flex-row items-center gap-1">
+                            <View className="w-2 h-2 rounded-full bg-gray-400"></View>
+                            <Text className="text-sm font-medium uppercase text-gray-500">
+                              {item.type}
                             </Text>
                           </View>
                         </View>
-                      ))}
-                    </View>
-                  ))}
-                </View>
 
-                {/* 총 금액 표시 */}
-                <View className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                  <View className="flex-row justify-between items-center">
-                    <Text className="text-lg font-medium text-blue-800">
-                      총 현금 보유액
-                    </Text>
-                    <Text className="text-2xl font-bold text-blue-900">
-                      {getTotalAmount()}원
-                    </Text>
+                        {/* 수량 입력 */}
+                        <View className="flex-row justify-between items-center mb-3">
+                          <Text className="text-sm font-medium text-gray-600">
+                            수량
+                          </Text>
+                          <TextInput
+                            className="border border-gray-300 bg-white text-gray-800 rounded-lg px-3 py-2 text-center text-lg font-medium w-20"
+                            value={item.quantity.toString()}
+                            onChangeText={(text) =>
+                              handleQuantityChange(index, text)
+                            }
+                            keyboardType="numeric"
+                            placeholder="0"
+                          />
+                        </View>
+
+                        {/* 금액 표시 */}
+                        <View className="flex-row justify-between items-center">
+                          <Text className="text-sm text-gray-600">금액</Text>
+                          <Text className="text-lg font-bold text-gray-800">
+                            {formatAmount(item.quantity, item.unitValue)}원
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
+
+                    {/* 총 현금 보유액 카드 */}
+                    <View className="bg-blue-50 border-2 border-blue-300 rounded-xl p-4 my-2 w-[48%] max-w-[350px]">
+                      {/* 제목 */}
+                      <View className="flex-row items-center justify-between mb-3">
+                        <Text className="text-xl font-bold text-blue-800">
+                          총 보유액
+                        </Text>
+                        <View className="flex-row items-center gap-1">
+                          <View className="w-2 h-2 rounded-full bg-blue-500"></View>
+                          <Text className="text-sm font-medium uppercase text-blue-600">
+                            합계
+                          </Text>
+                        </View>
+                      </View>
+
+                      {/* 총 금액 표시 */}
+                      <View className="flex-1 justify-center">
+                        <Text className="text-2xl font-bold text-blue-900 text-center">
+                          {getTotalAmount()}원
+                        </Text>
+                      </View>
+                    </View>
                   </View>
-                </View>
-              </ScrollView>
+                </ScrollView>
+              </View>
 
               {/* 모달 푸터 */}
               <View className="flex-row gap-3 p-6 border-t border-gray-200">
