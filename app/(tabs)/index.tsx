@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Animated, Pressable, Text, View } from 'react-native';
 
 import McPosLogo from '../../assets/icon/mcPosLogo.svg';
-import AdminModal from '../../components/AdminModal';
-import CategoryTabs from '../../components/menuSelection/CategoryTabs';
-import MenuGrid from '../../components/menuSelection/MenuGrid';
-import OrderSection from '../../components/order/OrderSection';
+import {
+  AdminModal,
+  CategoryTabs,
+  MenuGrid,
+  OrderSection,
+} from '../../components';
 import { useButtonAnimation } from '../../hooks';
 
 /**

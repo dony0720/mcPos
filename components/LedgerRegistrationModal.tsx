@@ -62,7 +62,6 @@ export default function LedgerRegistrationModal({
       !formData.receptionist ||
       !formData.paymentMethod
     ) {
-      alert('모든 항목을 입력해주세요.');
       return;
     }
 

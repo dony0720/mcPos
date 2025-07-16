@@ -1,8 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
-import ActionButtons from './ActionButtons';
-import { LedgerData } from './types';
+import { LedgerActionButtons, LedgerData } from './index';
 
 interface LedgerTableRowProps {
   item: LedgerData;
@@ -36,7 +35,7 @@ export default function LedgerTableRow({
         </View>
       </View>
 
-      <ActionButtons
+      <LedgerActionButtons
         item={item}
         onCharge={onCharge}
         onHistory={onHistory}
