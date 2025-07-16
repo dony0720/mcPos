@@ -42,7 +42,7 @@ export default function CashDrawerCards({
   return (
     <View className="mt-8">
       {/* 헤더 - 제목과 버튼들 */}
-      <View className="flex flex-row justify-between items-center mb-4">
+      <View className="flex flex-row justify-between items-center mb-6">
         <Text className="text-2xl font-bold text-gray-800">현금 서랍 현황</Text>
 
         {/* 현금 입출금 버튼 */}
@@ -80,19 +80,35 @@ export default function CashDrawerCards({
       </View>
 
       {/* 권종별 현금 현황 카드 */}
-      {/* 더 균등한 간격과 패딩 조정 */}
-      <View className="flex flex-row flex-wrap gap-2 justify-between">
-        {cashDrawerData.map((card, cardIndex) => (
-          <View key={cardIndex} className="w-[48%] min-w-[200px]">
-            <CashDrawerCard
-              type={card.type}
-              title={card.title}
-              theme={card.theme}
-              quantity={`${card.quantity}${card.type === "지폐" ? "장" : card.type === "동전" ? "개" : "매"}`}
-              totalAmount={`${(card.quantity * card.unitValue).toLocaleString()}원`}
-            />
-          </View>
-        ))}
+      {/* SalesInfoCards처럼 한 줄에 2개씩 일정하게 배치 */}
+      <View className="flex flex-col gap-4">
+        {Array.from({ length: Math.ceil(cashDrawerData.length / 2) }).map(
+          (_, rowIndex) => (
+            <View key={rowIndex} className="flex flex-row gap-4">
+              {cashDrawerData
+                .slice(rowIndex * 2, rowIndex * 2 + 2)
+                .map((card, cardIndex) => (
+                  <View key={cardIndex} className="flex-1">
+                    <CashDrawerCard
+                      type={card.type}
+                      title={card.title}
+                      theme={card.theme}
+                      quantity={`${card.quantity}${
+                        card.type === "지폐"
+                          ? "장"
+                          : card.type === "동전"
+                          ? "개"
+                          : "매"
+                      }`}
+                      totalAmount={`${(
+                        card.quantity * card.unitValue
+                      ).toLocaleString()}원`}
+                    />
+                  </View>
+                ))}
+            </View>
+          )
+        )}
       </View>
 
       {/* 입금 모달 */}

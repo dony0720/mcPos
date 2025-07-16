@@ -63,13 +63,6 @@ export default function CashManagement() {
       quantity: 50,
       unitValue: 100,
     },
-    {
-      type: '쿠폰',
-      title: '쿠폰',
-      theme: 'gray' as const,
-      quantity: 30,
-      unitValue: 2000,
-    },
   ]);
 
   const handleInspection = () => {

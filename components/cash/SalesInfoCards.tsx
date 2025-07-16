@@ -5,7 +5,7 @@ import SalesInfoCard from "./SalesInfoCard";
 export default function SalesInfoCards() {
   // 매출 관련 카드 데이터
   const salesInfoData = [
-    // 첫 번째 행
+    // 첫 번째 행: 시작금액, 오늘 매출, 입금, 출금
     [
       {
         icon: "play-circle" as const,
@@ -20,6 +20,21 @@ export default function SalesInfoCards() {
         theme: "blue" as const,
       },
       {
+        icon: "arrow-down-circle" as const,
+        title: "입금",
+        amount: "+50,000원",
+        theme: "emerald" as const,
+      },
+      {
+        icon: "arrow-up-circle" as const,
+        title: "출금",
+        amount: "-30,000원",
+        theme: "red" as const,
+      },
+    ],
+    // 두 번째 행: 현금, 이체, 쿠폰, 장부
+    [
+      {
         icon: "cash" as const,
         title: "현금",
         amount: "450,000원",
@@ -31,9 +46,6 @@ export default function SalesInfoCards() {
         amount: "280,000원",
         theme: "purple" as const,
       },
-    ],
-    // 두 번째 행
-    [
       {
         icon: "ticket" as const,
         title: "쿠폰",
@@ -45,18 +57,6 @@ export default function SalesInfoCards() {
         title: "장부",
         amount: "75,000원",
         theme: "indigo" as const,
-      },
-      {
-        icon: "arrow-down-circle" as const,
-        title: "입금",
-        amount: "+50,000원",
-        theme: "emerald" as const,
-      },
-      {
-        icon: "arrow-up-circle" as const,
-        title: "출금",
-        amount: "-30,000원",
-        theme: "red" as const,
       },
     ],
   ];
