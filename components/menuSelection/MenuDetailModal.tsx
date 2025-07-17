@@ -13,11 +13,6 @@ import {
  * - 선택된 메뉴의 상세 정보와 옵션 선택 기능을 제공하는 모달
  */
 
-/**
- * 메뉴 상세 모달 컴포넌트
- * - 선택된 메뉴의 상세 정보와 옵션 선택 기능을 제공하는 모달
- */
-
 interface MenuDetailModalProps {
   visible: boolean;
   onClose: () => void;
