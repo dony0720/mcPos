@@ -52,7 +52,6 @@ export default function ChargeModal({
 
   const handleConfirm = () => {
     if (!chargeAmount || !receptionist || !paymentMethod) {
-      alert('모든 필드를 입력해주세요.');
       return;
     }
 
@@ -143,7 +142,6 @@ export default function ChargeModal({
                   className='border border-gray-300 rounded-lg px-4 py-3 flex-row justify-between items-center'
                   onPress={() => {
                     setShowReceptionistDropdown(!showReceptionistDropdown);
-                    setShowPaymentDropdown(false);
                   }}
                 >
                   <Text
@@ -192,7 +190,6 @@ export default function ChargeModal({
                   className='border border-gray-300 rounded-lg px-4 py-3 flex-row justify-between items-center'
                   onPress={() => {
                     setShowPaymentDropdown(!showPaymentDropdown);
-                    setShowReceptionistDropdown(false);
                   }}
                 >
                   <Text
