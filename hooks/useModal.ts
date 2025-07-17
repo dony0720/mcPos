@@ -35,6 +35,3 @@ export const useModal = (): UseModalReturn => {
     isModalOpen,
   };
 };
-
-// 기존 타입 호환성을 위한 타입 정의
-export type ModalType = 'registration' | 'charge' | 'history';
