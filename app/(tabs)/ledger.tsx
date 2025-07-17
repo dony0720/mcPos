@@ -10,6 +10,7 @@ import {
   LedgerTable,
   PageHeader,
 } from '../../components';
+import { useModal } from '../../hooks';
 
 // 샘플 장부 데이터 (퍼블리싱용 정적 데이터)
 const ledgerData: LedgerData[] = [
@@ -61,9 +62,7 @@ const ledgerData: LedgerData[] = [
 ];
 
 export default function LedgerManagement() {
-  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
-  const [showChargeModal, setShowChargeModal] = useState(false);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const { openModal, closeModal, isModalOpen } = useModal();
   const [selectedCustomer, setSelectedCustomer] = useState<LedgerData | null>(
     null
   );
@@ -71,24 +70,23 @@ export default function LedgerManagement() {
   // 단순화된 핸들러 함수들 (퍼블리싱용)
   const handleRegistrationConfirm = (data: any) => {
     console.log('장부 등록:', data);
-    setShowRegistrationModal(false);
+    closeModal();
   };
 
   const handleChargeConfirm = (chargeData: any) => {
     console.log('충전:', chargeData);
-    setShowChargeModal(false);
-    setSelectedCustomer(null);
+    handleCloseModal();
   };
 
   // 버튼 핸들러 함수들
   const handleCharge = (item: LedgerData) => {
     setSelectedCustomer(item);
-    setShowChargeModal(true);
+    openModal('charge');
   };
 
   const handleHistory = (item: LedgerData) => {
     setSelectedCustomer(item);
-    setShowHistoryModal(true);
+    openModal('history');
   };
 
   const handleDelete = (item: LedgerData) => {
@@ -99,13 +97,17 @@ export default function LedgerManagement() {
     console.log('거래 내역 삭제:', transactionId);
   };
 
+  // 모달 닫기 핸들러 - 고객 정보도 함께 초기화
+  const handleCloseModal = () => {
+    closeModal();
+    setSelectedCustomer(null);
+  };
+
   return (
     <View className='h-full w-full bg-white flex flex-col box-border px-[5%]'>
       <PageHeader />
 
-      <LedgerHeader
-        onShowRegistrationModal={() => setShowRegistrationModal(true)}
-      />
+      <LedgerHeader onShowRegistrationModal={() => openModal('registration')} />
 
       <LedgerTable
         ledgerData={ledgerData}
@@ -116,19 +118,16 @@ export default function LedgerManagement() {
 
       {/* 장부 등록 모달 */}
       <LedgerRegistrationModal
-        visible={showRegistrationModal}
-        onClose={() => setShowRegistrationModal(false)}
+        visible={isModalOpen('registration')}
+        onClose={closeModal}
         onConfirm={handleRegistrationConfirm}
       />
 
       {/* 장부 충전 모달 */}
       {selectedCustomer && (
         <ChargeModal
-          visible={showChargeModal}
-          onClose={() => {
-            setShowChargeModal(false);
-            setSelectedCustomer(null);
-          }}
+          visible={isModalOpen('charge')}
+          onClose={handleCloseModal}
           onConfirm={handleChargeConfirm}
           customerInfo={{
             name: selectedCustomer.name,
@@ -141,11 +140,8 @@ export default function LedgerManagement() {
       {/* 거래 내역 모달 */}
       {selectedCustomer && (
         <HistoryModal
-          visible={showHistoryModal}
-          onClose={() => {
-            setShowHistoryModal(false);
-            setSelectedCustomer(null);
-          }}
+          visible={isModalOpen('history')}
+          onClose={handleCloseModal}
           onDeleteTransaction={handleDeleteTransaction}
           customerInfo={{
             name: selectedCustomer.name,
