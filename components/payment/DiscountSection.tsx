@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
+import { useModal } from '../../hooks';
 import DiscountModal, { Discount } from './DiscountModal';
 
 interface DiscountSectionProps {
@@ -13,11 +14,11 @@ export default function DiscountSection({
   onDiscountSelect,
   onDiscountDelete,
 }: DiscountSectionProps) {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const { openModal, closeModal, isModalOpen } = useModal();
 
   const handleDiscountSelect = (discount: Discount) => {
     onDiscountSelect(discount);
-    setIsModalVisible(false);
+    closeModal();
   };
 
   const handleDiscountDelete = () => {
@@ -39,7 +40,7 @@ export default function DiscountSection({
         <View className='flex flex-row items-center gap-3'>
           {/* 할인 선택 버튼 - 할인 모달 열기 */}
           <Pressable
-            onPress={() => setIsModalVisible(true)}
+            onPress={() => openModal('discount')}
             className='w-32 h-12 max-w-[128px] rounded-lg border border-primaryGreen bg-white flex flex-row items-center justify-center gap-2'
           >
             <Ionicons name='pricetag-outline' size={18} color='#2CC56F' />
@@ -63,8 +64,8 @@ export default function DiscountSection({
 
       {/* 할인 선택 모달 - 사용 가능한 할인 목록 표시 */}
       <DiscountModal
-        visible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
+        visible={isModalOpen('discount')}
+        onClose={closeModal}
         onSelectDiscount={handleDiscountSelect}
       />
     </>

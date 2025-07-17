@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Animated, Pressable, Text, View } from 'react-native';
 
 import McPosLogo from '../../assets/icon/mcPosLogo.svg';
@@ -8,7 +8,7 @@ import {
   MenuGrid,
   OrderSection,
 } from '../../components';
-import { useButtonAnimation } from '../../hooks';
+import { useButtonAnimation, useModal } from '../../hooks';
 
 /**
  * 메뉴 선택 메인 화면 컴포넌트
@@ -17,7 +17,7 @@ import { useButtonAnimation } from '../../hooks';
 export default function MenuSelection() {
   // 상태 및 애니메이션 관리
   const adminAnimation = useButtonAnimation(); // 관리자 버튼 애니메이션
-  const [isAdminModalVisible, setIsAdminModalVisible] = useState(false); // 관리자 모달 표시 상태
+  const { openModal, closeModal, isModalOpen } = useModal(); // 모달 관리
 
   // 이벤트 핸들러
   /**
@@ -25,14 +25,14 @@ export default function MenuSelection() {
    * 관리자 모달을 열어 비밀번호 입력을 요청
    */
   const handleAdminPress = () => {
-    setIsAdminModalVisible(true);
+    openModal('admin');
   };
 
   /**
    * 관리자 모달 닫기 핸들러
    */
-  const closeAdminModal = () => {
-    setIsAdminModalVisible(false);
+  const handleCloseAdminModal = () => {
+    closeModal();
   };
 
   /**
@@ -44,7 +44,7 @@ export default function MenuSelection() {
     if (password === 'admin123') {
       // 인증 성공 - 관리자 모드로 이동하거나 원하는 동작 수행
       console.log('관리자 인증 성공');
-      setIsAdminModalVisible(false);
+      closeModal();
     } else {
       // 인증 실패
       console.log('비밀번호가 틀렸습니다');
@@ -97,8 +97,8 @@ export default function MenuSelection() {
 
       {/* 모달 섹션 - 관리자 인증을 위한 비밀번호 입력 모달 */}
       <AdminModal
-        visible={isAdminModalVisible}
-        onClose={closeAdminModal}
+        visible={isModalOpen('admin')}
+        onClose={handleCloseAdminModal}
         onConfirm={handleAdminConfirm}
       />
     </View>
