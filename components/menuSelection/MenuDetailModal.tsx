@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
-import ActionButtons from './ActionButtons';
-import MenuInfoCard from './MenuInfoCard';
-import OptionsSelector from './OptionsSelector';
-import TemperatureSelector from './TemperatureSelector';
+import {
+  MenuActionButtons,
+  MenuInfoCard,
+  OptionsSelector,
+  TemperatureSelector,
+} from './index';
+
+/**
+ * 메뉴 상세 모달 컴포넌트
+ * - 선택된 메뉴의 상세 정보와 옵션 선택 기능을 제공하는 모달
+ */
 
 /**
  * 메뉴 상세 모달 컴포넌트
@@ -90,7 +97,7 @@ export default function MenuDetailModal({
           </ScrollView>
 
           {/* 액션 버튼 섹션 - 취소/장바구니 추가 */}
-          <ActionButtons onClose={onClose} onAddToCart={handleAddToCart} />
+          <MenuActionButtons onClose={onClose} onAddToCart={handleAddToCart} />
         </View>
       </View>
     </Modal>

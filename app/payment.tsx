@@ -3,14 +3,16 @@
 import React, { useState } from 'react';
 import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 
-import DiscountSection from '../components/payment/DiscountSection';
-import NumberInputModal from '../components/payment/NumberInputModal';
-import OrderMethodSelector from '../components/payment/OrderMethodSelector';
-import PaymentHeader from '../components/payment/PaymentHeader';
-import PaymentMenuItem from '../components/payment/PaymentMenuItem';
-import PaymentMethodSelector from '../components/payment/PaymentMethodSelector';
-import SelectAllCheckbox from '../components/payment/SelectAllCheckbox';
-import { useButtonAnimation } from '../hooks';
+import {
+  DiscountSection,
+  NumberInputModal,
+  OrderMethodSelector,
+  PaymentHeader,
+  PaymentMenuItem,
+  PaymentMethodSelector,
+  SelectAllCheckbox,
+} from '../components';
+import { useButtonAnimation, useModal } from '../hooks';
 
 export default function Payment() {
   // 간단한 상태 관리
@@ -19,7 +21,9 @@ export default function Payment() {
     useState<string>('cash');
   const [selectedOrderMethod, setSelectedOrderMethod] =
     useState<string>('store');
-  const [showModal, setShowModal] = useState(false);
+
+  // 모달 관리
+  const { openModal, closeModal, isModalOpen } = useModal();
   const [modalType, setModalType] = useState<'phone' | 'pickup'>('pickup');
   const [isLedgerFirstStep, setIsLedgerFirstStep] = useState(false);
 
@@ -42,15 +46,16 @@ export default function Payment() {
     console.log('할인 삭제');
   };
 
+  // 결제 처리 핸들러
   const handlePaymentPress = () => {
     if (selectedPaymentMethod === 'ledger') {
       setModalType('phone');
       setIsLedgerFirstStep(true);
-      setShowModal(true);
+      openModal('numberInput');
     } else {
       setModalType('pickup');
       setIsLedgerFirstStep(false);
-      setShowModal(true);
+      openModal('numberInput');
     }
   };
 
@@ -64,7 +69,13 @@ export default function Payment() {
     } else {
       // 픽업 번호 입력 완료 또는 일반 결제 완료
       console.log('픽업 번호:', number);
-      setShowModal(false);
+      closeModal();
+    }
+  };
+
+  const handleModalClose = () => {
+    if (!isLedgerFirstStep) {
+      closeModal();
     }
   };
 
@@ -105,7 +116,7 @@ export default function Payment() {
   const totalAmount = mockOrderItems.reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <View className='h-full w-full box-border bg-white flex flex-col'>
+    <View className='h-full w-full bg-white flex flex-col'>
       {/* 상단 헤더 섹션 */}
       <PaymentHeader onBack={handleBack} />
 
@@ -175,14 +186,10 @@ export default function Payment() {
           </Animated.View>
         </Pressable>
 
-        {/* 단일 모달 - props 간소화 */}
+        {/* 번호 입력 모달 */}
         <NumberInputModal
-          visible={showModal}
-          onClose={() => {
-            if (!isLedgerFirstStep) {
-              setShowModal(false);
-            }
-          }}
+          visible={isModalOpen('numberInput')}
+          onClose={handleModalClose}
           onConfirm={handleModalConfirm}
           type={modalType}
         />
