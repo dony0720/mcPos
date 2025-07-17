@@ -5,6 +5,6 @@ export { default as MenuGrid } from './MenuGrid';
 export { default as MenuInfoCard } from './MenuInfoCard';
 export { default as MenuItem } from './MenuItem';
 export { default as OptionsSelector } from './OptionsSelector';
-export { default as MenuSelection } from './PaginationButtons';
+export { default as PaginationButtons } from './PaginationButtons';
 export { default as QuantitySelector } from './QuantitySelector';
 export { default as TemperatureSelector } from './TemperatureSelector';

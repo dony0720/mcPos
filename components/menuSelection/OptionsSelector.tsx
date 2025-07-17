@@ -26,7 +26,7 @@ export default function OptionsSelector({
 
       {/* 옵션 선택 버튼 그리드 */}
       <View className='flex-row flex-wrap gap-5'>
-        {options.map(option => {
+        {options.map((option, index) => {
           const isSelected = selectedOptions.includes(option);
           return (
             <TouchableOpacity

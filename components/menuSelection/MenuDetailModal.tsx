@@ -63,8 +63,8 @@ export default function MenuDetailModal({
       visible={visible}
       onRequestClose={onClose}
     >
-      <View className='flex-1 w-full h-full box-border px-[20%] justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-lg w-full h-[50%] box-border p-6'>
+      <View className='flex-1 w-full h-full box-border px-[10%] justify-center items-center bg-black/50 '>
+        <View className='bg-white rounded-lg w-full h-[60%] box-border p-6 max-w-[600px]'>
           {/* 모달 헤더 */}
           <View className='flex-row justify-between items-center mb-4'>
             <Text className='text-xl font-bold'>메뉴 옵션 선택</Text>
