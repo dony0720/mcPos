@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
-import ActionButtons from './ActionButtons';
-import MenuInfoCard from './MenuInfoCard';
-import OptionsSelector from './OptionsSelector';
-import TemperatureSelector from './TemperatureSelector';
+import {
+  MenuActionButtons,
+  MenuInfoCard,
+  OptionsSelector,
+  TemperatureSelector,
+} from './index';
 
 /**
  * 메뉴 상세 모달 컴포넌트
@@ -56,8 +58,8 @@ export default function MenuDetailModal({
       visible={visible}
       onRequestClose={onClose}
     >
-      <View className='flex-1 w-full h-full box-border px-[20%] justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-lg w-full h-[50%] box-border p-6'>
+      <View className='flex-1 w-full h-full box-border px-[10%] justify-center items-center bg-black/50 '>
+        <View className='bg-white rounded-lg w-full h-[60%] box-border p-6 max-w-[600px]'>
           {/* 모달 헤더 */}
           <View className='flex-row justify-between items-center mb-4'>
             <Text className='text-xl font-bold'>메뉴 옵션 선택</Text>
@@ -90,7 +92,7 @@ export default function MenuDetailModal({
           </ScrollView>
 
           {/* 액션 버튼 섹션 - 취소/장바구니 추가 */}
-          <ActionButtons onClose={onClose} onAddToCart={handleAddToCart} />
+          <MenuActionButtons onClose={onClose} onAddToCart={handleAddToCart} />
         </View>
       </View>
     </Modal>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
-import MenuDetailModal from './MenuDetailModal';
-import MenuItem from './MenuItem';
-import PaginationButtons from './menuSelction';
+import { useModal } from '../../hooks';
+import { MenuDetailModal, MenuItem } from './index';
+import PaginationButtons from './PaginationButtons';
 
 /**
  * 메뉴 그리드 컴포넌트
@@ -20,7 +20,6 @@ interface MenuItemType {
 
 export default function MenuGrid() {
   // 메뉴 데이터 관리
-  // 임시 메뉴 데이터
   const menuItems = Array(12)
     .fill(null)
     .map((_, index) => ({
@@ -30,41 +29,27 @@ export default function MenuGrid() {
     }));
 
   // 모달 상태 관리
-  const [modalVisible, setModalVisible] = useState(false);
+  const { openModal, closeModal, isModalOpen } = useModal();
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItemType | null>(
     null
   );
 
   // 이벤트 핸들러
-  /**
-   * 위쪽 페이지네이션 버튼 핸들러
-   */
   const handleUpPress = () => {
-    // 위쪽 페이지네이션 로직
     console.log('Up button pressed');
   };
 
-  /**
-   * 아래쪽 페이지네이션 버튼 핸들러
-   */
   const handleDownPress = () => {
-    // 아래쪽 페이지네이션 로직
     console.log('Down button pressed');
   };
 
-  /**
-   * 메뉴 아이템 클릭 핸들러
-   */
   const handleMenuItemPress = (item: MenuItemType) => {
     setSelectedMenuItem(item);
-    setModalVisible(true);
+    openModal('menuDetail');
   };
 
-  /**
-   * 모달 닫기 핸들러
-   */
   const handleModalClose = () => {
-    setModalVisible(false);
+    closeModal();
     setSelectedMenuItem(null);
   };
 
@@ -93,7 +78,7 @@ export default function MenuGrid() {
 
       {/* 모달 섹션 - 메뉴 상세 모달 */}
       <MenuDetailModal
-        visible={modalVisible}
+        visible={isModalOpen('menuDetail')}
         onClose={handleModalClose}
         menuItem={selectedMenuItem}
       />
