@@ -125,11 +125,6 @@ export default function ChargeModal({
                 onChangeText={handleAmountChange}
                 keyboardType='numeric'
               />
-              {chargeAmount && (
-                <Text className='text-sm text-gray-500 mt-1'>
-                  {chargeAmount}원
-                </Text>
-              )}
             </View>
 
             {/* 접수자 선택 */}
