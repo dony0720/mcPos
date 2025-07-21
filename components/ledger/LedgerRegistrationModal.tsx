@@ -84,11 +84,21 @@ export default function LedgerRegistrationModal({
   };
 
   const formatAmount = (text: string) => {
-    // 숫자만 남기기
-    const cleaned = text.replace(/\D/g, '');
+    // 숫자가 아닌 문자들을 모두 제거 (한 글자씩 확인)
+    let numbersOnly = '';
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (char >= '0' && char <= '9') {
+        numbersOnly += char;
+      }
+    }
 
-    // 천 단위 콤마 추가
-    return cleaned.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    // 빈 문자열이면 그대로 반환
+    if (!numbersOnly) return '';
+
+    // 숫자로 변환 후 천 단위 콤마 자동 추가
+    const number = parseInt(numbersOnly, 10);
+    return number.toLocaleString('ko-KR');
   };
 
   return (
