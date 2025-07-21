@@ -1,32 +1,34 @@
 import { useState } from 'react';
 
-// 순수한 모달 상태 관리 hook
-interface UseModalReturn {
-  // 현재 열린 모달
+// POS 시스템에 최적화된 모달 상태 관리 hook
+interface UseModal {
+  // 현재 최상위 모달 (기존 호환성 유지)
   currentModal: string | null;
 
-  // 모달 제어 함수
+  // 핵심 모달 제어 함수
   openModal: (type: string) => void;
   closeModal: () => void;
 
-  // 편의 함수들
+  // 편의 함수
   isModalOpen: (type: string) => boolean;
 }
 
-export const useModal = (): UseModalReturn => {
-  const [currentModal, setCurrentModal] = useState<string | null>(null);
+export const useModal = (): UseModal => {
+  const [modalStack, setModalStack] = useState<string[]>([]);
 
   const openModal = (type: string) => {
-    setCurrentModal(type);
+    setModalStack(prev => [...prev, type]);
   };
 
   const closeModal = () => {
-    setCurrentModal(null);
+    setModalStack(prev => prev.slice(0, -1));
   };
 
   const isModalOpen = (type: string): boolean => {
-    return currentModal === type;
+    return modalStack.includes(type);
   };
+
+  const currentModal = modalStack[modalStack.length - 1] || null;
 
   return {
     currentModal,
