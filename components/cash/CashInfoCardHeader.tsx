@@ -1,6 +1,6 @@
-import React from "react";
-import { View, Text } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { Text, View } from 'react-native';
 
 interface CashInfoCardHeaderProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -16,7 +16,7 @@ export default function CashInfoCardHeader({
   titleColor,
 }: CashInfoCardHeaderProps) {
   return (
-    <View className="flex flex-row items-center gap-2">
+    <View className='flex flex-row items-center gap-2'>
       <Ionicons name={icon} size={20} color={iconColor} />
       <Text className={`${titleColor} text-base font-medium`}>{title}</Text>
     </View>

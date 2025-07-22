@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Pressable, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Pressable, View } from 'react-native';
 
 interface PaginationButtonsProps {
   onUpPress?: () => void;
@@ -33,26 +33,26 @@ export default function PaginationButtons({
   };
 
   return (
-    <View role="group" className="w-[50px] h-full pl-0 box-border">
+    <View role='group' className='w-[50px] h-full pl-0 box-border'>
       <Pressable
-        role="button"
+        role='button'
         onPressIn={onUpButtonPressIn}
         onPressOut={onUpButtonPressOut}
         className={`w-full h-1/2 rounded-t-lg border border-gray-300 flex justify-center items-center ${
-          isUpPressed ? "bg-gray-200" : "bg-white"
+          isUpPressed ? 'bg-gray-200' : 'bg-white'
         }`}
       >
-        <Ionicons name="chevron-up" size={24} color="#6B7280" />
+        <Ionicons name='chevron-up' size={24} color='#6B7280' />
       </Pressable>
       <Pressable
-        role="button"
+        role='button'
         onPressIn={onDownButtonPressIn}
         onPressOut={onDownButtonPressOut}
         className={`w-full h-1/2 border rounded-b-lg border-gray-300 border-t-0 flex justify-center items-center ${
-          isDownPressed ? "bg-gray-200" : "bg-white"
+          isDownPressed ? 'bg-gray-200' : 'bg-white'
         }`}
       >
-        <Ionicons name="chevron-down" size={24} color="#6B7280" />
+        <Ionicons name='chevron-down' size={24} color='#6B7280' />
       </Pressable>
     </View>
   );

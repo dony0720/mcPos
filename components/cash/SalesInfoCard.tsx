@@ -1,8 +1,9 @@
-import React from "react";
-import { View, Text } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import CashInfoCardHeader from "./CashInfoCardHeader";
-import { salesCardThemeStyles, SalesCardTheme } from "./cardThemes";
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { Text, View } from 'react-native';
+
+import { SalesCardTheme, salesCardThemeStyles } from './cardThemes';
+import CashInfoCardHeader from './CashInfoCardHeader';
 
 interface SalesInfoCardProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -20,7 +21,7 @@ export default function SalesInfoCard({
   const styles = salesCardThemeStyles[theme];
 
   return (
-    <View className="flex-1 bg-white border border-gray-200 rounded-xl p-6 min-h-[90px] justify-center">
+    <View className='flex-1 bg-white border border-gray-200 rounded-xl p-6 min-h-[90px] justify-center'>
       <CashInfoCardHeader
         icon={icon}
         title={title}
