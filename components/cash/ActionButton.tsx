@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text } from 'react-native';
 
@@ -21,16 +22,21 @@ export default function ActionButton({
 
   return (
     <Pressable
-      className={`h-[40px] px-4 flex flex-row items-center gap-2 rounded-lg ${
-        isOutline ? 'bg-white border border-gray-300' : `bg-${color}`
-      }`}
+      className={clsx(
+        'h-[40px] px-4 flex flex-row items-center gap-2 rounded-lg',
+        {
+          'bg-white border border-gray-300': isOutline,
+          [`bg-${color}`]: !isOutline,
+        }
+      )}
       onPress={onPress}
     >
       <Ionicons name={icon} size={20} color={isOutline ? '#374151' : 'white'} />
       <Text
-        className={`font-semibold text-base ${
-          isOutline ? 'text-gray-700' : 'text-white'
-        }`}
+        className={clsx('font-semibold text-base', {
+          'text-gray-700': isOutline,
+          'text-white': !isOutline,
+        })}
       >
         {title}
       </Text>

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 import { Text, View } from 'react-native';
 
@@ -22,10 +23,14 @@ export default function CashDrawerCard({
 
   return (
     <View
-      className={`w-full ${styles.bg} border ${styles.border} rounded-xl p-5 max-h-[130px] justify-center`}
+      className={clsx(
+        'w-full border rounded-xl p-5 max-h-[130px] justify-center',
+        styles.bg,
+        styles.border
+      )}
     >
       <View className='flex flex-row items-center justify-between'>
-        <Text className={`text-2xl font-bold ${styles.titleColor}`}>
+        <Text className={clsx('text-2xl font-bold', styles.titleColor)}>
           {title}
         </Text>
         <View className='flex flex-row items-center gap-1'>
@@ -38,14 +43,14 @@ export default function CashDrawerCard({
 
       <View className='mt-3'>
         <View className='flex flex-row justify-between items-center mb-1'>
-          <Text className={`text-base ${styles.titleColor}`}>수량</Text>
-          <Text className={`text-base font-medium ${styles.amountColor}`}>
+          <Text className={clsx('text-base', styles.titleColor)}>수량</Text>
+          <Text className={clsx('text-base font-medium', styles.amountColor)}>
             {quantity}
           </Text>
         </View>
         <View className='flex flex-row justify-between items-center'>
-          <Text className={`text-base ${styles.titleColor}`}>금액</Text>
-          <Text className={`text-xl font-bold ${styles.amountColor}`}>
+          <Text className={clsx('text-base', styles.titleColor)}>금액</Text>
+          <Text className={clsx('text-xl font-bold', styles.amountColor)}>
             {totalAmount}
           </Text>
         </View>

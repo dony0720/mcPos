@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
@@ -40,23 +41,30 @@ export default function OptionsSelector({
                   setSelectedOptions([...selectedOptions, option]);
                 }
               }}
-              className={`h-[70px] w-[48%] flex items-center justify-center rounded-lg border ${
-                index < 2 ? 'mb-3' : ''
-              } ${
-                isSelected
-                  ? 'bg-[#475569] border-[#475569]'
-                  : 'bg-white border-gray-300'
-              }`}
+              className={clsx(
+                'h-[70px] w-[48%] flex items-center justify-center rounded-lg border',
+                {
+                  'mb-3': index < 2,
+                  'bg-[#475569] border-[#475569]': isSelected,
+                  'bg-white border-gray-300': !isSelected,
+                }
+              )}
             >
               {/* 옵션 정보 */}
               <View className='flex items-center gap-2'>
                 <Text
-                  className={`${isSelected ? 'text-white' : 'text-gray-700'}`}
+                  className={clsx({
+                    'text-white': isSelected,
+                    'text-gray-700': !isSelected,
+                  })}
                 >
                   {option}
                 </Text>
                 <Text
-                  className={`${isSelected ? 'text-white' : 'text-gray-700'}`}
+                  className={clsx({
+                    'text-white': isSelected,
+                    'text-gray-700': !isSelected,
+                  })}
                 >
                   +500원
                 </Text>

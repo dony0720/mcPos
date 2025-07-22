@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import clsx from 'clsx';
 import React from 'react';
 import { Text, View } from 'react-native';
 
@@ -30,7 +31,7 @@ export default function SalesInfoCard({
       />
 
       <Text
-        className={`text-2xl font-bold ${styles.amountColor} mt-2`}
+        className={clsx('text-2xl font-bold mt-2', styles.amountColor)}
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.6}
