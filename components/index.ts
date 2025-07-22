@@ -1,8 +1,5 @@
 // Root level components
 export { default as AdminModal } from './AdminModal';
-export { default as ChargeModal } from './ChargeModal';
-export { default as EditModal } from './EditModal';
-export { default as HistoryModal } from './HistoryModal';
 
 // Cash components
 export * from './cash';
