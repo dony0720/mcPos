@@ -4,6 +4,12 @@ export { default as ChargeModal } from './ChargeModal';
 export { default as EditModal } from './EditModal';
 export { default as HistoryModal } from './HistoryModal';
 
+// Cash components
+export * from './cash';
+
+// Common components
+export { default as PageHeader } from './common/PageHeader';
+
 // Ledger components
 export * from './ledger';
 

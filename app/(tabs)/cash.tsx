@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
-import CashDrawerCards from '../../components/cash/CashDrawerCards';
-import CashHeader from '../../components/cash/CashHeader';
-import CashInspectionModal from '../../components/cash/CashInspectionModal';
-import SalesInfoCards from '../../components/cash/SalesInfoCards';
-import PageHeader from '../../components/common/PageHeader';
+import {
+  CashDrawerCards,
+  CashHeader,
+  CashInspectionModal,
+  PageHeader,
+  SalesInfoCards,
+} from '../../components';
 
 // 현금 서랍 아이템 타입 정의
 interface CashDrawerItem {
