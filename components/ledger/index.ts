@@ -1,8 +1,10 @@
 export { default as LedgerActionButtons } from './ActionButtons';
+export { default as ChargeModal } from './ChargeModal';
+export { default as HistoryModal } from './HistoryModal';
 export { default as LedgerHeader } from './LedgerHeader';
 export { default as LedgerRegistrationModal } from './LedgerRegistrationModal';
 export { default as LedgerTable } from './LedgerTable';
 export { default as LedgerTableHeader } from './LedgerTableHeader';
 export { default as LedgerTableRow } from './LedgerTableRow';
-export { default as PageHeader } from './PageHeader';
+export { default as LedgerPageHeader } from './PageHeader';
 export * from './types';

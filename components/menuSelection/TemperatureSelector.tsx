@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
@@ -30,19 +31,22 @@ export default function TemperatureSelector({
           <TouchableOpacity
             key={temp}
             onPress={() => setSelectedTemperature(temp)}
-            className={`h-[70px] w-[48%] flex items-center justify-center rounded-lg border ${
-              selectedTemperature === temp
-                ? 'bg-[#475569] border-[#475569]'
-                : 'bg-white border-gray-300'
-            }`}
+            className={clsx(
+              'h-[70px] w-[48%] flex items-center justify-center rounded-lg border',
+              {
+                'bg-[#475569] border-[#475569]': selectedTemperature === temp,
+                'bg-white border-gray-300': selectedTemperature !== temp,
+              }
+            )}
           >
             {/* 온도 옵션 정보 */}
             <View className='flex items-center gap-2'>
               <Text className='text-2xl'>{temp === 'Hot' ? '🔥' : '🧊'}</Text>
               <Text
-                className={`${
-                  selectedTemperature === temp ? 'text-white' : 'text-gray-700'
-                }`}
+                className={clsx({
+                  'text-white': selectedTemperature === temp,
+                  'text-gray-700': selectedTemperature !== temp,
+                })}
               >
                 {temp === 'Hot' ? 'Hot' : 'Iced'}
               </Text>

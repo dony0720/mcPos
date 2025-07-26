@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { clsx } from 'clsx';
 import React from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
@@ -298,13 +299,13 @@ export default function HistoryModal({
                         <View className='flex-row gap-4'>
                           <Text className='text-gray-600'>금액:</Text>
                           <Text
-                            className={`font-semibold ${
-                              transaction.type === '사용'
-                                ? 'text-red-600'
-                                : transaction.type === '충전'
-                                  ? 'text-green-600'
-                                  : 'text-gray-800'
-                            }`}
+                            className={clsx('font-semibold', {
+                              'text-red-600': transaction.type === '사용',
+                              'text-green-600': transaction.type === '충전',
+                              'text-gray-800':
+                                transaction.type !== '사용' &&
+                                transaction.type !== '충전',
+                            })}
                           >
                             {transaction.type === '사용' ? '-' : '+'}
                             {transaction.amount}

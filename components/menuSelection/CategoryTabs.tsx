@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -22,11 +23,10 @@ export default function CategoryTabs() {
             className='flex-1 py-3 flex justify-center items-center'
           >
             <Text
-              className={`text-[16px] font-bold ${
-                selectedCategory === category
-                  ? 'text-primaryGreen'
-                  : 'text-gray-500'
-              }`}
+              className={clsx('text-[16px] font-bold', {
+                'text-primaryGreen': selectedCategory === category,
+                'text-gray-500': selectedCategory !== category,
+              })}
             >
               {category}
             </Text>
