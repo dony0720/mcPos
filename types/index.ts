@@ -3,6 +3,9 @@
 // Payment 관련 타입들 re-export
 export * from './payment';
 
+// Ledger 관련 타입들 re-export
+export * from './ledger';
+
 // 추후 다른 도메인의 타입들도 여기서 export
 // export * from './menu';
 // export * from './order';

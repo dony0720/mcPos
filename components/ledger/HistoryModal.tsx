@@ -3,19 +3,8 @@ import { clsx } from 'clsx';
 import React from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
-import {
-  type CustomerInfo,
-  PaymentMethod,
-  type Transaction,
-  TransactionType,
-} from '../../constants/ledger';
-
-interface HistoryModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onDeleteTransaction: (transactionId: string) => void;
-  customerInfo: CustomerInfo;
-}
+import { PaymentMethod, TransactionType } from '../../constants/ledger';
+import { HistoryModalProps, Transaction } from '../../types';
 
 export default function HistoryModal({
   visible,

@@ -9,19 +9,10 @@ import {
   View,
 } from 'react-native';
 
-interface LedgerRegistrationModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: (data: LedgerRegistrationData) => void;
-}
-
-interface LedgerRegistrationData {
-  name: string;
-  phoneNumber: string;
-  initialAmount: string;
-  receptionist: string;
-  paymentMethod: string;
-}
+import {
+  LedgerRegistrationData,
+  LedgerRegistrationModalProps,
+} from '../../types';
 
 export default function LedgerRegistrationModal({
   visible,

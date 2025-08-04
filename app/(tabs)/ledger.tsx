@@ -4,13 +4,18 @@ import { View } from 'react-native';
 import {
   ChargeModal,
   HistoryModal,
-  LedgerData,
   LedgerHeader,
   LedgerRegistrationModal,
   LedgerTable,
   PageHeader,
 } from '../../components';
 import { useModal } from '../../hooks';
+import {
+  ChargeData,
+  CustomerInfo,
+  LedgerData,
+  LedgerRegistrationData,
+} from '../../types';
 
 // 샘플 장부 데이터 (퍼블리싱용 정적 데이터)
 const ledgerData: LedgerData[] = [
@@ -63,29 +68,37 @@ const ledgerData: LedgerData[] = [
 
 export default function LedgerManagement() {
   const { openModal, closeModal, isModalOpen } = useModal();
-  const [selectedCustomer, setSelectedCustomer] = useState<LedgerData | null>(
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerInfo | null>(
     null
   );
 
   // 단순화된 핸들러 함수들 (퍼블리싱용)
-  const handleRegistrationConfirm = (data: any) => {
+  const handleRegistrationConfirm = (data: LedgerRegistrationData) => {
     console.log('장부 등록:', data);
     closeModal();
   };
 
-  const handleChargeConfirm = (chargeData: any) => {
+  const handleChargeConfirm = (chargeData: ChargeData) => {
     console.log('충전:', chargeData);
     handleCloseModal();
   };
 
   // 버튼 핸들러 함수들
   const handleCharge = (item: LedgerData) => {
-    setSelectedCustomer(item);
+    setSelectedCustomer({
+      name: item.name,
+      memberNumber: item.memberNumber,
+      phoneNumber: item.phoneNumber,
+    });
     openModal('charge');
   };
 
   const handleHistory = (item: LedgerData) => {
-    setSelectedCustomer(item);
+    setSelectedCustomer({
+      name: item.name,
+      memberNumber: item.memberNumber,
+      phoneNumber: item.phoneNumber,
+    });
     openModal('history');
   };
 

@@ -10,20 +10,7 @@ import {
   View,
 } from 'react-native';
 
-interface ChargeModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: (data: {
-    chargeAmount: string;
-    receptionist: string;
-    paymentMethod: string;
-  }) => void;
-  customerInfo: {
-    name: string;
-    memberNumber: string;
-    phoneNumber: string;
-  };
-}
+import { ChargeModalProps } from '../../types';
 
 export default function ChargeModal({
   visible,

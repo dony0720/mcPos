@@ -1,16 +1,9 @@
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
+import { LedgerTableProps } from '../../types';
 import LedgerTableHeader from './LedgerTableHeader';
 import LedgerTableRow from './LedgerTableRow';
-import { LedgerData } from './types';
-
-interface LedgerTableProps {
-  ledgerData: LedgerData[];
-  onCharge: (item: LedgerData) => void;
-  onHistory: (item: LedgerData) => void;
-  onDelete: (item: LedgerData) => void;
-}
 
 export default function LedgerTable({
   ledgerData,
