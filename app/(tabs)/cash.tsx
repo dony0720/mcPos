@@ -8,10 +8,10 @@ import {
   PageHeader,
   SalesInfoCards,
 } from '../../components';
-import { CashDrawerItem, CashTheme } from '../../constants';
+import { CashDrawerMoneyItem, CashTheme } from '../../types';
 
 // 권종별 현금 서랍 초기 데이터
-const INITIAL_CASH_DRAWER_DATA: CashDrawerItem[] = [
+const INITIAL_CASH_DRAWER_DATA: CashDrawerMoneyItem[] = [
   {
     type: '지폐',
     title: '5만원',
@@ -61,7 +61,7 @@ export default function CashManagement() {
     useState(false);
 
   // 권종별 현금 서랍 현황 데이터 상태
-  const [cashDrawerData, setCashDrawerData] = useState<CashDrawerItem[]>(
+  const [cashDrawerData, setCashDrawerData] = useState<CashDrawerMoneyItem[]>(
     INITIAL_CASH_DRAWER_DATA
   );
 
@@ -73,7 +73,7 @@ export default function CashManagement() {
     setIsInspectionModalVisible(true);
   };
 
-  const handleInspectionConfirm = (updatedData: CashDrawerItem[]) => {
+  const handleInspectionConfirm = (updatedData: CashDrawerMoneyItem[]) => {
     setCashDrawerData(updatedData);
     console.log('시재 점검 완료:', updatedData);
   };

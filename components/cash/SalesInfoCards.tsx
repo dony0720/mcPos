@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import { SalesTheme } from '../../constants';
+import { SalesTheme } from '../../types';
 import SalesInfoCard from './SalesInfoCard';
 
 // 매출 정보 카드 초기 데이터

@@ -3,13 +3,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text } from 'react-native';
 
-interface ActionButtonProps {
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  variant: 'outline' | 'filled';
-  color?: string;
-  onPress?: () => void;
-}
+import { ActionButtonProps } from '../../types';
 
 export default function ActionButton({
   icon,

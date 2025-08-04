@@ -2,15 +2,8 @@ import clsx from 'clsx';
 import React from 'react';
 import { Text, View } from 'react-native';
 
-import { CardTheme, cardThemeStyles } from './cardThemes';
-
-interface CashDrawerCardProps {
-  type: string;
-  title: string;
-  quantity: string;
-  totalAmount: string;
-  theme: CardTheme;
-}
+import { CashDrawerCardProps } from '../../types';
+import { cardThemeStyles } from './cardThemes';
 
 export default function CashDrawerCard({
   type,

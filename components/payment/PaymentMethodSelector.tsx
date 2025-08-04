@@ -3,12 +3,15 @@ import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { PAYMENT_METHODS, PaymentMethodSelectorProps } from '../../types';
+import {
+  CASH_REGISTER_PAYMENTS,
+  CashRegisterPaymentSelectorProps,
+} from '../../types';
 
 export default function PaymentMethodSelector({
   selectedPaymentMethod,
   onPaymentMethodPress,
-}: PaymentMethodSelectorProps) {
+}: CashRegisterPaymentSelectorProps) {
   return (
     // 결제 방법 선택 섹션 - 현금, 이체, 쿠폰, 장부 중 선택
     <View>
@@ -17,7 +20,7 @@ export default function PaymentMethodSelector({
 
       {/* 결제 방법 선택 버튼들 */}
       <View className='w-full flex flex-row gap-4'>
-        {PAYMENT_METHODS.map(method => (
+        {CASH_REGISTER_PAYMENTS.map(method => (
           <Pressable
             key={method.id}
             onPress={() => onPaymentMethodPress(method.id)}

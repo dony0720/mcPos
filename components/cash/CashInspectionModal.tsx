@@ -10,15 +10,7 @@ import {
   View,
 } from 'react-native';
 
-import { CashDrawerItem } from '../../constants';
-
-// 모달 props 타입 정의
-interface CashInspectionModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: (updatedData: CashDrawerItem[]) => void;
-  initialData: CashDrawerItem[];
-}
+import { CashDrawerMoneyItem, CashInspectionModalProps } from '../../types';
 
 export default function CashInspectionModal({
   visible,
@@ -26,7 +18,7 @@ export default function CashInspectionModal({
   onConfirm,
   initialData,
 }: CashInspectionModalProps) {
-  const [cashData, setCashData] = useState<CashDrawerItem[]>([]);
+  const [cashData, setCashData] = useState<CashDrawerMoneyItem[]>([]);
 
   // 모달이 열릴 때 초기 데이터 설정
   useEffect(() => {

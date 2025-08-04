@@ -1,17 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
 import clsx from 'clsx';
 import React from 'react';
 import { Text, View } from 'react-native';
 
-import { SalesCardTheme, salesCardThemeStyles } from './cardThemes';
+import { SalesInfoCardProps } from '../../types';
+import { salesCardThemeStyles } from './cardThemes';
 import CashInfoCardHeader from './CashInfoCardHeader';
-
-interface SalesInfoCardProps {
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  amount: string;
-  theme: SalesCardTheme;
-}
 
 export default function SalesInfoCard({
   icon,

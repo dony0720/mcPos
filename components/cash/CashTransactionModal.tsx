@@ -9,12 +9,7 @@ import {
   View,
 } from 'react-native';
 
-// 모달 props 타입 정의
-interface CashTransactionModalProps {
-  visible: boolean;
-  onClose: () => void;
-  type: 'deposit' | 'withdraw';
-}
+import { CashTransactionModalProps } from '../../types';
 
 export default function CashTransactionModal({
   visible,

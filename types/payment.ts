@@ -3,19 +3,21 @@
 // ===== 기본 엔티티 타입들 =====
 
 /**
- * 결제 수단 정보
+ * 계산대 결제 수단 정보
+ * @description 계산대에서 사용하는 결제 방법들 (현금, 이체, 쿠폰, 장부)
  */
-export interface PaymentMethod {
-  id: string;
+export interface CashRegisterPayment {
+  id: CashRegisterPaymentId;
   name: string;
   icon: string;
 }
 
 /**
- * 주문 방법 정보
+ * 주문 접수 방법 정보
+ * @description 주문을 받는 방식들 (매장, 포장, 배달)
  */
-export interface OrderMethod {
-  id: string;
+export interface OrderReceiptMethod {
+  id: OrderReceiptMethodId;
   name: string;
   icon: string;
 }
@@ -45,17 +47,17 @@ export interface Discount {
 /**
  * 결제 수단 선택기 Props
  */
-export interface PaymentMethodSelectorProps {
-  selectedPaymentMethod: string | null;
-  onPaymentMethodPress: (methodId: string) => void;
+export interface CashRegisterPaymentSelectorProps {
+  selectedPaymentMethod: CashRegisterPaymentId | null;
+  onPaymentMethodPress: (methodId: CashRegisterPaymentId) => void;
 }
 
 /**
  * 주문 방법 선택기 Props
  */
-export interface OrderMethodSelectorProps {
-  selectedOrderMethod: string | null;
-  onOrderMethodPress: (methodId: string) => void;
+export interface OrderReceiptMethodSelectorProps {
+  selectedOrderMethod: OrderReceiptMethodId | null;
+  onOrderMethodPress: (methodId: OrderReceiptMethodId) => void;
 }
 
 /**
@@ -105,6 +107,24 @@ export interface PaymentHeaderProps {
   onBack: () => void;
 }
 
+/**
+ * 키패드 Props
+ */
+export interface KeypadProps {
+  onNumberPress: (number: string) => void;
+  onBackspace: () => void;
+  maxLength?: number;
+  currentInput?: string;
+}
+
+/**
+ * 할인 섹션 Props
+ */
+export interface DiscountSectionProps {
+  onDiscountSelect: (discount: Discount | null) => void;
+  onDiscountDelete: () => void;
+}
+
 // ===== 유틸리티 타입들 =====
 
 /**
@@ -115,12 +135,12 @@ export type NumberInputType = 'phone' | 'pickup';
 /**
  * 결제 수단 ID 타입
  */
-export type PaymentMethodId = 'cash' | 'transfer' | 'coupon' | 'ledger';
+export type CashRegisterPaymentId = 'cash' | 'transfer' | 'coupon' | 'ledger';
 
 /**
  * 주문 방법 ID 타입
  */
-export type OrderMethodId = 'takeout' | 'dine-in';
+export type OrderReceiptMethodId = 'takeout' | 'dine-in';
 
 /**
  * 할인 ID 타입
@@ -140,8 +160,8 @@ export type DiscountId =
  */
 export interface PaymentState {
   isChecked: boolean;
-  selectedPaymentMethod: PaymentMethodId | null;
-  selectedOrderMethod: OrderMethodId | null;
+  selectedPaymentMethod: CashRegisterPaymentId | null;
+  selectedOrderMethod: OrderReceiptMethodId | null;
   orderItems: OrderItem[];
   appliedDiscounts: Discount[];
   totalAmount: number;
@@ -164,7 +184,7 @@ export interface PaymentModalState {
 /**
  * 결제 수단 목록
  */
-export const PAYMENT_METHODS: PaymentMethod[] = [
+export const CASH_REGISTER_PAYMENTS: CashRegisterPayment[] = [
   { id: 'cash', name: '현금', icon: 'cash-outline' },
   { id: 'transfer', name: '이체', icon: 'card-outline' },
   { id: 'coupon', name: '쿠폰', icon: 'ticket-outline' },
@@ -174,7 +194,7 @@ export const PAYMENT_METHODS: PaymentMethod[] = [
 /**
  * 주문 방법 목록
  */
-export const ORDER_METHODS: OrderMethod[] = [
+export const ORDER_RECEIPT_METHODS: OrderReceiptMethod[] = [
   { id: 'takeout', name: '테이크아웃', icon: 'bag-outline' },
   { id: 'dine-in', name: '매장', icon: 'restaurant-outline' },
 ] as const;
@@ -239,7 +259,7 @@ export type CalculatePaymentAmount = (
  * 결제 처리 함수 타입
  */
 export type ProcessPayment = (
-  paymentMethod: PaymentMethodId,
+  paymentMethod: CashRegisterPaymentId,
   orderItems: OrderItem[],
   finalAmount: number,
   phoneNumber?: string,

@@ -13,15 +13,20 @@ import {
   SelectAllCheckbox,
 } from '../components';
 import { useButtonAnimation, useModal } from '../hooks';
-import { NumberInputType, OrderItem, PaymentMethodId } from '../types';
+import {
+  NumberInputType,
+  OrderItem,
+  CashRegisterPaymentId,
+  OrderReceiptMethodId,
+} from '../types';
 
 export default function Payment() {
   // 간단한 상태 관리
   const [isChecked, setIsChecked] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<PaymentMethodId>('cash');
+    useState<CashRegisterPaymentId>('cash');
   const [selectedOrderMethod, setSelectedOrderMethod] =
-    useState<string>('dine-in');
+    useState<OrderReceiptMethodId>('dine-in');
 
   // 모달 관리
   const { openModal, closeModal, isModalOpen } = useModal();

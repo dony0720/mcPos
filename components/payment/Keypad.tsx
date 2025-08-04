@@ -2,12 +2,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-interface KeypadProps {
-  onNumberPress: (number: string) => void;
-  onBackspace: () => void;
-  maxLength?: number;
-  currentInput?: string;
-}
+import { KeypadProps } from '../../types';
 
 export default function Keypad({
   onNumberPress,

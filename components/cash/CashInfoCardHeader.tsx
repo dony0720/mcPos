@@ -2,12 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, View } from 'react-native';
 
-interface CashInfoCardHeaderProps {
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  iconColor: string;
-  titleColor: string;
-}
+import { CashInfoCardHeaderProps } from '../../types';
 
 export default function CashInfoCardHeader({
   icon,

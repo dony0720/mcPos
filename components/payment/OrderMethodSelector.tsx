@@ -3,12 +3,15 @@ import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { ORDER_METHODS, OrderMethodSelectorProps } from '../../types';
+import {
+  ORDER_RECEIPT_METHODS,
+  OrderReceiptMethodSelectorProps,
+} from '../../types';
 
 export default function OrderMethodSelector({
   selectedOrderMethod,
   onOrderMethodPress,
-}: OrderMethodSelectorProps) {
+}: OrderReceiptMethodSelectorProps) {
   return (
     // 주문 방법 선택 섹션 - 매장, 포장, 배달 중 선택
     <View>
@@ -17,7 +20,7 @@ export default function OrderMethodSelector({
 
       {/* 주문 방식 선택 버튼들 */}
       <View className='w-full flex flex-row gap-4'>
-        {ORDER_METHODS.map(method => (
+        {ORDER_RECEIPT_METHODS.map(method => (
           <Pressable
             key={method.id}
             onPress={() => onOrderMethodPress(method.id)}

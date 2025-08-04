@@ -1,12 +1,8 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
+import { CashHeaderProps } from '../../types';
 import ActionButton from './ActionButton';
-
-interface CashHeaderProps {
-  onInspection?: () => void;
-  onDailySettlement?: () => void;
-}
 
 export default function CashHeader({
   onInspection,
