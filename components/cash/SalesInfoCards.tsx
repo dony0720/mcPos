@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
+import { SalesTheme } from '../../constants';
 import SalesInfoCard from './SalesInfoCard';
 
 // 매출 정보 카드 초기 데이터
@@ -11,25 +12,25 @@ const INITIAL_SALES_INFO_DATA = [
       icon: 'play-circle' as const,
       title: '시작금액',
       amount: '1,000,000원',
-      theme: 'gray' as const,
+      theme: SalesTheme.GRAY,
     },
     {
       icon: 'trending-up' as const,
       title: '오늘 매출',
       amount: '850,000원',
-      theme: 'blue' as const,
+      theme: SalesTheme.BLUE,
     },
     {
       icon: 'arrow-down-circle' as const,
       title: '입금',
       amount: '+50,000원',
-      theme: 'emerald' as const,
+      theme: SalesTheme.EMERALD,
     },
     {
       icon: 'arrow-up-circle' as const,
       title: '출금',
       amount: '-30,000원',
-      theme: 'red' as const,
+      theme: SalesTheme.RED,
     },
   ],
   // 두 번째 행: 현금, 이체, 쿠폰, 장부
@@ -38,25 +39,25 @@ const INITIAL_SALES_INFO_DATA = [
       icon: 'cash' as const,
       title: '현금',
       amount: '450,000원',
-      theme: 'green' as const,
+      theme: SalesTheme.GREEN,
     },
     {
       icon: 'card' as const,
       title: '이체',
       amount: '280,000원',
-      theme: 'purple' as const,
+      theme: SalesTheme.PURPLE,
     },
     {
       icon: 'ticket' as const,
       title: '쿠폰',
       amount: '45,000원',
-      theme: 'orange' as const,
+      theme: SalesTheme.ORANGE,
     },
     {
       icon: 'book' as const,
       title: '장부',
       amount: '75,000원',
-      theme: 'indigo' as const,
+      theme: SalesTheme.INDIGO,
     },
   ],
 ];

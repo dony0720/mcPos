@@ -94,5 +94,7 @@ export const salesCardThemeStyles = Object.fromEntries(
   ReturnType<typeof createBaseCardStyleWithColor>
 >;
 
-export type CardTheme = keyof typeof cardThemeStyles;
-export type SalesCardTheme = keyof typeof salesCardThemeStyles;
+import { CashTheme, SalesTheme } from '../../constants';
+
+export type CardTheme = CashTheme;
+export type SalesCardTheme = SalesTheme;

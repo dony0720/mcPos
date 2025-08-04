@@ -10,14 +10,7 @@ import {
   View,
 } from 'react-native';
 
-// 현금 서랍 아이템 타입 정의
-interface CashDrawerItem {
-  type: string;
-  title: string;
-  theme: 'yellow' | 'green' | 'orange' | 'blue' | 'gray';
-  quantity: number;
-  unitValue: number;
-}
+import { CashDrawerItem } from '../../constants';
 
 // 모달 props 타입 정의
 interface CashInspectionModalProps {

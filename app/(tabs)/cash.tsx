@@ -8,57 +8,49 @@ import {
   PageHeader,
   SalesInfoCards,
 } from '../../components';
-
-// 현금 서랍 아이템 타입 정의
-interface CashDrawerItem {
-  type: string;
-  title: string;
-  theme: 'yellow' | 'green' | 'orange' | 'blue' | 'gray';
-  quantity: number;
-  unitValue: number;
-}
+import { CashDrawerItem, CashTheme } from '../../constants';
 
 // 권종별 현금 서랍 초기 데이터
 const INITIAL_CASH_DRAWER_DATA: CashDrawerItem[] = [
   {
     type: '지폐',
     title: '5만원',
-    theme: 'yellow' as const,
+    theme: CashTheme.YELLOW,
     quantity: 8,
     unitValue: 50000,
   },
   {
     type: '지폐',
     title: '1만원',
-    theme: 'green' as const,
+    theme: CashTheme.GREEN,
     quantity: 15,
     unitValue: 10000,
   },
   {
     type: '지폐',
     title: '5천원',
-    theme: 'orange' as const,
+    theme: CashTheme.ORANGE,
     quantity: 12,
     unitValue: 5000,
   },
   {
     type: '지폐',
     title: '1천원',
-    theme: 'blue' as const,
+    theme: CashTheme.BLUE,
     quantity: 25,
     unitValue: 1000,
   },
   {
     type: '동전',
     title: '500원',
-    theme: 'gray' as const,
+    theme: CashTheme.GRAY,
     quantity: 30,
     unitValue: 500,
   },
   {
     type: '동전',
     title: '100원',
-    theme: 'gray' as const,
+    theme: CashTheme.GRAY,
     quantity: 50,
     unitValue: 100,
   },

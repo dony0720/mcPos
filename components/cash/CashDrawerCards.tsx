@@ -2,17 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
+import { CashDrawerItem } from '../../constants';
 import CashDrawerCard from './CashDrawerCard';
 import CashTransactionModal from './CashTransactionModal';
-
-// 현금 서랍 아이템 타입 정의
-interface CashDrawerItem {
-  type: string;
-  title: string;
-  theme: 'yellow' | 'green' | 'orange' | 'blue' | 'gray';
-  quantity: number;
-  unitValue: number;
-}
 
 // 컴포넌트 props 타입 정의
 interface CashDrawerCardsProps {
