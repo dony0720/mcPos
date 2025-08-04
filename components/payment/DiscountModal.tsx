@@ -9,60 +9,7 @@ import {
   View,
 } from 'react-native';
 
-// 할인 항목 정보를 정의하는 인터페이스
-interface Discount {
-  id: string;
-  name: string;
-  value: number; // 고정 가격
-  description?: string;
-}
-
-// 할인 모달 컴포넌트의 props 타입 정의
-interface DiscountModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onSelectDiscount: (discount: Discount) => void;
-}
-
-// 할인 옵션 데이터 - 각종 할인 혜택 정보
-const discountOptions: Discount[] = [
-  {
-    id: 'senior',
-    name: '경로우대',
-    value: 3000,
-    description: '65세 이상 3,000원 고정가',
-  },
-  {
-    id: 'student',
-    name: '학생할인',
-    value: 4000,
-    description: '학생증 제시 시 4,000원 고정가',
-  },
-  {
-    id: 'employee',
-    name: '직원할인',
-    value: 2000,
-    description: '직원 2,000원 고정가',
-  },
-  {
-    id: 'special1',
-    name: '특가 5,000원',
-    value: 5000,
-    description: '5,000원 고정 할인가',
-  },
-  {
-    id: 'special2',
-    name: '특가 6,000원',
-    value: 6000,
-    description: '6,000원 고정 할인가',
-  },
-  {
-    id: 'special3',
-    name: '특가 8,000원',
-    value: 8000,
-    description: '8,000원 고정 할인가',
-  },
-];
+import { Discount, DISCOUNT_OPTIONS, DiscountModalProps } from '../../types';
 
 export default function DiscountModal({
   visible,
@@ -106,7 +53,7 @@ export default function DiscountModal({
                 contentContainerStyle={{ paddingBottom: 16 }}
               >
                 <View className='p-4'>
-                  {discountOptions.map(discount => (
+                  {DISCOUNT_OPTIONS.map(discount => (
                     <Pressable
                       key={discount.id}
                       onPress={() => handleDiscountSelect(discount)}
@@ -161,5 +108,3 @@ export default function DiscountModal({
     </Modal>
   );
 }
-
-export type { Discount };

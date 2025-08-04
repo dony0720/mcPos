@@ -4,10 +4,7 @@ import { Animated, Pressable, View } from 'react-native';
 
 import McPosLogo from '../../assets/icon/mcPosLogo.svg';
 import { useButtonAnimation } from '../../hooks';
-
-interface PaymentHeaderProps {
-  onBack: () => void;
-}
+import { PaymentHeaderProps } from '../../types';
 
 export default function PaymentHeader({ onBack }: PaymentHeaderProps) {
   const backAnimation = useButtonAnimation();

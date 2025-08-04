@@ -4,15 +4,7 @@ import React from 'react';
 import { Animated, Image, Pressable, Text, View } from 'react-native';
 
 import { useButtonAnimation } from '../../hooks';
-
-interface PaymentMenuItemProps {
-  isChecked: boolean;
-  onCheckboxPress: () => void;
-  menuName: string;
-  options: string;
-  price: string;
-  onDeletePress: () => void;
-}
+import { PaymentMenuItemProps } from '../../types';
 
 export default function PaymentMenuItem({
   isChecked,

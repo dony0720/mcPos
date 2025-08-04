@@ -13,18 +13,19 @@ import {
   SelectAllCheckbox,
 } from '../components';
 import { useButtonAnimation, useModal } from '../hooks';
+import { NumberInputType, OrderItem, PaymentMethodId } from '../types';
 
 export default function Payment() {
   // 간단한 상태 관리
   const [isChecked, setIsChecked] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<string>('cash');
+    useState<PaymentMethodId>('cash');
   const [selectedOrderMethod, setSelectedOrderMethod] =
-    useState<string>('store');
+    useState<string>('dine-in');
 
   // 모달 관리
   const { openModal, closeModal, isModalOpen } = useModal();
-  const [modalType, setModalType] = useState<'phone' | 'pickup'>('pickup');
+  const [modalType, setModalType] = useState<NumberInputType>('pickup');
   const [isLedgerFirstStep, setIsLedgerFirstStep] = useState(false);
 
   const paymentButtonAnimation = useButtonAnimation();
@@ -80,7 +81,7 @@ export default function Payment() {
   };
 
   // 목업 데이터
-  const mockOrderItems = [
+  const mockOrderItems: OrderItem[] = [
     {
       id: 1,
       name: '아메리카노',

@@ -3,18 +3,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-interface PaymentMethodSelectorProps {
-  selectedPaymentMethod: string | null;
-  onPaymentMethodPress: (methodId: string) => void;
-}
-
-// 결제 수단 옵션 데이터 - 현금, 카드, 쿠폰, 장부 결제
-const paymentMethods = [
-  { id: 'cash', name: '현금', icon: 'cash-outline' },
-  { id: 'transfer', name: '이체', icon: 'card-outline' },
-  { id: 'coupon', name: '쿠폰', icon: 'ticket-outline' },
-  { id: 'ledger', name: '장부', icon: 'book-outline' },
-];
+import { PAYMENT_METHODS, PaymentMethodSelectorProps } from '../../types';
 
 export default function PaymentMethodSelector({
   selectedPaymentMethod,
@@ -28,7 +17,7 @@ export default function PaymentMethodSelector({
 
       {/* 결제 방법 선택 버튼들 */}
       <View className='w-full flex flex-row gap-4'>
-        {paymentMethods.map(method => (
+        {PAYMENT_METHODS.map(method => (
           <Pressable
             key={method.id}
             onPress={() => onPaymentMethodPress(method.id)}
@@ -41,7 +30,7 @@ export default function PaymentMethodSelector({
             )}
           >
             <Ionicons
-              name={method.icon as any}
+              name={method.icon as keyof typeof Ionicons.glyphMap}
               size={24}
               color={
                 selectedPaymentMethod === method.id ? '#000000' : '#6B7280'
