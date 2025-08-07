@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import {
   Modal,
@@ -167,7 +168,10 @@ export default function EditModal({
                   }}
                 >
                   <Text
-                    className={`text-base ${receptionist ? 'text-gray-800' : 'text-gray-400'}`}
+                    className={clsx('text-base', {
+                      'text-gray-800': receptionist,
+                      'text-gray-400': !receptionist,
+                    })}
                   >
                     {receptionist || '접수자를 선택하세요'}
                   </Text>
@@ -216,7 +220,10 @@ export default function EditModal({
                   }}
                 >
                   <Text
-                    className={`text-base ${paymentMethod ? 'text-gray-800' : 'text-gray-400'}`}
+                    className={clsx('text-base', {
+                      'text-gray-800': paymentMethod,
+                      'text-gray-400': !paymentMethod,
+                    })}
                   >
                     {paymentMethod || '결제수단을 선택하세요'}
                   </Text>

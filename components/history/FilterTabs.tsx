@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -59,11 +60,12 @@ export default function FilterTabs({
         <Pressable
           key={option.key}
           onPress={() => onFilterChange(option.key)}
-          className={`flex flex-row items-center px-3 py-2 rounded-full border ${
+          className={clsx(
+            'flex flex-row items-center px-3 py-2 rounded-full border',
             selectedFilter === option.key
               ? 'bg-blue-50 border-blue-500'
               : 'bg-white border-gray-200'
-          }`}
+          )}
         >
           <Ionicons
             name={option.icon as any}
@@ -71,9 +73,10 @@ export default function FilterTabs({
             color={selectedFilter === option.key ? '#3B82F6' : option.color}
           />
           <Text
-            className={`ml-2 font-medium ${
-              selectedFilter === option.key ? 'text-blue-600' : 'text-gray-600'
-            }`}
+            className={clsx('ml-2 font-medium', {
+              'text-blue-600': selectedFilter === option.key,
+              'text-gray-600': selectedFilter !== option.key,
+            })}
           >
             {option.label}
           </Text>

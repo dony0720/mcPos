@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import {
   Modal,
@@ -122,7 +123,10 @@ export default function CashTransactionModal({
                 </Pressable>
                 <Pressable
                   onPress={handleConfirm}
-                  className={`flex-1 ${buttonColor} rounded-xl p-3 items-center`}
+                  className={clsx(
+                    'flex-1 rounded-xl p-3 items-center',
+                    buttonColor
+                  )}
                 >
                   <Text className='text-white font-medium text-lg'>
                     {title}

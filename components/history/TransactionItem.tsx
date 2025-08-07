@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import clsx from 'clsx';
 import dayjs from 'dayjs';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -105,7 +106,10 @@ export default function TransactionItem({
         {/* 좌측: 아이콘 및 기본 정보 */}
         <View className='flex flex-row items-center flex-1'>
           <View
-            className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${paymentStyle.bgClass}`}
+            className={clsx(
+              'w-12 h-12 rounded-full flex items-center justify-center mr-4',
+              paymentStyle.bgClass
+            )}
           >
             <Ionicons
               name={paymentStyle.icon as any}
@@ -120,10 +124,13 @@ export default function TransactionItem({
                 #{transaction.id.split('_')[1]}
               </Text>
               <View
-                className={`px-2 py-1 rounded-full ${paymentStyle.bgClass}`}
+                className={clsx('px-2 py-1 rounded-full', paymentStyle.bgClass)}
               >
                 <Text
-                  className={`text-xs font-medium ${paymentStyle.textClass}`}
+                  className={clsx(
+                    'text-xs font-medium',
+                    paymentStyle.textClass
+                  )}
                 >
                   {transaction.paymentMethod}
                 </Text>
