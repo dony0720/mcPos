@@ -1,5 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
   Modal,
   Pressable,
@@ -10,72 +12,58 @@ import {
 } from 'react-native';
 
 import {
-  LedgerRegistrationData,
-  LedgerRegistrationModalProps,
-} from '../../types';
+  LedgerRegistrationFormData,
+  ledgerRegistrationSchema,
+  PAYMENT_METHOD_OPTIONS,
+  RECEPTIONIST_OPTIONS,
+} from '../../schemas/ledgerSchema';
+import { LedgerRegistrationModalProps } from '../../types/ledger';
 
 export default function LedgerRegistrationModal({
   visible,
   onClose,
   onConfirm,
 }: LedgerRegistrationModalProps) {
-  const [formData, setFormData] = useState<LedgerRegistrationData>({
-    name: '',
-    phoneNumber: '',
-    initialAmount: '',
-    receptionist: '',
-    paymentMethod: '',
-  });
-
-  const [showReceptionistDropdown, setShowReceptionistDropdown] =
-    useState(false);
-  const [showPaymentMethodDropdown, setShowPaymentMethodDropdown] =
-    useState(false);
-
-  // 접수자 옵션
-  const receptionistOptions = [
-    '홍길동',
-    '김직원',
-    '이사장',
-    '박매니저',
-    '최대리',
-  ];
-
-  // 결제수단 옵션
-  const paymentMethodOptions = ['현금', '계좌이체'];
-
-  const handleConfirm = () => {
-    // 모든 필드가 입력되었는지 확인
-    if (
-      !formData.name.trim() ||
-      !formData.phoneNumber.trim() ||
-      !formData.initialAmount.trim() ||
-      !formData.receptionist ||
-      !formData.paymentMethod
-    ) {
-      return;
-    }
-
-    onConfirm(formData);
-    handleClose();
-  };
-
-  const handleClose = () => {
-    // 폼 데이터 초기화
-    setFormData({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+    setValue,
+  } = useForm<LedgerRegistrationFormData>({
+    resolver: zodResolver(ledgerRegistrationSchema),
+    mode: 'onChange', // 실시간 검증
+    defaultValues: {
       name: '',
       phoneNumber: '',
       initialAmount: '',
       receptionist: '',
       paymentMethod: '',
-    });
-    setShowReceptionistDropdown(false);
-    setShowPaymentMethodDropdown(false);
+    },
+  });
+  const [showReceptionistDropdown, setShowReceptionistDropdown] =
+    useState(false);
+  const [showPaymentMethodDropdown, setShowPaymentMethodDropdown] =
+    useState(false);
+
+  // 접수자 옵션 (스키마에서 가져옴)
+  const receptionistOptions = [...RECEPTIONIST_OPTIONS];
+
+  // 결제수단 옵션 (스키마에서 가져옴)
+  const paymentMethodOptions = [...PAYMENT_METHOD_OPTIONS];
+
+  // 폼 제출 핸들러 - 검증이 통과된 경우에만 호출됨
+  const onSubmit = (data: LedgerRegistrationFormData) => {
+    onConfirm(data);
+    handleClose();
+  };
+
+  const handleClose = () => {
+    reset(); // 폼 초기화
     onClose();
   };
 
   const formatAmount = (text: string) => {
-    // 숫자가 아닌 문자들을 모두 제거 (한 글자씩 확인)
     let numbersOnly = '';
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
@@ -84,10 +72,8 @@ export default function LedgerRegistrationModal({
       }
     }
 
-    // 빈 문자열이면 그대로 반환
     if (!numbersOnly) return '';
 
-    // 숫자로 변환 후 천 단위 콤마 자동 추가
     const number = parseInt(numbersOnly, 10);
     return number.toLocaleString('ko-KR');
   };
@@ -105,28 +91,50 @@ export default function LedgerRegistrationModal({
             {/* 이름 입력 */}
             <View className='mb-4'>
               <Text className='text-gray-700 font-semibold mb-2'>이름</Text>
-              <TextInput
-                className='border border-gray-300 rounded-lg px-4 py-3'
-                placeholder='이름을 입력하세요'
-                value={formData.name}
-                onChangeText={text =>
-                  setFormData(prev => ({ ...prev, name: text }))
-                }
+              <Controller
+                control={control}
+                name='name'
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    className={`border rounded-lg px-4 py-3 ${
+                      errors.name ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder='이름을 입력하세요'
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                )}
               />
+              {errors.name && (
+                <Text className='text-red-500 text-sm mt-1'>
+                  {errors.name.message}
+                </Text>
+              )}
             </View>
 
             {/* 전화번호 입력 */}
             <View className='mb-4'>
               <Text className='text-gray-700 font-semibold mb-2'>전화번호</Text>
-              <TextInput
-                className='border border-gray-300 rounded-lg px-4 py-3'
-                placeholder='전화번호를 입력하세요'
-                value={formData.phoneNumber}
-                onChangeText={text => {
-                  setFormData(prev => ({ ...prev, phoneNumber: text }));
-                }}
-                keyboardType='phone-pad'
+              <Controller
+                control={control}
+                name='phoneNumber'
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    className={`border rounded-lg px-4 py-3 ${
+                      errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder='010-0000-0000'
+                    value={value}
+                    onChangeText={onChange}
+                    keyboardType='phone-pad'
+                  />
+                )}
               />
+              {errors.phoneNumber && (
+                <Text className='text-red-500 text-sm mt-1'>
+                  {errors.phoneNumber.message}
+                </Text>
+              )}
             </View>
 
             {/* 초기 충전 금액 입력 */}
@@ -134,110 +142,170 @@ export default function LedgerRegistrationModal({
               <Text className='text-gray-700 font-semibold mb-2'>
                 초기 충전 금액
               </Text>
-              <TextInput
-                className='border border-gray-300 rounded-lg px-4 py-3'
-                placeholder='충전할 금액을 입력하세요'
-                value={formData.initialAmount}
-                onChangeText={text => {
-                  const formatted = formatAmount(text);
-                  setFormData(prev => ({
-                    ...prev,
-                    initialAmount: formatted,
-                  }));
-                }}
-                keyboardType='numeric'
+              <Controller
+                control={control}
+                name='initialAmount'
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    className={`border rounded-lg px-4 py-3 ${
+                      errors.initialAmount
+                        ? 'border-red-500'
+                        : 'border-gray-300'
+                    }`}
+                    placeholder='충전할 금액을 입력하세요'
+                    value={value}
+                    onChangeText={text => {
+                      const formatted = formatAmount(text);
+                      onChange(formatted);
+                    }}
+                    keyboardType='numeric'
+                  />
+                )}
               />
+              {errors.initialAmount && (
+                <Text className='text-red-500 text-sm mt-1'>
+                  {errors.initialAmount.message}
+                </Text>
+              )}
             </View>
 
             {/* 접수자 선택 */}
             <View className='mb-4'>
               <Text className='text-gray-700 font-semibold mb-2'>접수자</Text>
-              <Pressable
-                className='border border-gray-300 rounded-lg px-4 py-3 flex-row justify-between items-center'
-                onPress={() =>
-                  setShowReceptionistDropdown(!showReceptionistDropdown)
-                }
-              >
-                <Text
-                  className={
-                    formData.receptionist ? 'text-gray-800' : 'text-gray-400'
-                  }
-                >
-                  {formData.receptionist || '접수자를 선택하세요'}
-                </Text>
-                <Ionicons
-                  name={
-                    showReceptionistDropdown ? 'chevron-up' : 'chevron-down'
-                  }
-                  size={20}
-                  color='#666'
-                />
-              </Pressable>
-
-              {showReceptionistDropdown && (
-                <View className='border border-gray-300 rounded-lg mt-1 bg-white'>
-                  {receptionistOptions.map((option, index) => (
+              <Controller
+                control={control}
+                name='receptionist'
+                render={({ field: { onChange, value } }) => (
+                  <View
+                    className={`border rounded-lg ${
+                      errors.receptionist ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  >
                     <Pressable
-                      key={index}
-                      className='px-4 py-3 border-b border-gray-100 last:border-b-0'
+                      className='px-4 py-3 flex-row items-center justify-between'
                       onPress={() => {
-                        setFormData(prev => ({
-                          ...prev,
-                          receptionist: option,
-                        }));
-                        setShowReceptionistDropdown(false);
+                        // 드롭다운 토글 로직이 필요한 경우 여기에 추가
+                        setShowReceptionistDropdown(!showReceptionistDropdown);
                       }}
                     >
-                      <Text className='text-gray-800'>{option}</Text>
+                      <Text
+                        className={`${value ? 'text-gray-800' : 'text-gray-400'}`}
+                      >
+                        {value || '접수자를 선택하세요'}
+                      </Text>
+                      <Ionicons
+                        name='chevron-down'
+                        size={20}
+                        color={value ? '#374151' : '#9CA3AF'}
+                      />
                     </Pressable>
-                  ))}
-                </View>
+
+                    {/* 옵션 목록 - 항상 표시 */}
+                    {showReceptionistDropdown && (
+                      <View className='border-t border-gray-100'>
+                        {receptionistOptions.map((option, index) => (
+                          <Pressable
+                            key={index}
+                            className='px-4 py-3 border-b border-gray-100 last:border-b-0'
+                            onPress={() => {
+                              onChange(option);
+                              setValue('receptionist', option);
+                              setShowReceptionistDropdown(false);
+                            }}
+                          >
+                            <View className='flex-row items-center justify-between'>
+                              <Text className='text-gray-800'>{option}</Text>
+                              {value === option && (
+                                <Ionicons
+                                  name='checkmark'
+                                  size={20}
+                                  color='#10B981'
+                                />
+                              )}
+                            </View>
+                          </Pressable>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                )}
+              />
+              {errors.receptionist && (
+                <Text className='text-red-500 text-sm mt-1'>
+                  {errors.receptionist.message}
+                </Text>
               )}
             </View>
 
             {/* 결제수단 선택 */}
             <View className='mb-6'>
               <Text className='text-gray-700 font-semibold mb-2'>결제수단</Text>
-              <Pressable
-                className='border border-gray-300 rounded-lg px-4 py-3 flex-row justify-between items-center'
-                onPress={() =>
-                  setShowPaymentMethodDropdown(!showPaymentMethodDropdown)
-                }
-              >
-                <Text
-                  className={
-                    formData.paymentMethod ? 'text-gray-800' : 'text-gray-400'
-                  }
-                >
-                  {formData.paymentMethod || '결제수단을 선택하세요'}
-                </Text>
-                <Ionicons
-                  name={
-                    showPaymentMethodDropdown ? 'chevron-up' : 'chevron-down'
-                  }
-                  size={20}
-                  color='#666'
-                />
-              </Pressable>
-
-              {showPaymentMethodDropdown && (
-                <View className='border border-gray-300 rounded-lg mt-1 bg-white'>
-                  {paymentMethodOptions.map((option, index) => (
+              <Controller
+                control={control}
+                name='paymentMethod'
+                render={({ field: { onChange, value } }) => (
+                  <View
+                    className={`border rounded-lg ${
+                      errors.paymentMethod
+                        ? 'border-red-500'
+                        : 'border-gray-300'
+                    }`}
+                  >
                     <Pressable
-                      key={index}
-                      className='px-4 py-3 border-b border-gray-100 last:border-b-0'
+                      className='px-4 py-3 flex-row items-center justify-between'
                       onPress={() => {
-                        setFormData(prev => ({
-                          ...prev,
-                          paymentMethod: option,
-                        }));
-                        setShowPaymentMethodDropdown(false);
+                        // 드롭다운 토글 로직이 필요한 경우 여기에 추가
+                        setShowPaymentMethodDropdown(
+                          !showPaymentMethodDropdown
+                        );
                       }}
                     >
-                      <Text className='text-gray-800'>{option}</Text>
+                      <Text
+                        className={`${value ? 'text-gray-800' : 'text-gray-400'}`}
+                      >
+                        {value || '결제수단을 선택하세요'}
+                      </Text>
+                      <Ionicons
+                        name='chevron-down'
+                        size={20}
+                        color={value ? '#374151' : '#9CA3AF'}
+                      />
                     </Pressable>
-                  ))}
-                </View>
+
+                    {/* 옵션 목록 - 항상 표시 */}
+                    {showPaymentMethodDropdown && (
+                      <View className='border-t border-gray-100'>
+                        {paymentMethodOptions.map((option, index) => (
+                          <Pressable
+                            key={index}
+                            className='px-4 py-3 border-b border-gray-100 last:border-b-0'
+                            onPress={() => {
+                              onChange(option);
+                              setValue('paymentMethod', option);
+                              setShowPaymentMethodDropdown(false);
+                            }}
+                          >
+                            <View className='flex-row items-center justify-between'>
+                              <Text className='text-gray-800'>{option}</Text>
+                              {value === option && (
+                                <Ionicons
+                                  name='checkmark'
+                                  size={20}
+                                  color='#10B981'
+                                />
+                              )}
+                            </View>
+                          </Pressable>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                )}
+              />
+              {errors.paymentMethod && (
+                <Text className='text-red-500 text-sm mt-1'>
+                  {errors.paymentMethod.message}
+                </Text>
               )}
             </View>
           </ScrollView>
@@ -245,7 +313,6 @@ export default function LedgerRegistrationModal({
           {/* 버튼들 */}
           <View className='flex-row gap-3'>
             <Pressable
-              role='button'
               className='flex-1 p-3 border border-gray-300 rounded-lg'
               onPress={handleClose}
             >
@@ -255,11 +322,19 @@ export default function LedgerRegistrationModal({
             </Pressable>
 
             <Pressable
-              role='button'
-              className='flex-1 p-3 bg-primaryGreen rounded-lg'
-              onPress={handleConfirm}
+              className={`flex-1 p-3 rounded-lg ${
+                isValid ? 'bg-primaryGreen' : 'bg-gray-300'
+              }`}
+              onPress={handleSubmit(onSubmit)}
+              disabled={!isValid}
             >
-              <Text className='text-white text-center font-semibold'>등록</Text>
+              <Text
+                className={`text-center font-semibold ${
+                  isValid ? 'text-white' : 'text-gray-500'
+                }`}
+              >
+                등록
+              </Text>
             </Pressable>
           </View>
         </View>

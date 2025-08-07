@@ -60,6 +60,7 @@ export interface LedgerData {
 
 /**
  * 장부 등록 데이터
+ * @deprecated - ledgerSchema.ts의 LedgerRegistrationFormData를 사용하세요
  */
 export interface LedgerRegistrationData {
   name: string;
@@ -119,6 +120,7 @@ export interface LedgerHeaderProps {
 
 /**
  * 장부 등록 모달 Props
+ * @note - onConfirm의 data는 ledgerSchema.ts의 LedgerRegistrationFormData 타입을 사용합니다
  */
 export interface LedgerRegistrationModalProps {
   visible: boolean;
