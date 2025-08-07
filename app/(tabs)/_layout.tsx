@@ -26,9 +26,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="history"
+        name='history'
         options={{
-          title: "거래내역",
+          title: '거래내역',
         }}
       />
     </Tabs>

@@ -1,6 +1,6 @@
 // usePaymentState.ts - SRP: 결제 상태 관리만 담당
 
-import { useState } from "react";
+import { useState } from 'react';
 
 export interface PaymentState {
   isChecked: boolean;
@@ -17,7 +17,7 @@ const initialState: PaymentState = {
   selectedOrderMethod: null,
   showUniqueNumberModal: false,
   showPickupNumberModal: false,
-  uniqueNumber: "",
+  uniqueNumber: '',
 };
 
 /**
@@ -31,39 +31,39 @@ export const usePaymentState = () => {
   // 상태 업데이트 함수들
   const actions = {
     updateState: (updates: Partial<PaymentState>) => {
-      setState((prev) => ({ ...prev, ...updates }));
+      setState(prev => ({ ...prev, ...updates }));
     },
 
     toggleCheckbox: () => {
-      setState((prev) => ({ ...prev, isChecked: !prev.isChecked }));
+      setState(prev => ({ ...prev, isChecked: !prev.isChecked }));
     },
 
     setPaymentMethod: (methodId: string) => {
-      setState((prev) => ({ ...prev, selectedPaymentMethod: methodId }));
+      setState(prev => ({ ...prev, selectedPaymentMethod: methodId }));
     },
 
     setOrderMethod: (methodId: string) => {
-      setState((prev) => ({ ...prev, selectedOrderMethod: methodId }));
+      setState(prev => ({ ...prev, selectedOrderMethod: methodId }));
     },
 
     showUniqueNumberModal: () => {
-      setState((prev) => ({ ...prev, showUniqueNumberModal: true }));
+      setState(prev => ({ ...prev, showUniqueNumberModal: true }));
     },
 
     hideUniqueNumberModal: () => {
-      setState((prev) => ({ ...prev, showUniqueNumberModal: false }));
+      setState(prev => ({ ...prev, showUniqueNumberModal: false }));
     },
 
     showPickupNumberModal: () => {
-      setState((prev) => ({ ...prev, showPickupNumberModal: true }));
+      setState(prev => ({ ...prev, showPickupNumberModal: true }));
     },
 
     hidePickupNumberModal: () => {
-      setState((prev) => ({ ...prev, showPickupNumberModal: false }));
+      setState(prev => ({ ...prev, showPickupNumberModal: false }));
     },
 
     setUniqueNumber: (number: string) => {
-      setState((prev) => ({ ...prev, uniqueNumber: number }));
+      setState(prev => ({ ...prev, uniqueNumber: number }));
     },
 
     resetState: () => {

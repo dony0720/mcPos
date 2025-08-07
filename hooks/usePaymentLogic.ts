@@ -1,15 +1,15 @@
 // usePaymentLogic.ts - SRP: 결제 비즈니스 로직만 담당
 
-import { useRouter } from "expo-router";
+import { useRouter } from 'expo-router';
+
 import {
-  PaymentService,
-  OrderService,
   DiscountService,
-  PaymentServiceFactory,
   OrderDetails,
   OrderItem,
+  OrderService,
   PaymentResult,
-} from "../services/PaymentService";
+  PaymentServiceFactory,
+} from '../services/PaymentService';
 
 /**
  * 결제 비즈니스 로직 훅 (SRP: 비즈니스 로직만 담당)
@@ -37,8 +37,8 @@ export const usePaymentLogic = (
   const getMockOrderItems = (): OrderItem[] => {
     return Array.from({ length: 10 }, (_, index) => ({
       id: `item-${index}`,
-      name: "아메리카노 (HOT)",
-      options: "연하게, 샷추가, 휘핑추가",
+      name: '아메리카노 (HOT)',
+      options: '연하게, 샷추가, 휘핑추가',
       price: 6000,
       quantity: 1,
     }));
@@ -97,7 +97,7 @@ export const usePaymentLogic = (
 
       // 결제 방법 검증
       if (!paymentService.validatePaymentMethod(paymentMethod)) {
-        throw new Error("유효하지 않은 결제 방법입니다.");
+        throw new Error('유효하지 않은 결제 방법입니다.');
       }
 
       // 결제 처리
@@ -105,7 +105,7 @@ export const usePaymentLogic = (
 
       if (!paymentResult.success) {
         throw new Error(
-          paymentResult.message || "결제 처리 중 오류가 발생했습니다."
+          paymentResult.message || '결제 처리 중 오류가 발생했습니다.'
         );
       }
 
@@ -114,35 +114,35 @@ export const usePaymentLogic = (
 
       if (!orderResult.success) {
         throw new Error(
-          orderResult.message || "주문 생성 중 오류가 발생했습니다."
+          orderResult.message || '주문 생성 중 오류가 발생했습니다.'
         );
       }
 
       return {
         success: true,
         transactionId: paymentResult.transactionId,
-        message: "결제 및 주문이 성공적으로 완료되었습니다.",
+        message: '결제 및 주문이 성공적으로 완료되었습니다.',
       };
     } catch (error) {
-      console.error("결제 처리 오류:", error);
+      console.error('결제 처리 오류:', error);
       return {
         success: false,
         message:
           error instanceof Error
             ? error.message
-            : "알 수 없는 오류가 발생했습니다.",
+            : '알 수 없는 오류가 발생했습니다.',
       };
     }
   };
 
   // 결제 완료 후 네비게이션
   const handlePaymentSuccess = () => {
-    router.push("/(tabs)");
+    router.push('/(tabs)');
   };
 
   // 뒤로가기 네비게이션
   const handleBackNavigation = () => {
-    router.push("/(tabs)");
+    router.push('/(tabs)');
   };
 
   return {
