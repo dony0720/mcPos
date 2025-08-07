@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import clsx from 'clsx';
+import React, { useState } from 'react';
 import {
   Modal,
   Pressable,
@@ -9,29 +10,15 @@ import {
   View,
 } from 'react-native';
 
-interface EditModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: (data: {
-    newAmount: string;
-    receptionist: string;
-    paymentMethod: string;
-  }) => void;
-  customerInfo: {
-    name: string;
-    memberNumber: string;
-    phoneNumber: string;
-    currentAmount: string;
-  };
-}
+import { ChargeModalProps } from '../../types';
 
-export default function EditModal({
+export default function ChargeModal({
   visible,
   onClose,
   onConfirm,
   customerInfo,
-}: EditModalProps) {
-  const [newAmount, setNewAmount] = useState('');
+}: ChargeModalProps) {
+  const [chargeAmount, setChargeAmount] = useState('');
   const [receptionist, setReceptionist] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [showReceptionistDropdown, setShowReceptionistDropdown] =
@@ -41,51 +28,48 @@ export default function EditModal({
   const receptionists = ['홍길동', '김직원', '이사장', '박매니저', '최대리'];
   const paymentMethods = ['현금', '계좌이체'];
 
-  // 모달이 열릴 때 현재 금액을 기본값으로 설정
-  useEffect(() => {
-    if (visible && customerInfo.currentAmount) {
-      const currentAmountNumber = customerInfo.currentAmount.replace(
-        /[^\d]/g,
-        ''
-      );
-      setNewAmount(
-        currentAmountNumber
-          ? parseInt(currentAmountNumber).toLocaleString()
-          : ''
-      );
+  const formatAmount = (text: string) => {
+    // 숫자가 아닌 문자들을 모두 제거 (한 글자씩 확인)
+    let numbersOnly = '';
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (char >= '0' && char <= '9') {
+        numbersOnly += char;
+      }
     }
-  }, [visible, customerInfo.currentAmount]);
 
-  const formatAmount = (value: string) => {
-    const number = value.replace(/[^\d]/g, '');
-    return number ? parseInt(number).toLocaleString() : '';
+    // 빈 문자열이면 그대로 반환
+    if (!numbersOnly) return '';
+
+    // 숫자로 변환 후 천 단위 콤마 자동 추가
+    const number = parseInt(numbersOnly, 10);
+    return number.toLocaleString('ko-KR');
   };
 
   const handleAmountChange = (value: string) => {
     const formatted = formatAmount(value);
-    setNewAmount(formatted);
+    setChargeAmount(formatted);
   };
 
   const handleConfirm = () => {
-    if (!newAmount || !receptionist || !paymentMethod) {
-      alert('모든 필드를 입력해주세요.');
+    if (!chargeAmount || !receptionist || !paymentMethod) {
       return;
     }
 
     onConfirm({
-      newAmount,
+      chargeAmount,
       receptionist,
       paymentMethod,
     });
 
     // 초기화
-    setNewAmount('');
+    setChargeAmount('');
     setReceptionist('');
     setPaymentMethod('');
   };
 
   const handleClose = () => {
-    setNewAmount('');
+    setChargeAmount('');
     setReceptionist('');
     setPaymentMethod('');
     setShowReceptionistDropdown(false);
@@ -99,7 +83,7 @@ export default function EditModal({
         <View className='bg-white rounded-2xl p-6 w-[90%] max-w-lg'>
           <ScrollView showsVerticalScrollIndicator={false}>
             <View className='flex-row items-center justify-between mb-6'>
-              <Text className='text-xl font-bold'>장부 수정</Text>
+              <Text className='text-xl font-bold'>장부 충전</Text>
               <Pressable onPress={handleClose} className='p-2'>
                 <Ionicons name='close' size={24} color='#666' />
               </Pressable>
@@ -122,35 +106,26 @@ export default function EditModal({
                   {customerInfo.name}
                 </Text>
               </View>
-              <View className='flex-row justify-between mb-2'>
+              <View className='flex-row justify-between'>
                 <Text className='text-gray-600'>전화번호:</Text>
                 <Text className='text-gray-800 font-medium'>
                   {customerInfo.phoneNumber}
                 </Text>
               </View>
-              <View className='flex-row justify-between'>
-                <Text className='text-gray-600'>현재 금액:</Text>
-                <Text className='text-gray-800 font-medium'>
-                  {customerInfo.currentAmount}
-                </Text>
-              </View>
             </View>
 
-            {/* 새로운 금액 입력 */}
+            {/* 충전 금액 입력 */}
             <View className='mb-4'>
               <Text className='text-base font-medium mb-2 text-gray-700'>
-                새로운 금액 *
+                충전 금액 *
               </Text>
               <TextInput
                 className='border border-gray-300 rounded-lg px-4 py-3 text-base'
-                placeholder='새로운 금액을 입력하세요'
-                value={newAmount}
+                placeholder='충전할 금액을 입력하세요'
+                value={chargeAmount}
                 onChangeText={handleAmountChange}
                 keyboardType='numeric'
               />
-              <Text className='text-xs text-orange-600 mt-1'>
-                * 기존 금액이 새로운 금액으로 완전히 교체됩니다.
-              </Text>
             </View>
 
             {/* 접수자 선택 */}
@@ -163,11 +138,13 @@ export default function EditModal({
                   className='border border-gray-300 rounded-lg px-4 py-3 flex-row justify-between items-center'
                   onPress={() => {
                     setShowReceptionistDropdown(!showReceptionistDropdown);
-                    setShowPaymentDropdown(false);
                   }}
                 >
                   <Text
-                    className={`text-base ${receptionist ? 'text-gray-800' : 'text-gray-400'}`}
+                    className={clsx('text-base', {
+                      'text-gray-800': receptionist,
+                      'text-gray-400': !receptionist,
+                    })}
                   >
                     {receptionist || '접수자를 선택하세요'}
                   </Text>
@@ -212,11 +189,13 @@ export default function EditModal({
                   className='border border-gray-300 rounded-lg px-4 py-3 flex-row justify-between items-center'
                   onPress={() => {
                     setShowPaymentDropdown(!showPaymentDropdown);
-                    setShowReceptionistDropdown(false);
                   }}
                 >
                   <Text
-                    className={`text-base ${paymentMethod ? 'text-gray-800' : 'text-gray-400'}`}
+                    className={clsx('text-base', {
+                      'text-gray-800': paymentMethod,
+                      'text-gray-400': !paymentMethod,
+                    })}
                   >
                     {paymentMethod || '결제수단을 선택하세요'}
                   </Text>
@@ -260,11 +239,11 @@ export default function EditModal({
                 </Text>
               </Pressable>
               <Pressable
-                className='flex-1 p-3 bg-orange-500 rounded-lg'
+                className='flex-1 p-3 bg-green-500 rounded-lg'
                 onPress={handleConfirm}
               >
                 <Text className='text-white text-center font-semibold'>
-                  수정
+                  충전
                 </Text>
               </Pressable>
             </View>

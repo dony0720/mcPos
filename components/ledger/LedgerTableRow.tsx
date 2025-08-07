@@ -1,14 +1,8 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
-import { LedgerActionButtons, LedgerData } from './index';
-
-interface LedgerTableRowProps {
-  item: LedgerData;
-  onCharge: (item: LedgerData) => void;
-  onHistory: (item: LedgerData) => void;
-  onDelete: (item: LedgerData) => void;
-}
+import { LedgerTableRowProps } from '../../types';
+import { LedgerActionButtons } from './index';
 
 export default function LedgerTableRow({
   item,

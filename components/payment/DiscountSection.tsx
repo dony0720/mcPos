@@ -3,12 +3,8 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { useModal } from '../../hooks';
-import DiscountModal, { Discount } from './DiscountModal';
-
-interface DiscountSectionProps {
-  onDiscountSelect: (discount: Discount | null) => void;
-  onDiscountDelete: () => void;
-}
+import { Discount, DiscountSectionProps } from '../../types';
+import DiscountModal from './DiscountModal';
 
 export default function DiscountSection({
   onDiscountSelect,

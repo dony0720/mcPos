@@ -3,11 +3,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-interface SelectAllCheckboxProps {
-  isChecked: boolean;
-  onCheckboxPress: () => void;
-  title?: string;
-}
+import { SelectAllCheckboxProps } from '../../types';
 
 export default function SelectAllCheckbox({
   isChecked,

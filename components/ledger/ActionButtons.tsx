@@ -2,14 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { LedgerData } from './types';
-
-interface ActionButtonsProps {
-  item: LedgerData;
-  onCharge: (item: LedgerData) => void;
-  onHistory: (item: LedgerData) => void;
-  onDelete: (item: LedgerData) => void;
-}
+import { ActionButtonsProps } from '../../types';
 
 export default function ActionButtons({
   item,

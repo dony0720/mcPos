@@ -1,12 +1,8 @@
+import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-interface KeypadProps {
-  onNumberPress: (number: string) => void;
-  onBackspace: () => void;
-  maxLength?: number;
-  currentInput?: string;
-}
+import { KeypadProps } from '../../types';
 
 export default function Keypad({
   onNumberPress,
@@ -20,7 +16,9 @@ export default function Keypad({
     return (
       <Pressable
         onPress={() => !isDisabled && onNumberPress(number)}
-        className={`w-24 h-24 mx-4 my-2 ${isDisabled ? 'opacity-50' : ''}`}
+        className={clsx('w-24 h-24 mx-4 my-2', {
+          'opacity-50': isDisabled,
+        })}
         disabled={isDisabled}
       >
         <View className='w-full h-full flex items-center justify-center'>

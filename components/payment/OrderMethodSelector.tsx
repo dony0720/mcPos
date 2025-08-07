@@ -3,27 +3,15 @@ import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-interface OrderMethod {
-  id: string;
-  name: string;
-  icon: string;
-}
-
-interface OrderMethodSelectorProps {
-  selectedOrderMethod: string | null;
-  onOrderMethodPress: (methodId: string) => void;
-}
-
-// 주문 방식 옵션 데이터 - 테이크아웃, 매장 내 식사
-const orderMethods: OrderMethod[] = [
-  { id: 'takeout', name: '테이크아웃', icon: 'bag-outline' },
-  { id: 'dine-in', name: '매장', icon: 'restaurant-outline' },
-];
+import {
+  ORDER_RECEIPT_METHODS,
+  OrderReceiptMethodSelectorProps,
+} from '../../types';
 
 export default function OrderMethodSelector({
   selectedOrderMethod,
   onOrderMethodPress,
-}: OrderMethodSelectorProps) {
+}: OrderReceiptMethodSelectorProps) {
   return (
     // 주문 방법 선택 섹션 - 매장, 포장, 배달 중 선택
     <View>
@@ -32,7 +20,7 @@ export default function OrderMethodSelector({
 
       {/* 주문 방식 선택 버튼들 */}
       <View className='w-full flex flex-row gap-4'>
-        {orderMethods.map(method => (
+        {ORDER_RECEIPT_METHODS.map(method => (
           <Pressable
             key={method.id}
             onPress={() => onOrderMethodPress(method.id)}
@@ -45,7 +33,7 @@ export default function OrderMethodSelector({
             )}
           >
             <Ionicons
-              name={method.icon as any}
+              name={method.icon as keyof typeof Ionicons.glyphMap}
               size={24}
               color={selectedOrderMethod === method.id ? '#000000' : '#6B7280'}
             />

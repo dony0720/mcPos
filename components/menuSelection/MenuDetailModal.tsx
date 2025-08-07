@@ -78,7 +78,6 @@ export default function MenuDetailModal({
             />
 
             {/* 온도 선택 섹션 */}
-            {/* 온도 선택 섹션 */}
             <TemperatureSelector
               selectedTemperature={selectedTemperature}
               setSelectedTemperature={setSelectedTemperature}

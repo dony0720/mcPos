@@ -3,14 +3,8 @@ import clsx from 'clsx';
 import React, { useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 
+import { NumberInputModalProps } from '../../types';
 import Keypad from './Keypad';
-
-interface NumberInputModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: (number: string) => void;
-  type?: 'phone' | 'pickup'; // phone: 핸드폰 번호 4자리 고정, pickup: 픽업 번호 자유 입력
-}
 
 export default function NumberInputModal({
   visible,

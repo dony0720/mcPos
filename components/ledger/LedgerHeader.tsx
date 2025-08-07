@@ -2,9 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-interface LedgerHeaderProps {
-  onShowRegistrationModal: () => void;
-}
+import { LedgerHeaderProps } from '../../types';
 
 export default function LedgerHeader({
   onShowRegistrationModal,
