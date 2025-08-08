@@ -8,8 +8,3 @@ export * from './ledger';
 
 // Cash 관련 타입들
 export * from './cash';
-
-// 추후 다른 도메인의 타입들도 여기서 export
-// export * from './menu';
-// export * from './order';
-// export * from './user';

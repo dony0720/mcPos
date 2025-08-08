@@ -14,9 +14,9 @@ import {
 } from '../components';
 import { useButtonAnimation, useModal } from '../hooks';
 import {
+  CashRegisterPaymentId,
   NumberInputType,
   OrderItem,
-  CashRegisterPaymentId,
   OrderReceiptMethodId,
 } from '../types';
 

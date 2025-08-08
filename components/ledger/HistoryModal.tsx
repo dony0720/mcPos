@@ -4,10 +4,10 @@ import React from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 import {
-  HistoryModalProps,
   CustomerAccountPaymentMethod as PaymentMethod,
   CustomerAccountTransactionType as TransactionType,
   CustomerTransaction as Transaction,
+  HistoryModalProps,
 } from '../../types';
 
 export default function HistoryModal({

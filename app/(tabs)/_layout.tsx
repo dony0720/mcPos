@@ -25,6 +25,12 @@ export default function TabLayout() {
           title: '시재관리',
         }}
       />
+      <Tabs.Screen
+        name='history'
+        options={{
+          title: '거래내역',
+        }}
+      />
     </Tabs>
   );
 }
