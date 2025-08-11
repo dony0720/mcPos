@@ -10,11 +10,13 @@ import { Text, TouchableOpacity, View } from 'react-native';
 interface ActionButtonsProps {
   onClose: () => void;
   onAddToCart: () => void;
+  totalPrice: number;
 }
 
 export default function ActionButtons({
   onClose,
   onAddToCart,
+  totalPrice,
 }: ActionButtonsProps) {
   return (
     <View className='flex-row gap-3 mt-4'>
@@ -31,7 +33,9 @@ export default function ActionButtons({
         onPress={onAddToCart}
         className='flex-1 py-3 rounded-lg bg-primaryGreen justify-center items-center'
       >
-        <Text className='text-white font-semibold'>장바구니에 추가</Text>
+        <Text className='text-white font-semibold'>
+          {totalPrice.toLocaleString()}원 장바구니에 추가
+        </Text>
       </TouchableOpacity>
     </View>
   );

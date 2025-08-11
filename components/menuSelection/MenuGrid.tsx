@@ -2,35 +2,107 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 
 import { useModal } from '../../hooks';
-import { MenuDetailModal, MenuItem } from './index';
+import type { MenuGridProps, MenuItem } from '../../types';
+import { MenuDetailModal, MenuItem as MenuItemComponent } from './index';
 import PaginationButtons from './PaginationButtons';
 
-/**
- * 메뉴 그리드 컴포넌트
- * - 선택된 카테고리의 메뉴 아이템들을 그리드 형태로 표시
- * - 페이지네이션 및 메뉴 상세 모달 기능 포함
- */
+// 실제 메뉴 데이터
+const MENU_ITEMS: MenuItem[] = [
+  // 커피 메뉴
+  {
+    id: 'coffee-1',
+    name: '아메리카노',
+    price: 4500,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-2',
+    name: '카페라떼',
+    price: 5000,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-3',
+    name: '바닐라라떼',
+    price: 5500,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-4',
+    name: '카라멜마키아또',
+    price: 5500,
+    category: 'COFFEE',
+  },
 
-// 메뉴 아이템 타입 정의
-interface MenuItemType {
-  id: number;
-  name: string;
-  price: string;
-}
+  // 논커피 메뉴
+  {
+    id: 'non-coffee-1',
+    name: '초콜릿라떼',
+    price: 5500,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-2',
+    name: '녹차라떼',
+    price: 5000,
+    category: 'NON_COFFEE',
+  },
 
-export default function MenuGrid() {
-  // 메뉴 데이터 관리
-  const menuItems = Array(12)
-    .fill(null)
-    .map((_, index) => ({
-      id: index,
-      name: '아메리카노',
-      price: '1,500원',
-    }));
+  // 차 메뉴
+  {
+    id: 'tea-1',
+    name: '얼그레이',
+    price: 4500,
+    category: 'TEA',
+  },
+  {
+    id: 'tea-2',
+    name: '캐모마일',
+    price: 4500,
+    category: 'TEA',
+  },
+
+  // 에이드 메뉴
+  {
+    id: 'ade-1',
+    name: '레몬에이드',
+    price: 5500,
+    category: 'ADE',
+  },
+  {
+    id: 'ade-2',
+    name: '자몽에이드',
+    price: 5500,
+    category: 'ADE',
+  },
+
+  // 디저트 메뉴
+  {
+    id: 'dessert-1',
+    name: '티라미수',
+    price: 6500,
+    category: 'DESSERT',
+  },
+  {
+    id: 'dessert-2',
+    name: '치즈케이크',
+    price: 6000,
+    category: 'DESSERT',
+  },
+];
+
+export default function MenuGrid({
+  selectedCategory,
+  onSelectMenu,
+}: MenuGridProps) {
+  // 현재 카테고리의 메뉴 아이템들 필터링
+  const filteredMenuItems = MENU_ITEMS.filter(
+    item => item.category === selectedCategory
+  );
 
   // 모달 상태 관리
   const { openModal, closeModal, isModalOpen } = useModal();
-  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItemType | null>(
+  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(
     null
   );
 
@@ -43,7 +115,7 @@ export default function MenuGrid() {
     console.log('Down button pressed');
   };
 
-  const handleMenuItemPress = (item: MenuItemType) => {
+  const handleMenuItemPress = (item: MenuItem) => {
     setSelectedMenuItem(item);
     openModal('menuDetail');
   };
@@ -58,12 +130,12 @@ export default function MenuGrid() {
       {/* 메뉴 그리드 섹션 */}
       <View className='flex-1 h-full'>
         <View className='flex-row flex-wrap h-full justify-between content-between'>
-          {menuItems.map(item => (
-            <MenuItem
+          {filteredMenuItems.map(item => (
+            <MenuItemComponent
               key={item.id}
               id={item.id}
               name={item.name}
-              price={item.price}
+              price={`${item.price.toLocaleString()}원`}
               onPress={() => handleMenuItemPress(item)}
             />
           ))}
@@ -81,6 +153,7 @@ export default function MenuGrid() {
         visible={isModalOpen('menuDetail')}
         onClose={handleModalClose}
         menuItem={selectedMenuItem}
+        onConfirm={onSelectMenu}
       />
     </View>
   );

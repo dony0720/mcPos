@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Animated, Pressable, Text, View } from 'react-native';
 
 import McPosLogo from '../../assets/icon/mcPosLogo.svg';
@@ -9,6 +9,8 @@ import {
   OrderSection,
 } from '../../components';
 import { useButtonAnimation, useModal } from '../../hooks';
+import { useOrderStore } from '../../stores';
+import type { MenuCategory } from '../../types';
 
 /**
  * 메뉴 선택 메인 화면 컴포넌트
@@ -18,6 +20,14 @@ export default function MenuSelection() {
   // 상태 및 애니메이션 관리
   const adminAnimation = useButtonAnimation(); // 관리자 버튼 애니메이션
   const { openModal, closeModal, isModalOpen } = useModal(); // 모달 관리
+
+  // Zustand 스토어 사용
+  const { orderItems, totalAmount, addItem, updateQuantity, removeItem } =
+    useOrderStore();
+
+  // 카테고리 상태 관리 (로컬 상태)
+  const [selectedCategory, setSelectedCategory] =
+    useState<MenuCategory>('COFFEE');
 
   // 이벤트 핸들러
   /**
@@ -80,11 +90,14 @@ export default function MenuSelection() {
       </View>
 
       {/* 메뉴 선택 섹션 */}
-      {/* 음료 카테고리 탭 (HOT/COLD/DESSERT 등) */}
-      <CategoryTabs />
+      {/* 음료 카테고리 탭 */}
+      <CategoryTabs
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+      />
 
       {/* 메뉴 아이템 그리드 - 선택된 카테고리의 메뉴들을 표시 */}
-      <MenuGrid />
+      <MenuGrid selectedCategory={selectedCategory} onSelectMenu={addItem} />
 
       {/* 주문 내역 섹션 */}
       {/* 주문 내역 제목 */}
@@ -93,7 +106,12 @@ export default function MenuSelection() {
       </Text>
 
       {/* 선택된 메뉴들의 주문 내역 및 결제 버튼 */}
-      <OrderSection />
+      <OrderSection
+        items={orderItems}
+        totalAmount={totalAmount}
+        onUpdateQuantity={updateQuantity}
+        onRemoveItem={removeItem}
+      />
 
       {/* 모달 섹션 - 관리자 인증을 위한 비밀번호 입력 모달 */}
       <AdminModal

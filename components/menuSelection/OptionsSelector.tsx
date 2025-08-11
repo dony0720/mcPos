@@ -2,6 +2,8 @@ import clsx from 'clsx';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
+import { MENU_OPTIONS } from '../../types';
+
 /**
  * 옵션 선택자 컴포넌트
  * - 메뉴의 추가 옵션(샷추가, 시럽추가 등)을 선택할 수 있는 컴포넌트
@@ -17,8 +19,8 @@ export default function OptionsSelector({
   selectedOptions,
   setSelectedOptions,
 }: OptionsSelectorProps) {
-  // 옵션 데이터
-  const options = ['샷추가', '시럽추가', '휘핑크림'];
+  // 중앙화된 옵션 데이터 사용
+  const options = MENU_OPTIONS;
 
   return (
     <View>
@@ -28,17 +30,17 @@ export default function OptionsSelector({
       {/* 옵션 선택 버튼 그리드 */}
       <View className='flex-row flex-wrap gap-5'>
         {options.map((option, index) => {
-          const isSelected = selectedOptions.includes(option);
+          const isSelected = selectedOptions.includes(option.name);
           return (
             <TouchableOpacity
-              key={option}
+              key={option.name}
               onPress={() => {
                 if (isSelected) {
                   setSelectedOptions(
-                    selectedOptions.filter(item => item !== option)
+                    selectedOptions.filter(item => item !== option.name)
                   );
                 } else {
-                  setSelectedOptions([...selectedOptions, option]);
+                  setSelectedOptions([...selectedOptions, option.name]);
                 }
               }}
               className={clsx(
@@ -58,7 +60,7 @@ export default function OptionsSelector({
                     'text-gray-700': !isSelected,
                   })}
                 >
-                  {option}
+                  {option.name}
                 </Text>
                 <Text
                   className={clsx({
@@ -66,7 +68,7 @@ export default function OptionsSelector({
                     'text-gray-700': !isSelected,
                   })}
                 >
-                  +500원
+                  +{option.price.toLocaleString()}원
                 </Text>
               </View>
             </TouchableOpacity>

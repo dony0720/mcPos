@@ -13,14 +13,18 @@ import {
   SelectAllCheckbox,
 } from '../components';
 import { useButtonAnimation, useModal } from '../hooks';
+import { useOrderStore } from '../stores';
 import {
   CashRegisterPaymentId,
   NumberInputType,
-  OrderItem,
   OrderReceiptMethodId,
 } from '../types';
+import { calculateUnitPrice } from '../utils';
 
 export default function Payment() {
+  // Zustand 스토어에서 주문 데이터 가져오기
+  const { orderItems, totalAmount } = useOrderStore();
+
   // 간단한 상태 관리
   const [isChecked, setIsChecked] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
@@ -85,42 +89,6 @@ export default function Payment() {
     }
   };
 
-  // 목업 데이터
-  const mockOrderItems: OrderItem[] = [
-    {
-      id: 1,
-      name: '아메리카노',
-      options: ['HOT', 'Regular'],
-      price: 4500,
-    },
-    {
-      id: 2,
-      name: '카페라떼',
-      options: ['ICE', 'Large'],
-      price: 5500,
-    },
-    {
-      id: 3,
-      name: '카푸치노',
-      options: ['HOT', 'Regular'],
-      price: 5000,
-    },
-    {
-      id: 4,
-      name: '바닐라라떼',
-      options: ['ICE', 'Large', '시럽 추가'],
-      price: 6000,
-    },
-    {
-      id: 5,
-      name: '카라멜마키아토',
-      options: ['HOT', 'Regular', '휘핑크림'],
-      price: 6500,
-    },
-  ];
-
-  const totalAmount = mockOrderItems.reduce((sum, item) => sum + item.price, 0);
-
   return (
     <View className='h-full w-full bg-white flex flex-col'>
       {/* 상단 헤더 섹션 */}
@@ -139,17 +107,26 @@ export default function Payment() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: 16, paddingVertical: 16 }}
       >
-        {mockOrderItems.map(item => (
-          <PaymentMenuItem
-            key={item.id}
-            isChecked={isChecked}
-            onCheckboxPress={() => setIsChecked(!isChecked)}
-            menuName={item.name}
-            options={item.options.join(', ')}
-            price={`${item.price.toLocaleString()}원`}
-            onDeletePress={handleDelete}
-          />
-        ))}
+        {orderItems.map(item => {
+          // 옵션 포함 단위 가격 계산
+          const unitPrice = calculateUnitPrice(
+            item.menuItem.price,
+            item.options
+          );
+          const itemTotalPrice = unitPrice * item.quantity;
+
+          return (
+            <PaymentMenuItem
+              key={item.id}
+              isChecked={isChecked}
+              onCheckboxPress={() => setIsChecked(!isChecked)}
+              menuName={`${item.menuItem.name} (${item.menuItem.temperature}) x${item.quantity}`}
+              options={item.options.join(', ')}
+              price={`${itemTotalPrice.toLocaleString()}원`}
+              onDeletePress={handleDelete}
+            />
+          );
+        })}
       </ScrollView>
 
       {/* 구분선 */}

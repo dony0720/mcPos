@@ -3,55 +3,33 @@ import React from 'react';
 import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useButtonAnimation } from '../../hooks';
+import { calculateUnitPrice } from '../../utils';
 import OrderItem from './OrderItem';
 
-export default function OrderSection() {
+interface OrderSectionProps {
+  items: Array<{
+    id: string;
+    menuItem: {
+      name: string;
+      price: number;
+      temperature?: 'HOT' | 'ICE';
+    };
+    quantity: number;
+    options: string[];
+  }>;
+  totalAmount: number;
+  onUpdateQuantity: (itemId: string, change: number) => void;
+  onRemoveItem: (itemId: string) => void;
+}
+
+export default function OrderSection({
+  items,
+  totalAmount,
+  onUpdateQuantity,
+  onRemoveItem,
+}: OrderSectionProps) {
   const paymentAnimation = useButtonAnimation();
   const router = useRouter();
-
-  // 임시 주문 데이터
-  const orderItems = [
-    {
-      id: 1,
-      menuName: '자몽 허니 블랙티 (ICE)',
-      options: ['연하게', '샷추가', '휘핑추가', '휘핑추가'],
-      quantity: 1,
-      price: '6000원',
-    },
-    {
-      id: 2,
-      menuName: '아메리카노 (HOT)',
-      options: ['샷추가'],
-      quantity: 2,
-      price: '3000원',
-    },
-    {
-      id: 3,
-      menuName: '카페라떼 (ICE)',
-      options: ['연하게', '시럽추가'],
-      quantity: 1,
-      price: '4500원',
-    },
-    {
-      id: 4,
-      menuName: '바닐라라떼 (HOT)',
-      options: ['휘핑추가', '시럽추가', '샷추가'],
-      quantity: 3,
-      price: '5500원',
-    },
-  ];
-
-  const handleQuantityIncrease = (id: number) => {
-    console.log('Increase quantity for item:', id);
-  };
-
-  const handleQuantityDecrease = (id: number) => {
-    console.log('Decrease quantity for item:', id);
-  };
-
-  const handleRemoveItem = (id: number) => {
-    console.log('Remove item:', id);
-  };
 
   const handlePaymentPress = () => {
     router.push('/payment');
@@ -66,25 +44,35 @@ export default function OrderSection() {
             showsVerticalScrollIndicator={false}
             contentContainerClassName='gap-4'
           >
-            {orderItems.map(item => (
-              <OrderItem
-                key={item.id}
-                menuName={item.menuName}
-                options={item.options}
-                quantity={item.quantity}
-                price={item.price}
-                onIncrease={() => handleQuantityIncrease(item.id)}
-                onDecrease={() => handleQuantityDecrease(item.id)}
-                onRemove={() => handleRemoveItem(item.id)}
-              />
-            ))}
+            {items.map(item => {
+              // 유틸리티 함수로 단위 가격 계산
+              const itemUnitPrice = calculateUnitPrice(
+                item.menuItem.price,
+                item.options
+              );
+
+              return (
+                <OrderItem
+                  key={item.id}
+                  menuName={`${item.menuItem.name} (${item.menuItem.temperature})`}
+                  options={item.options}
+                  quantity={item.quantity}
+                  price={`${itemUnitPrice.toLocaleString()}원`}
+                  onIncrease={() => onUpdateQuantity(item.id, 1)}
+                  onDecrease={() => onUpdateQuantity(item.id, -1)}
+                  onRemove={() => onRemoveItem(item.id)}
+                />
+              );
+            })}
           </ScrollView>
         </View>
         <View className='w-[35%] h-full rounded-lg px-4'>
           <View className='w-full h-full flex flex-col justify-between gap-4'>
             <View className='w-full flex gap-2 text-gray-500'>
               <Text className='text-2xl'>총 결제 금액</Text>
-              <Text className='text-4xl font-bold'>10,000원</Text>
+              <Text className='text-4xl font-bold'>
+                {totalAmount.toLocaleString()}원
+              </Text>
             </View>
             <Pressable
               className='w-full h-[90px]'
