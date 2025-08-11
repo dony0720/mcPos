@@ -1,5 +1,20 @@
-import React, { useState } from 'react';
-import { Modal, Pressable, Text, TextInput, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import {
+  Modal,
+  Pressable,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+import {
+  type AdminLoginFormData,
+  adminLoginSchema,
+} from '../schemas/adminSchema';
 
 interface AdminModalProps {
   visible: boolean;
@@ -12,15 +27,36 @@ export default function AdminModal({
   onClose,
   onConfirm,
 }: AdminModalProps) {
-  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleConfirm = () => {
-    onConfirm(password);
-    setPassword(''); // 비밀번호 초기화
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<AdminLoginFormData>({
+    resolver: zodResolver(adminLoginSchema),
+    mode: 'onChange',
+    defaultValues: {
+      password: '',
+    },
+  });
+
+  // 모달이 열릴 때마다 폼 초기화
+  useEffect(() => {
+    if (visible) {
+      reset();
+      setShowPassword(false); // 비밀번호 가시성도 초기화
+    }
+  }, [visible, reset]);
+
+  const onSubmit = (data: AdminLoginFormData) => {
+    onConfirm(data.password);
+    reset();
   };
 
   const handleClose = () => {
-    setPassword(''); // 비밀번호 초기화
+    reset();
     onClose();
   };
 
@@ -41,14 +77,43 @@ export default function AdminModal({
           </Text>
 
           {/* 비밀번호 입력창 */}
-          <TextInput
-            className='border border-gray-300 rounded-lg px-4 py-3 mb-4'
-            placeholder='비밀번호를 입력하세요'
-            secureTextEntry={true}
-            value={password}
-            onChangeText={setPassword}
-            autoFocus={true}
-          />
+          <View className='relative'>
+            <Controller
+              control={control}
+              name='password'
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  className={`border rounded-lg px-4 py-3 pr-12 mb-2 ${
+                    errors.password ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder='비밀번호를 입력하세요'
+                  secureTextEntry={!showPassword}
+                  value={value}
+                  onChangeText={onChange}
+                  autoFocus={true}
+                />
+              )}
+            />
+
+            {/* Eye 아이콘 버튼 */}
+            <TouchableOpacity
+              className='absolute right-3 top-3'
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Ionicons
+                name={showPassword ? 'eye-off' : 'eye'}
+                size={20}
+                color='#6B7280'
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* 에러 메시지 */}
+          {errors.password && (
+            <Text className='text-red-500 text-sm mb-4 px-1'>
+              {errors.password.message}
+            </Text>
+          )}
 
           {/* 버튼들 */}
           <View className='flex-row gap-3'>
@@ -64,11 +129,19 @@ export default function AdminModal({
 
             <Pressable
               role='button'
-              className='flex-1 p-3 bg-primaryGreen rounded-lg'
-              onPress={handleConfirm}
-              disabled={!password.trim()}
+              className={`flex-1 p-3 rounded-lg ${
+                isValid ? 'bg-primaryGreen' : 'bg-gray-300'
+              }`}
+              onPress={handleSubmit(onSubmit)}
+              disabled={!isValid}
             >
-              <Text className='text-white text-center font-semibold'>확인</Text>
+              <Text
+                className={`text-center font-semibold ${
+                  isValid ? 'text-white' : 'text-gray-500'
+                }`}
+              >
+                확인
+              </Text>
             </Pressable>
           </View>
         </View>
