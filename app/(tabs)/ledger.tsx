@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 
 import {
+  AdminProtectedRoute,
   ChargeModal,
   HistoryModal,
   LedgerHeader,
@@ -117,52 +118,56 @@ export default function LedgerManagement() {
   };
 
   return (
-    <View className='h-full w-full bg-white flex flex-col box-border px-[5%]'>
-      <PageHeader />
+    <AdminProtectedRoute>
+      <View className='h-full w-full bg-white flex flex-col box-border px-[5%]'>
+        <PageHeader />
 
-      <LedgerHeader onShowRegistrationModal={() => openModal('registration')} />
-
-      <LedgerTable
-        ledgerData={ledgerData}
-        onCharge={handleCharge}
-        onHistory={handleHistory}
-        onDelete={handleDelete}
-      />
-
-      {/* 장부 등록 모달 */}
-      <LedgerRegistrationModal
-        visible={isModalOpen('registration')}
-        onClose={closeModal}
-        onConfirm={handleRegistrationConfirm}
-      />
-
-      {/* 장부 충전 모달 */}
-      {selectedCustomer && (
-        <ChargeModal
-          visible={isModalOpen('charge')}
-          onClose={handleCloseModal}
-          onConfirm={handleChargeConfirm}
-          customerInfo={{
-            name: selectedCustomer.name,
-            memberNumber: selectedCustomer.memberNumber,
-            phoneNumber: selectedCustomer.phoneNumber,
-          }}
+        <LedgerHeader
+          onShowRegistrationModal={() => openModal('registration')}
         />
-      )}
 
-      {/* 거래 내역 모달 */}
-      {selectedCustomer && (
-        <HistoryModal
-          visible={isModalOpen('history')}
-          onClose={handleCloseModal}
-          onDeleteTransaction={handleDeleteTransaction}
-          customerInfo={{
-            name: selectedCustomer.name,
-            memberNumber: selectedCustomer.memberNumber,
-            phoneNumber: selectedCustomer.phoneNumber,
-          }}
+        <LedgerTable
+          ledgerData={ledgerData}
+          onCharge={handleCharge}
+          onHistory={handleHistory}
+          onDelete={handleDelete}
         />
-      )}
-    </View>
+
+        {/* 장부 등록 모달 */}
+        <LedgerRegistrationModal
+          visible={isModalOpen('registration')}
+          onClose={closeModal}
+          onConfirm={handleRegistrationConfirm}
+        />
+
+        {/* 장부 충전 모달 */}
+        {selectedCustomer && (
+          <ChargeModal
+            visible={isModalOpen('charge')}
+            onClose={handleCloseModal}
+            onConfirm={handleChargeConfirm}
+            customerInfo={{
+              name: selectedCustomer.name,
+              memberNumber: selectedCustomer.memberNumber,
+              phoneNumber: selectedCustomer.phoneNumber,
+            }}
+          />
+        )}
+
+        {/* 거래 내역 모달 */}
+        {selectedCustomer && (
+          <HistoryModal
+            visible={isModalOpen('history')}
+            onClose={handleCloseModal}
+            onDeleteTransaction={handleDeleteTransaction}
+            customerInfo={{
+              name: selectedCustomer.name,
+              memberNumber: selectedCustomer.memberNumber,
+              phoneNumber: selectedCustomer.phoneNumber,
+            }}
+          />
+        )}
+      </View>
+    </AdminProtectedRoute>
   );
 }

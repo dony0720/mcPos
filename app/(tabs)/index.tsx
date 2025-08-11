@@ -9,7 +9,7 @@ import {
   OrderSection,
 } from '../../components';
 import { useButtonAnimation, useModal } from '../../hooks';
-import { useOrderStore } from '../../stores';
+import { useAuthStore, useOrderStore } from '../../stores';
 import type { MenuCategory } from '../../types';
 
 /**
@@ -24,6 +24,7 @@ export default function MenuSelection() {
   // Zustand 스토어 사용
   const { orderItems, totalAmount, addItem, updateQuantity, removeItem } =
     useOrderStore();
+  const { isAdminAuthenticated, login, logout } = useAuthStore();
 
   // 카테고리 상태 관리 (로컬 상태)
   const [selectedCategory, setSelectedCategory] =
@@ -35,7 +36,13 @@ export default function MenuSelection() {
    * 관리자 모달을 열어 비밀번호 입력을 요청
    */
   const handleAdminPress = () => {
-    openModal('admin');
+    if (isAdminAuthenticated) {
+      // 이미 인증된 상태면 로그아웃
+      logout();
+    } else {
+      // 인증되지 않은 상태면 로그인 모달 열기
+      openModal('admin');
+    }
   };
 
   /**
@@ -50,13 +57,11 @@ export default function MenuSelection() {
    * @param password - 입력된 비밀번호
    */
   const handleAdminConfirm = (password: string) => {
-    // 비밀번호 검증 로직
-    if (password === 'admin123') {
-      // 인증 성공 - 관리자 모드로 이동하거나 원하는 동작 수행
+    const isValid = login(password);
+    if (isValid) {
       console.log('관리자 인증 성공');
       closeModal();
     } else {
-      // 인증 실패
       console.log('비밀번호가 틀렸습니다');
       // 필요시 에러 메시지 표시
     }
@@ -83,7 +88,7 @@ export default function MenuSelection() {
             }}
           >
             <Text className='text-white text-[16px] font-bold'>
-              관리자 모드
+              {isAdminAuthenticated ? '로그아웃' : '관리자 모드'}
             </Text>
           </Animated.View>
         </Pressable>

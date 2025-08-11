@@ -5,7 +5,7 @@ export { default as AdminModal } from './AdminModal';
 export * from './cash';
 
 // Common components
-export { default as PageHeader } from './common/PageHeader';
+export * from './common';
 
 // Ledger components
 export * from './ledger';
