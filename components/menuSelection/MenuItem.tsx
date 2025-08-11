@@ -9,7 +9,7 @@ import type { MenuItemProps } from '../../types';
 
 export default function MenuItem({ id, name, price, onPress }: MenuItemProps) {
   return (
-    <View key={id} className='w-1/4 pr-3 pl-0 box-border'>
+    <View key={id} className='w-full box-border'>
       <TouchableOpacity onPress={onPress} className='w-full'>
         <View className='w-full flex flex-col rounded-lg gap-2'>
           {/* 메뉴 아이콘 섹션 */}

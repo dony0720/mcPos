@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { useModal } from '../../hooks';
@@ -8,7 +8,7 @@ import PaginationButtons from './PaginationButtons';
 
 // 실제 메뉴 데이터
 const MENU_ITEMS: MenuItem[] = [
-  // 커피 메뉴
+  // 커피 메뉴 (22개)
   {
     id: 'coffee-1',
     name: '아메리카노',
@@ -33,8 +33,116 @@ const MENU_ITEMS: MenuItem[] = [
     price: 5500,
     category: 'COFFEE',
   },
+  {
+    id: 'coffee-5',
+    name: '카푸치노',
+    price: 5000,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-6',
+    name: '에스프레소',
+    price: 3500,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-7',
+    name: '모카라떼',
+    price: 5500,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-8',
+    name: '헤이즐넛라떼',
+    price: 5500,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-9',
+    name: '콜드브루',
+    price: 4500,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-10',
+    name: '아포가토',
+    price: 6000,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-11',
+    name: '플랫화이트',
+    price: 5200,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-12',
+    name: '마끼아또',
+    price: 4800,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-13',
+    name: '브레베',
+    price: 5800,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-14',
+    name: '코르타도',
+    price: 5300,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-15',
+    name: '리스트레또',
+    price: 4000,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-16',
+    name: '롱고',
+    price: 4200,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-17',
+    name: '로마노',
+    price: 4000,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-18',
+    name: '콘판나',
+    price: 4500,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-19',
+    name: '아이스아메리카노',
+    price: 4500,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-20',
+    name: '아이스라떼',
+    price: 5000,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-21',
+    name: '아이스모카',
+    price: 5500,
+    category: 'COFFEE',
+  },
+  {
+    id: 'coffee-22',
+    name: '아이스바닐라라떼',
+    price: 5500,
+    category: 'COFFEE',
+  },
 
-  // 논커피 메뉴
+  // 논커피 메뉴 (15개)
   {
     id: 'non-coffee-1',
     name: '초콜릿라떼',
@@ -47,8 +155,86 @@ const MENU_ITEMS: MenuItem[] = [
     price: 5000,
     category: 'NON_COFFEE',
   },
+  {
+    id: 'non-coffee-3',
+    name: '고구마라떼',
+    price: 5200,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-4',
+    name: '타로라떼',
+    price: 5200,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-5',
+    name: '흑임자라떼',
+    price: 5300,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-6',
+    name: '딸기라떼',
+    price: 5500,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-7',
+    name: '바나나라떼',
+    price: 5400,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-8',
+    name: '망고라떼',
+    price: 5600,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-9',
+    name: '코코아',
+    price: 4800,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-10',
+    name: '화이트초콜릿라떼',
+    price: 5700,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-11',
+    name: '말차라떼',
+    price: 5200,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-12',
+    name: '홍차라떼',
+    price: 5000,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-13',
+    name: '얼그레이라떼',
+    price: 5100,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-14',
+    name: '블루베리라떼',
+    price: 5600,
+    category: 'NON_COFFEE',
+  },
+  {
+    id: 'non-coffee-15',
+    name: '라벤더라떼',
+    price: 5800,
+    category: 'NON_COFFEE',
+  },
 
-  // 차 메뉴
+  // 차 메뉴 (12개)
   {
     id: 'tea-1',
     name: '얼그레이',
@@ -61,8 +247,68 @@ const MENU_ITEMS: MenuItem[] = [
     price: 4500,
     category: 'TEA',
   },
+  {
+    id: 'tea-3',
+    name: '페퍼민트',
+    price: 4500,
+    category: 'TEA',
+  },
+  {
+    id: 'tea-4',
+    name: '자스민차',
+    price: 4800,
+    category: 'TEA',
+  },
+  {
+    id: 'tea-5',
+    name: '루이보스',
+    price: 4600,
+    category: 'TEA',
+  },
+  {
+    id: 'tea-6',
+    name: '히비스커스',
+    price: 4900,
+    category: 'TEA',
+  },
+  {
+    id: 'tea-7',
+    name: '레몬밤',
+    price: 4700,
+    category: 'TEA',
+  },
+  {
+    id: 'tea-8',
+    name: '로즈힙',
+    price: 5000,
+    category: 'TEA',
+  },
+  {
+    id: 'tea-9',
+    name: '우롱차',
+    price: 4500,
+    category: 'TEA',
+  },
+  {
+    id: 'tea-10',
+    name: '녹차',
+    price: 4000,
+    category: 'TEA',
+  },
+  {
+    id: 'tea-11',
+    name: '홍차',
+    price: 4200,
+    category: 'TEA',
+  },
+  {
+    id: 'tea-12',
+    name: '백차',
+    price: 5200,
+    category: 'TEA',
+  },
 
-  // 에이드 메뉴
+  // 에이드 메뉴 (10개)
   {
     id: 'ade-1',
     name: '레몬에이드',
@@ -75,8 +321,56 @@ const MENU_ITEMS: MenuItem[] = [
     price: 5500,
     category: 'ADE',
   },
+  {
+    id: 'ade-3',
+    name: '라임에이드',
+    price: 5200,
+    category: 'ADE',
+  },
+  {
+    id: 'ade-4',
+    name: '오렌지에이드',
+    price: 5300,
+    category: 'ADE',
+  },
+  {
+    id: 'ade-5',
+    name: '키위에이드',
+    price: 5600,
+    category: 'ADE',
+  },
+  {
+    id: 'ade-6',
+    name: '청포도에이드',
+    price: 5500,
+    category: 'ADE',
+  },
+  {
+    id: 'ade-7',
+    name: '딸기에이드',
+    price: 5800,
+    category: 'ADE',
+  },
+  {
+    id: 'ade-8',
+    name: '복숭아에이드',
+    price: 5700,
+    category: 'ADE',
+  },
+  {
+    id: 'ade-9',
+    name: '블루베리에이드',
+    price: 6000,
+    category: 'ADE',
+  },
+  {
+    id: 'ade-10',
+    name: '망고에이드',
+    price: 6200,
+    category: 'ADE',
+  },
 
-  // 디저트 메뉴
+  // 디저트 메뉴 (10개)
   {
     id: 'dessert-1',
     name: '티라미수',
@@ -87,6 +381,54 @@ const MENU_ITEMS: MenuItem[] = [
     id: 'dessert-2',
     name: '치즈케이크',
     price: 6000,
+    category: 'DESSERT',
+  },
+  {
+    id: 'dessert-3',
+    name: '마카롱',
+    price: 3500,
+    category: 'DESSERT',
+  },
+  {
+    id: 'dessert-4',
+    name: '크로와상',
+    price: 4000,
+    category: 'DESSERT',
+  },
+  {
+    id: 'dessert-5',
+    name: '머핀',
+    price: 4500,
+    category: 'DESSERT',
+  },
+  {
+    id: 'dessert-6',
+    name: '쿠키',
+    price: 3000,
+    category: 'DESSERT',
+  },
+  {
+    id: 'dessert-7',
+    name: '스콘',
+    price: 4200,
+    category: 'DESSERT',
+  },
+  {
+    id: 'dessert-8',
+    name: '와플',
+    price: 5500,
+    category: 'DESSERT',
+  },
+  {
+    id: 'dessert-9',
+    name: '브라우니',
+    price: 4800,
+    category: 'DESSERT',
+  },
+  {
+    id: 'dessert-10',
+    name: '도넛',
+    price: 3800,
     category: 'DESSERT',
   },
 ];
@@ -100,19 +442,39 @@ export default function MenuGrid({
     item => item.category === selectedCategory
   );
 
+  // 페이지네이션 상태 관리
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 8; // 4x2 그리드
+  const totalPages = Math.ceil(filteredMenuItems.length / itemsPerPage);
+
+  // 현재 페이지의 아이템들
+  const currentItems = filteredMenuItems.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+
+  // 카테고리 변경 시 페이지 리셋
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [selectedCategory]);
+
   // 모달 상태 관리
   const { openModal, closeModal, isModalOpen } = useModal();
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(
     null
   );
 
-  // 이벤트 핸들러
-  const handleUpPress = () => {
-    console.log('Up button pressed');
+  // 페이지네이션 핸들러
+  const handlePrevPress = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
-  const handleDownPress = () => {
-    console.log('Down button pressed');
+  const handleNextPress = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
   const handleMenuItemPress = (item: MenuItem) => {
@@ -126,26 +488,48 @@ export default function MenuGrid({
   };
 
   return (
-    <View className='flex flex-row w-full h-[65%] box-border px-[5%] py-[3%] items-center'>
-      {/* 메뉴 그리드 섹션 */}
-      <View className='flex-1 h-full'>
-        <View className='flex-row flex-wrap h-full justify-between content-between'>
-          {filteredMenuItems.map(item => (
-            <MenuItemComponent
-              key={item.id}
-              id={item.id}
-              name={item.name}
-              price={`${item.price.toLocaleString()}원`}
-              onPress={() => handleMenuItemPress(item)}
-            />
-          ))}
+    <View className='w-full h-[50%] box-border px-[5%] py-[3%]'>
+      {/* 메뉴 그리드 섹션 - 4x2 레이아웃 */}
+      <View className='flex-1'>
+        <View className='h-full flex flex-col justify-between'>
+          {/* 첫 번째 행 (4개) */}
+          <View className='flex-row h-[48%] gap-5'>
+            {currentItems.slice(0, 4).map(item => (
+              <View key={item.id} className='w-[23%]'>
+                <MenuItemComponent
+                  id={item.id}
+                  name={item.name}
+                  price={`${item.price.toLocaleString()}원`}
+                  onPress={() => handleMenuItemPress(item)}
+                />
+              </View>
+            ))}
+          </View>
+
+          {/* 두 번째 행 (4개) */}
+          <View className='flex-row h-[48%] gap-5'>
+            {currentItems.slice(4, 8).map(item => (
+              <View key={item.id} className='w-[23%]'>
+                <MenuItemComponent
+                  id={item.id}
+                  name={item.name}
+                  price={`${item.price.toLocaleString()}원`}
+                  onPress={() => handleMenuItemPress(item)}
+                />
+              </View>
+            ))}
+          </View>
         </View>
       </View>
 
-      {/* 페이지네이션 버튼 섹션 */}
+      {/* 페이지네이션 버튼 섹션 - 메뉴 아래에 배치 */}
       <PaginationButtons
-        onUpPress={handleUpPress}
-        onDownPress={handleDownPress}
+        onPrevPress={handlePrevPress}
+        onNextPress={handleNextPress}
+        canGoPrev={currentPage > 0}
+        canGoNext={currentPage < totalPages - 1}
+        currentPage={currentPage}
+        totalPages={totalPages}
       />
 
       {/* 모달 섹션 - 메뉴 상세 모달 */}
