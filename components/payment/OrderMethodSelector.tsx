@@ -16,7 +16,7 @@ export default function OrderMethodSelector({
     // 주문 방법 선택 섹션 - 매장, 포장, 배달 중 선택
     <View>
       {/* 섹션 제목 */}
-      <Text className='text-3xl font-medium my-6'>주문 방식</Text>
+      <Text className='text-2xl font-medium my-6'>주문 방식</Text>
 
       {/* 주문 방식 선택 버튼들 */}
       <View className='w-full flex flex-row gap-4'>

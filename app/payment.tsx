@@ -91,91 +91,93 @@ export default function Payment() {
 
   return (
     <View className='h-full w-full bg-white flex flex-col'>
-      {/* 상단 헤더 섹션 */}
-      <PaymentHeader onBack={handleBack} />
+      <View className='flex-1 max-w-7xl mx-auto w-full'>
+        {/* 상단 헤더 섹션 */}
+        <PaymentHeader onBack={handleBack} />
 
-      {/* 전체 선택 체크박스 섹션 */}
-      <SelectAllCheckbox
-        isChecked={isChecked}
-        onCheckboxPress={() => setIsChecked(!isChecked)}
-        title='결제 정보'
-      />
-
-      {/* 주문 메뉴 목록 섹션 */}
-      <ScrollView
-        className='w-full h-[50%] px-6 box-border overflow-hidden'
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ gap: 16, paddingVertical: 16 }}
-      >
-        {orderItems.map(item => {
-          // 옵션 포함 단위 가격 계산
-          const unitPrice = calculateUnitPrice(
-            item.menuItem.price,
-            item.options
-          );
-          const itemTotalPrice = unitPrice * item.quantity;
-
-          return (
-            <PaymentMenuItem
-              key={item.id}
-              isChecked={isChecked}
-              onCheckboxPress={() => setIsChecked(!isChecked)}
-              menuName={`${item.menuItem.name} (${item.menuItem.temperature}) x${item.quantity}`}
-              options={item.options.join(', ')}
-              price={`${itemTotalPrice.toLocaleString()}원`}
-              onDeletePress={handleDelete}
-            />
-          );
-        })}
-      </ScrollView>
-
-      {/* 구분선 */}
-      <View className='w-full h-[1px] bg-gray-300' />
-
-      <View className='w-full h-[50%] px-6 box-border'>
-        {/* 결제 방법 선택 섹션 */}
-        <PaymentMethodSelector
-          selectedPaymentMethod={selectedPaymentMethod}
-          onPaymentMethodPress={setSelectedPaymentMethod}
+        {/* 전체 선택 체크박스 섹션 */}
+        <SelectAllCheckbox
+          isChecked={isChecked}
+          onCheckboxPress={() => setIsChecked(!isChecked)}
+          title='결제 정보'
         />
 
-        {/* 주문 방법 선택 섹션 */}
-        <OrderMethodSelector
-          selectedOrderMethod={selectedOrderMethod}
-          onOrderMethodPress={setSelectedOrderMethod}
-        />
-
-        {/* 할인 적용 섹션 */}
-        <DiscountSection
-          onDiscountSelect={handleDiscountSelect}
-          onDiscountDelete={handleDiscountDelete}
-        />
-
-        {/* 최종 결제 버튼 섹션 */}
-        <Pressable
-          onPressIn={paymentButtonAnimation.onPressIn}
-          onPressOut={paymentButtonAnimation.onPressOut}
-          onPress={handlePaymentPress}
+        {/* 주문 메뉴 목록 섹션 */}
+        <ScrollView
+          className='w-full h-[50%] px-[5%] box-border overflow-hidden'
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ gap: 16, paddingVertical: 16 }}
         >
-          <Animated.View
-            className='w-full h-16 sm:h-20 lg:h-24 min-h-16 max-h-28 bg-primaryGreen flex items-center justify-center rounded-lg'
-            style={{
-              transform: [{ scale: paymentButtonAnimation.scaleAnim }],
-            }}
-          >
-            <Text className='text-white text-3xl font-bold'>
-              {totalAmount.toLocaleString()}원 결제하기
-            </Text>
-          </Animated.View>
-        </Pressable>
+          {orderItems.map(item => {
+            // 옵션 포함 단위 가격 계산
+            const unitPrice = calculateUnitPrice(
+              item.menuItem.price,
+              item.options
+            );
+            const itemTotalPrice = unitPrice * item.quantity;
 
-        {/* 번호 입력 모달 */}
-        <NumberInputModal
-          visible={isModalOpen('numberInput')}
-          onClose={handleModalClose}
-          onConfirm={handleModalConfirm}
-          type={modalType}
-        />
+            return (
+              <PaymentMenuItem
+                key={item.id}
+                isChecked={isChecked}
+                onCheckboxPress={() => setIsChecked(!isChecked)}
+                menuName={`${item.menuItem.name} (${item.menuItem.temperature}) x${item.quantity}`}
+                options={item.options.join(', ')}
+                price={`${itemTotalPrice.toLocaleString()}원`}
+                onDeletePress={handleDelete}
+              />
+            );
+          })}
+        </ScrollView>
+
+        {/* 구분선 */}
+        <View className='w-full h-[1px] bg-gray-300' />
+
+        <View className='w-full h-[50%] px-[5%] pb-10 box-border flex flex-col justify-between'>
+          {/* 결제 방법 선택 섹션 */}
+          <PaymentMethodSelector
+            selectedPaymentMethod={selectedPaymentMethod}
+            onPaymentMethodPress={setSelectedPaymentMethod}
+          />
+
+          {/* 주문 방법 선택 섹션 */}
+          <OrderMethodSelector
+            selectedOrderMethod={selectedOrderMethod}
+            onOrderMethodPress={setSelectedOrderMethod}
+          />
+
+          {/* 할인 적용 섹션 */}
+          <DiscountSection
+            onDiscountSelect={handleDiscountSelect}
+            onDiscountDelete={handleDiscountDelete}
+          />
+
+          {/* 최종 결제 버튼 섹션 */}
+          <Pressable
+            onPressIn={paymentButtonAnimation.onPressIn}
+            onPressOut={paymentButtonAnimation.onPressOut}
+            onPress={handlePaymentPress}
+          >
+            <Animated.View
+              className='w-full h-16 sm:h-20 lg:h-24 min-h-16 max-h-28 bg-primaryGreen flex items-center justify-center rounded-lg'
+              style={{
+                transform: [{ scale: paymentButtonAnimation.scaleAnim }],
+              }}
+            >
+              <Text className='text-white text-3xl font-bold'>
+                {totalAmount.toLocaleString()}원 결제하기
+              </Text>
+            </Animated.View>
+          </Pressable>
+
+          {/* 번호 입력 모달 */}
+          <NumberInputModal
+            visible={isModalOpen('numberInput')}
+            onClose={handleModalClose}
+            onConfirm={handleModalConfirm}
+            type={modalType}
+          />
+        </View>
       </View>
     </View>
   );

@@ -444,7 +444,7 @@ export default function MenuGrid({
 
   // 페이지네이션 상태 관리
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 8; // 4x2 그리드
+  const itemsPerPage = 6; // 3x2 그리드
   const totalPages = Math.ceil(filteredMenuItems.length / itemsPerPage);
 
   // 현재 페이지의 아이템들
@@ -465,13 +465,13 @@ export default function MenuGrid({
   );
 
   // 페이지네이션 핸들러
-  const handlePrevPress = () => {
+  const handleUpPress = () => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
     }
   };
 
-  const handleNextPress = () => {
+  const handleDownPress = () => {
     if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1);
     }
@@ -488,14 +488,14 @@ export default function MenuGrid({
   };
 
   return (
-    <View className='w-full h-[50%] box-border px-[5%] py-[3%]'>
-      {/* 메뉴 그리드 섹션 - 4x2 레이아웃 */}
-      <View className='flex-1'>
+    <View className='flex flex-row w-full flex-[13] box-border px-[5%] py-[3%] items-center'>
+      {/* 메뉴 그리드 섹션 - 3x2 레이아웃 */}
+      <View className='flex-1 h-full'>
         <View className='h-full flex flex-col justify-between'>
-          {/* 첫 번째 행 (4개) */}
+          {/* 첫 번째 행 (3개) */}
           <View className='flex-row h-[48%] gap-5'>
-            {currentItems.slice(0, 4).map(item => (
-              <View key={item.id} className='w-[23%]'>
+            {currentItems.slice(0, 3).map(item => (
+              <View key={item.id} className='w-[30%]'>
                 <MenuItemComponent
                   id={item.id}
                   name={item.name}
@@ -506,10 +506,10 @@ export default function MenuGrid({
             ))}
           </View>
 
-          {/* 두 번째 행 (4개) */}
+          {/* 두 번째 행 (3개) */}
           <View className='flex-row h-[48%] gap-5'>
-            {currentItems.slice(4, 8).map(item => (
-              <View key={item.id} className='w-[23%]'>
+            {currentItems.slice(3, 6).map(item => (
+              <View key={item.id} className='w-[30%]'>
                 <MenuItemComponent
                   id={item.id}
                   name={item.name}
@@ -522,14 +522,10 @@ export default function MenuGrid({
         </View>
       </View>
 
-      {/* 페이지네이션 버튼 섹션 - 메뉴 아래에 배치 */}
+      {/* 페이지네이션 버튼 섹션 */}
       <PaginationButtons
-        onPrevPress={handlePrevPress}
-        onNextPress={handleNextPress}
-        canGoPrev={currentPage > 0}
-        canGoNext={currentPage < totalPages - 1}
-        currentPage={currentPage}
-        totalPages={totalPages}
+        onUpPress={handleUpPress}
+        onDownPress={handleDownPress}
       />
 
       {/* 모달 섹션 - 메뉴 상세 모달 */}

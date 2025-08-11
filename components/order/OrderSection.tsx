@@ -36,9 +36,9 @@ export default function OrderSection({
   };
 
   return (
-    <View className='w-full h-[20%] box-border px-[5%] py-2 flex flex-col gap-2'>
+    <View className='w-full flex-[7] box-border px-[5%] flex flex-col gap-2'>
       <View className='w-full h-full box-border py-4 flex flex-row gap-2'>
-        <View className='w-[65%] bg-gray-100 rounded-lg p-4'>
+        <View className='w-[70%] bg-gray-100 rounded-lg p-4'>
           <ScrollView
             className='flex-1'
             showsVerticalScrollIndicator={false}
@@ -66,7 +66,7 @@ export default function OrderSection({
             })}
           </ScrollView>
         </View>
-        <View className='w-[35%] h-full rounded-lg px-4'>
+        <View className='w-[30%] h-full rounded-lg px-4'>
           <View className='w-full h-full flex flex-col justify-between gap-4'>
             <View className='w-full flex gap-2 text-gray-500'>
               <Text className='text-2xl'>총 결제 금액</Text>
@@ -86,7 +86,7 @@ export default function OrderSection({
                   transform: [{ scale: paymentAnimation.scaleAnim }],
                 }}
               >
-                <Text className='text-white text-4xl font-bold'>결제하기</Text>
+                <Text className='text-white text-3xl font-bold'>결제하기</Text>
               </Animated.View>
             </Pressable>
           </View>

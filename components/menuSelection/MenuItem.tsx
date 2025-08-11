@@ -9,9 +9,9 @@ import type { MenuItemProps } from '../../types';
 
 export default function MenuItem({ id, name, price, onPress }: MenuItemProps) {
   return (
-    <View key={id} className='w-full box-border'>
-      <TouchableOpacity onPress={onPress} className='w-full'>
-        <View className='w-full flex flex-col rounded-lg gap-2'>
+    <View key={id} className='w-full h-full box-border'>
+      <TouchableOpacity onPress={onPress} className='w-full h-full'>
+        <View className='w-full h-full flex flex-col rounded-lg gap-2'>
           {/* 메뉴 아이콘 섹션 */}
           {/*    <View className='overflow-hidden rounded-lg aspect-square'>
             <Image
@@ -25,8 +25,8 @@ export default function MenuItem({ id, name, price, onPress }: MenuItemProps) {
 
           {/* 메뉴 정보 섹션 */}
           <View className='px-1'>
-            <Text className='font-medium text-base'>{name}</Text>
-            <Text className='text-gray-600 text-sm mt-1'>{price}</Text>
+            <Text className='font-semibold text-lg'>{name}</Text>
+            <Text className='text-gray-600 text-base mt-1'>{price}</Text>
           </View>
         </View>
       </TouchableOpacity>

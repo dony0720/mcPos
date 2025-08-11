@@ -85,24 +85,26 @@ export default function CashManagement() {
 
   return (
     <AdminProtectedRoute>
-      <View className='h-full w-full bg-white flex flex-col box-border px-[5%]'>
-        <PageHeader />
+      <View className='h-full w-full bg-white flex flex-col'>
+        <View className='flex-1 max-w-7xl mx-auto w-full box-border px-[5%]'>
+          <PageHeader />
 
-        <CashHeader
-          onInspection={handleInspection}
-          onDailySettlement={handleDailySettlement}
-        />
+          <CashHeader
+            onInspection={handleInspection}
+            onDailySettlement={handleDailySettlement}
+          />
 
-        <SalesInfoCards />
+          <SalesInfoCards />
 
-        <CashDrawerCards cashDrawerData={cashDrawerData} />
+          <CashDrawerCards cashDrawerData={cashDrawerData} />
 
-        <CashInspectionModal
-          visible={isInspectionModalVisible}
-          onClose={handleInspectionClose}
-          onConfirm={handleInspectionConfirm}
-          initialData={cashDrawerData}
-        />
+          <CashInspectionModal
+            visible={isInspectionModalVisible}
+            onClose={handleInspectionClose}
+            onConfirm={handleInspectionConfirm}
+            initialData={cashDrawerData}
+          />
+        </View>
       </View>
     </AdminProtectedRoute>
   );
