@@ -59,11 +59,9 @@ export default function MenuSelection() {
   const handleAdminConfirm = (password: string) => {
     const isValid = login(password);
     if (isValid) {
-      console.log('관리자 인증 성공');
       closeModal();
     } else {
-      console.log('비밀번호가 틀렸습니다');
-      // 필요시 에러 메시지 표시
+      return;
     }
   };
 
