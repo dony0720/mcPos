@@ -18,7 +18,7 @@ export default function MenuDetailModal({
   visible,
   onClose,
   menuItem,
-  onConfirm,
+  onAddItem,
 }: MenuDetailModalProps) {
   // 상태 관리
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -46,8 +46,8 @@ export default function MenuDetailModal({
    * 선택된 옵션들과 함께 장바구니에 메뉴를 추가
    */
   const handleAddToCart = () => {
-    if (menuItem && onConfirm) {
-      onConfirm(
+    if (menuItem && onAddItem) {
+      onAddItem(
         {
           ...menuItem,
           temperature: selectedTemperature,

@@ -3,24 +3,9 @@ import React from 'react';
 import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useButtonAnimation } from '../../hooks';
+import type { OrderSectionProps } from '../../types';
 import { calculateUnitPrice } from '../../utils';
 import OrderItem from './OrderItem';
-
-interface OrderSectionProps {
-  items: Array<{
-    id: string;
-    menuItem: {
-      name: string;
-      price: number;
-      temperature?: 'HOT' | 'ICE';
-    };
-    quantity: number;
-    options: string[];
-  }>;
-  totalAmount: number;
-  onUpdateQuantity: (itemId: string, change: number) => void;
-  onRemoveItem: (itemId: string) => void;
-}
 
 export default function OrderSection({
   items,

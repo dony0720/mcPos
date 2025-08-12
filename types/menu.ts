@@ -29,12 +29,12 @@ export interface MenuItemProps {
 
 export interface MenuGridProps {
   selectedCategory: MenuCategory;
-  onSelectMenu: (menuItem: MenuItem, options: string[]) => void;
+  onAddItem: (menuItem: MenuItem, options: string[]) => void;
 }
 
 export interface MenuDetailModalProps extends ModalProps {
   menuItem: MenuItem | null;
-  onConfirm?: (menuItem: MenuItem, options: string[]) => void;
+  onAddItem?: (menuItem: MenuItem, options: string[]) => void;
 }
 
 export interface MenuInfoCardProps {

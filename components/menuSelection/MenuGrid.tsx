@@ -9,7 +9,7 @@ import PaginationButtons from './PaginationButtons';
 
 export default function MenuGrid({
   selectedCategory,
-  onSelectMenu,
+  onAddItem,
 }: MenuGridProps) {
   // 현재 카테고리의 메뉴 아이템들 필터링
   const filteredMenuItems = MENU_ITEMS.filter(
@@ -107,7 +107,7 @@ export default function MenuGrid({
         visible={isModalOpen('menuDetail')}
         onClose={handleModalClose}
         menuItem={selectedMenuItem}
-        onConfirm={onSelectMenu}
+        onAddItem={onAddItem}
       />
     </View>
   );

@@ -101,7 +101,7 @@ export default function MenuSelection() {
         />
 
         {/* 메뉴 아이템 그리드 - 선택된 카테고리의 메뉴들을 표시 */}
-        <MenuGrid selectedCategory={selectedCategory} onSelectMenu={addItem} />
+        <MenuGrid selectedCategory={selectedCategory} onAddItem={addItem} />
 
         {/* 주문 내역 섹션 */}
         {/* 주문 내역 제목 */}

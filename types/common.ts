@@ -28,3 +28,11 @@ export interface ModalProps {
   visible: boolean;
   onClose: () => void;
 }
+
+// 주문 관련 액션 타입들
+export interface OrderActions {
+  onAddItem?: (menuItem: any, options: string[]) => void;
+  onUpdateQuantity?: (itemId: string, change: number) => void;
+  onRemoveItem?: (itemId: string) => void;
+  onClearOrder?: () => void;
+}

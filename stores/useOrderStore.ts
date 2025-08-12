@@ -1,22 +1,7 @@
 import { create } from 'zustand';
 
-import type { MenuItem, OrderItem } from '../types';
+import type { MenuItem, OrderItem, OrderState } from '../types';
 import { calculateTotalPrice } from '../utils';
-
-interface OrderState {
-  // 상태
-  orderItems: OrderItem[];
-
-  // 계산된 값들
-  totalAmount: number;
-  itemCount: number;
-
-  // 액션들
-  addItem: (menuItem: MenuItem, options: string[]) => void;
-  updateQuantity: (itemId: string, change: number) => void;
-  removeItem: (itemId: string) => void;
-  clearOrder: () => void;
-}
 
 export const useOrderStore = create<OrderState>(set => ({
   // 초기 상태

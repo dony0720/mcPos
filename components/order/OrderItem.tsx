@@ -2,15 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-interface OrderItemProps {
-  menuName: string;
-  options: string[];
-  quantity: number;
-  price: string;
-  onIncrease: () => void;
-  onDecrease: () => void;
-  onRemove: () => void;
-}
+import type { OrderItemProps } from '../../types';
 
 export default function OrderItem({
   menuName,
