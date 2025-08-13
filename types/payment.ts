@@ -1,4 +1,10 @@
 import { BaseItem, ModalProps, Optionable } from './common';
+import {
+  PaymentMethod,
+  PaymentDetailsType,
+  DiscountType,
+  OrderReceiptMethod as OrderReceiptMethodEnum,
+} from './enums';
 
 // ===== 기본 엔티티 타입들 =====
 
@@ -20,7 +26,7 @@ export interface PaymentOrderItem extends Optionable {
 
 export interface Discount extends Pick<BaseItem, 'id' | 'name'> {
   value: number;
-  type: 'fixed' | 'deduction'; // fixed: 고정가격으로 변경, deduction: 차감
+  type: DiscountType; // fixed: 고정가격으로 변경, deduction: 차감
   description?: string;
 }
 
@@ -80,8 +86,8 @@ export interface DiscountSectionProps {
 // ===== 유틸리티 타입들 =====
 
 export type NumberInputType = 'phone' | 'pickup';
-export type CashRegisterPaymentId = 'cash' | 'transfer' | 'coupon' | 'ledger';
-export type OrderReceiptMethodId = 'takeout' | 'dine-in';
+export type CashRegisterPaymentId = PaymentMethod;
+export type OrderReceiptMethodId = OrderReceiptMethodEnum;
 export type DiscountId =
   | 'senior'
   | 'student'
@@ -113,15 +119,23 @@ export interface PaymentModalState {
 // ===== 상수 데이터 =====
 
 export const CASH_REGISTER_PAYMENTS: CashRegisterPayment[] = [
-  { id: 'cash', name: '현금', icon: 'cash-outline' },
-  { id: 'transfer', name: '이체', icon: 'card-outline' },
-  { id: 'coupon', name: '쿠폰', icon: 'ticket-outline' },
-  { id: 'ledger', name: '장부', icon: 'book-outline' },
+  { id: PaymentMethod.CASH, name: '현금', icon: 'cash-outline' },
+  { id: PaymentMethod.TRANSFER, name: '이체', icon: 'card-outline' },
+  { id: PaymentMethod.COUPON, name: '쿠폰', icon: 'ticket-outline' },
+  { id: PaymentMethod.LEDGER, name: '장부', icon: 'book-outline' },
 ] as const;
 
 export const ORDER_RECEIPT_METHODS: OrderReceiptMethod[] = [
-  { id: 'takeout', name: '테이크아웃', icon: 'bag-outline' },
-  { id: 'dine-in', name: '매장', icon: 'restaurant-outline' },
+  {
+    id: OrderReceiptMethodEnum.TAKEOUT,
+    name: '테이크아웃',
+    icon: 'bag-outline',
+  },
+  {
+    id: OrderReceiptMethodEnum.DINE_IN,
+    name: '매장',
+    icon: 'restaurant-outline',
+  },
 ] as const;
 
 export const DISCOUNT_OPTIONS: Discount[] = [
@@ -129,14 +143,14 @@ export const DISCOUNT_OPTIONS: Discount[] = [
     id: 'fixed-1500',
     name: '1500원 고정가',
     value: 1500,
-    type: 'fixed',
+    type: DiscountType.FIXED,
     description: '선택된 메뉴를 1,500원으로 변경',
   },
   {
     id: 'deduction-1000',
     name: '1000원 차감',
     value: 1000,
-    type: 'deduction',
+    type: DiscountType.DEDUCTION,
     description: '선택된 메뉴에서 1,000원 차감',
   },
 ] as const;

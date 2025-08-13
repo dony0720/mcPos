@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { CashDrawerMoneyItem, CashTheme } from '../types';
+import { CashDrawerMoneyItem, CashTheme, CashTransactionType } from '../types';
 
 // 권종별 현금 분리 결과
 export interface CashBreakdown {
@@ -15,7 +15,7 @@ export interface CashBreakdown {
 export interface CashTransaction {
   id: string;
   timestamp: Date;
-  type: 'sale' | 'change' | 'adjustment' | 'manual_deposit' | 'manual_withdraw'; // 매출, 거스름돈, 조정, 수동입금, 수동출금
+  type: CashTransactionType; // 매출, 거스름돈, 조정, 수동입금, 수동출금
   transactionId?: string; // 연결된 거래 ID (매출/거스름돈인 경우)
   breakdown: CashBreakdown[]; // 권종별 변동 내역
   totalAmount: number; // 총 변동 금액
@@ -41,7 +41,10 @@ export interface CashStoreActions {
   applyCashBreakdown: (
     receivedBreakdown: CashBreakdown[] | Record<string, number>,
     changeBreakdown: CashBreakdown[] | Record<string, number>,
-    type: 'sale' | 'manual_deposit' | 'manual_withdraw',
+    type:
+      | CashTransactionType.SALE
+      | CashTransactionType.MANUAL_DEPOSIT
+      | CashTransactionType.MANUAL_WITHDRAW,
     description?: string,
     transactionId?: string
   ) => void;
@@ -257,7 +260,10 @@ export const useCashStore = create<CashState>()(
       applyCashBreakdown: (
         receivedBreakdown: CashBreakdown[] | Record<string, number>,
         changeBreakdown: CashBreakdown[] | Record<string, number>,
-        type: 'sale' | 'manual_deposit' | 'manual_withdraw',
+        type:
+          | CashTransactionType.SALE
+          | CashTransactionType.MANUAL_DEPOSIT
+          | CashTransactionType.MANUAL_WITHDRAW,
         description: string = '',
         transactionId?: string
       ) => {
@@ -316,11 +322,11 @@ export const useCashStore = create<CashState>()(
         );
 
         // 거래 타입별 처리
-        if (type === 'sale') {
+        if (type === CashTransactionType.SALE) {
           // 받은 금액 기록
           if (receivedTotal > 0) {
             get().addCashTransaction({
-              type: 'sale',
+              type: CashTransactionType.SALE,
               transactionId,
               breakdown: normalizedReceived,
               totalAmount: receivedTotal,
@@ -331,7 +337,7 @@ export const useCashStore = create<CashState>()(
           // 거스름돈 기록
           if (Math.abs(changeTotal) > 0) {
             get().addCashTransaction({
-              type: 'change',
+              type: CashTransactionType.CHANGE,
               transactionId,
               breakdown: normalizedChange.map(item => ({
                 ...item,
@@ -342,21 +348,21 @@ export const useCashStore = create<CashState>()(
               description: '거스름돈',
             });
           }
-        } else if (type === 'manual_deposit') {
+        } else if (type === CashTransactionType.MANUAL_DEPOSIT) {
           // 수동 입금 기록
           if (receivedTotal > 0) {
             get().addCashTransaction({
-              type: 'manual_deposit',
+              type: CashTransactionType.MANUAL_DEPOSIT,
               breakdown: normalizedReceived,
               totalAmount: receivedTotal,
               description: description || '수동 입금',
             });
           }
-        } else if (type === 'manual_withdraw') {
+        } else if (type === CashTransactionType.MANUAL_WITHDRAW) {
           // 수동 출금 기록
           if (Math.abs(changeTotal) > 0) {
             get().addCashTransaction({
-              type: 'manual_withdraw',
+              type: CashTransactionType.MANUAL_WITHDRAW,
               breakdown: normalizedChange.map(item => ({
                 ...item,
                 quantity: -Math.abs(item.quantity), // 음수로 기록
@@ -401,11 +407,11 @@ export const useCashStore = create<CashState>()(
         const todayTransactions = get().getTodayCashTransactions();
 
         const totalSales = todayTransactions
-          .filter(t => t.type === 'sale')
+          .filter(t => t.type === CashTransactionType.SALE)
           .reduce((sum, t) => sum + t.totalAmount, 0);
 
         const totalChange = todayTransactions
-          .filter(t => t.type === 'change')
+          .filter(t => t.type === CashTransactionType.CHANGE)
           .reduce((sum, t) => sum + Math.abs(t.totalAmount), 0);
 
         const netCashFlow = totalSales - totalChange;
@@ -422,7 +428,7 @@ export const useCashStore = create<CashState>()(
       getTodayDeposits: () => {
         const todayTransactions = get().getTodayCashTransactions();
         return todayTransactions
-          .filter(t => t.type === 'manual_deposit')
+          .filter(t => t.type === CashTransactionType.MANUAL_DEPOSIT)
           .reduce((sum, t) => sum + t.totalAmount, 0);
       },
 
@@ -430,7 +436,7 @@ export const useCashStore = create<CashState>()(
       getTodayWithdrawals: () => {
         const todayTransactions = get().getTodayCashTransactions();
         return todayTransactions
-          .filter(t => t.type === 'manual_withdraw')
+          .filter(t => t.type === CashTransactionType.MANUAL_WITHDRAW)
           .reduce((sum, t) => sum + Math.abs(t.totalAmount), 0);
       },
     }),

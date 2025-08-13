@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { useCashStore } from '../../stores';
-import { CashDrawerCardsProps } from '../../types';
+import { CashDrawerCardsProps, CashTransactionType } from '../../types';
 import CashDrawerCard from './CashDrawerCard';
 import CashTransactionModal from './CashTransactionModal';
 
@@ -30,7 +30,7 @@ export default function CashDrawerCards({
     const breakdown = calculateOptimalBreakdown(amount);
 
     // 현금 서랍에 반영 (입금이므로 양수로 적용)
-    applyCashBreakdown(breakdown, [], 'manual_deposit', memo);
+    applyCashBreakdown(breakdown, [], CashTransactionType.MANUAL_DEPOSIT, memo);
   };
 
   // 출금 확인 처리
@@ -45,7 +45,12 @@ export default function CashDrawerCards({
       total: -item.total, // 음수로 변환
     }));
 
-    applyCashBreakdown([], negativeBreakdown, 'manual_withdraw', memo);
+    applyCashBreakdown(
+      [],
+      negativeBreakdown,
+      CashTransactionType.MANUAL_WITHDRAW,
+      memo
+    );
   };
 
   // 총 현금 보유액 계산

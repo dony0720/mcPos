@@ -19,10 +19,18 @@ import {
 import { useButtonAnimation, useModal } from '../hooks';
 import { useCashStore, useOrderStore, useTransactionStore } from '../stores';
 import {
+  CashTransactionType,
+  OrderReceiptMethod as OrderReceiptMethodEnum,
+  PaymentDetailsType,
+  PaymentMethod,
+  TransactionStatus,
+} from '../types';
+import {
   CashRegisterPaymentId,
   Discount,
   NumberInputType,
   OrderReceiptMethodId,
+  PaymentDetails,
 } from '../types';
 import { calculateDiscountedUnitPrice } from '../utils';
 
@@ -52,9 +60,9 @@ export default function Payment() {
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<CashRegisterPaymentId>('cash');
+    useState<CashRegisterPaymentId>(PaymentMethod.CASH);
   const [selectedOrderMethod, setSelectedOrderMethod] =
-    useState<OrderReceiptMethodId>('dine-in');
+    useState<OrderReceiptMethodId>(OrderReceiptMethodEnum.DINE_IN);
 
   // 모달 관리
   const { openModal, closeModal, isModalOpen } = useModal();
@@ -74,18 +82,18 @@ export default function Payment() {
   const paymentButtonAnimation = useButtonAnimation();
 
   // 결제 방법별 세부 정보 생성
-  const createPaymentDetails = () => {
+  const createPaymentDetails = (): PaymentDetails => {
     switch (selectedPaymentMethod) {
-      case 'cash':
+      case PaymentMethod.CASH:
         return {
-          type: 'cash' as const,
+          type: PaymentDetailsType.CASH,
           receivedAmount,
           changeAmount,
         };
-      case 'coupon':
+      case PaymentMethod.COUPON:
         if (remainingAmount > 0) {
           return {
-            type: 'coupon_cash' as const,
+            type: PaymentDetailsType.COUPON_CASH,
             couponAmount,
             remainingAmount,
             receivedAmount,
@@ -93,22 +101,22 @@ export default function Payment() {
           };
         } else {
           return {
-            type: 'coupon' as const,
+            type: PaymentDetailsType.COUPON,
             couponAmount,
           };
         }
-      case 'transfer':
+      case PaymentMethod.TRANSFER:
         return {
-          type: 'transfer' as const,
+          type: PaymentDetailsType.TRANSFER,
         };
-      case 'ledger':
+      case PaymentMethod.LEDGER:
         return {
-          type: 'ledger' as const,
+          type: PaymentDetailsType.LEDGER,
           phoneNumber: '', // 실제로는 입력받은 전화번호를 사용
         };
       default:
         return {
-          type: 'cash' as const,
+          type: PaymentDetailsType.CASH,
           receivedAmount: 0,
           changeAmount: 0,
         };
@@ -125,10 +133,10 @@ export default function Payment() {
     } = {};
 
     switch (selectedPaymentMethod) {
-      case 'cash':
+      case PaymentMethod.CASH:
         breakdown.cash = totalAmount;
         break;
-      case 'coupon':
+      case PaymentMethod.COUPON:
         if (remainingAmount > 0) {
           // 쿠폰 + 현금 조합
           breakdown.coupon = couponAmount;
@@ -138,10 +146,10 @@ export default function Payment() {
           breakdown.coupon = totalAmount;
         }
         break;
-      case 'transfer':
+      case PaymentMethod.TRANSFER:
         breakdown.transfer = totalAmount;
         break;
-      case 'ledger':
+      case PaymentMethod.LEDGER:
         breakdown.ledger = totalAmount;
         break;
     }
@@ -315,10 +323,10 @@ export default function Payment() {
         pickupNumber: number,
         paymentDetails: createPaymentDetails(),
         paymentBreakdown: createPaymentBreakdown(),
-        status: 'completed',
+        status: TransactionStatus.COMPLETED,
       });
 
-      if (selectedPaymentMethod === 'cash') {
+      if (selectedPaymentMethod === PaymentMethod.CASH) {
         // 자동 권종 분리 처리
         const receivedBreakdown = calculateOptimalBreakdown(receivedAmount);
         const changeBreakdown = calculateOptimalChangeBreakdown(changeAmount);
@@ -327,11 +335,11 @@ export default function Payment() {
         applyCashBreakdown(
           receivedBreakdown,
           changeBreakdown,
-          'sale',
+          CashTransactionType.SALE,
           '현금 결제',
           transactionId
         );
-      } else if (selectedPaymentMethod === 'coupon') {
+      } else if (selectedPaymentMethod === PaymentMethod.COUPON) {
         if (remainingAmount > 0) {
           // 쿠폰+현금 결제에서 현금 부분 자동 권종 분리
           const receivedBreakdown = calculateOptimalBreakdown(receivedAmount);
@@ -341,7 +349,7 @@ export default function Payment() {
           applyCashBreakdown(
             receivedBreakdown,
             changeBreakdown,
-            'sale',
+            CashTransactionType.SALE,
             '쿠폰+현금 결제',
             transactionId
           );

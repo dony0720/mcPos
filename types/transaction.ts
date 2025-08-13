@@ -1,5 +1,9 @@
 import { OrderItem } from './menu';
 import { CashRegisterPaymentId, OrderReceiptMethodId } from './payment';
+import {
+  TransactionStatus as TransactionStatusEnum,
+  PaymentDetailsType,
+} from './enums';
 
 // 거래내역 기본 인터페이스
 export interface Transaction {
@@ -23,7 +27,7 @@ export interface Transaction {
   };
 
   // 상태
-  status: TransactionStatus;
+  status: TransactionStatusEnum;
 }
 
 // 결제 세부 정보 (결제 방법에 따라 다름)
@@ -36,20 +40,20 @@ export type PaymentDetails =
 
 // 현금 결제 정보
 export interface CashPaymentDetails {
-  type: 'cash';
+  type: PaymentDetailsType.CASH;
   receivedAmount: number;
   changeAmount: number;
 }
 
 // 쿠폰 전액 결제 정보
 export interface CouponPaymentDetails {
-  type: 'coupon';
+  type: PaymentDetailsType.COUPON;
   couponAmount: number;
 }
 
 // 쿠폰+현금 조합 결제 정보
 export interface CouponCashPaymentDetails {
-  type: 'coupon_cash';
+  type: PaymentDetailsType.COUPON_CASH;
   couponAmount: number;
   remainingAmount: number;
   receivedAmount: number;
@@ -58,22 +62,17 @@ export interface CouponCashPaymentDetails {
 
 // 이체 결제 정보
 export interface TransferPaymentDetails {
-  type: 'transfer';
+  type: PaymentDetailsType.TRANSFER;
 }
 
 // 장부 결제 정보
 export interface LedgerPaymentDetails {
-  type: 'ledger';
+  type: PaymentDetailsType.LEDGER;
   phoneNumber: string;
 }
 
-// 거래 상태
-export type TransactionStatus =
-  | 'completed' // 완료
-  | 'preparing' // 준비중
-  | 'ready' // 준비완료
-  | 'picked_up' // 수령완료
-  | 'cancelled'; // 취소됨
+// 거래 상태 (enum 사용)
+export type TransactionStatus = TransactionStatusEnum;
 
 // 거래내역 스토어 액션들
 export interface TransactionStoreActions {
