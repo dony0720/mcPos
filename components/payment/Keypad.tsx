@@ -57,11 +57,9 @@ export default function Keypad({
               : false;
             if (!isDisabled) onNumberPress('00');
           }}
-          className={`w-24 h-24 mx-4 my-2 ${
-            maxLength && currentInput.length >= maxLength - 1
-              ? 'opacity-50'
-              : ''
-          }`}
+          className={clsx('w-24 h-24 mx-4 my-2', {
+            'opacity-50': maxLength && currentInput.length >= maxLength - 1,
+          })}
           disabled={maxLength ? currentInput.length >= maxLength - 1 : false}
         >
           <View className='w-full h-full flex items-center justify-center'>

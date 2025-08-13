@@ -4,22 +4,7 @@ import dayjs from 'dayjs';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-export interface OrderItem {
-  id: string;
-  menuName: string;
-  options: string;
-  price: number;
-  quantity: number;
-}
-
-export interface Transaction {
-  id: string;
-  date: string;
-  paymentMethod: string;
-  amount: number;
-  orderItems?: OrderItem[];
-  orderMethod?: string; // 테이크아웃, 매장
-}
+import { Transaction } from '../../types';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -30,9 +15,26 @@ export default function TransactionItem({
   transaction,
   onPress,
 }: TransactionItemProps) {
+  // 결제 방법 ID를 한글로 변환
+  const getPaymentMethodLabel = (paymentMethodId: string) => {
+    switch (paymentMethodId) {
+      case 'cash':
+        return '현금';
+      case 'transfer':
+        return '이체';
+      case 'coupon':
+        return '쿠폰';
+      case 'ledger':
+        return '장부';
+      default:
+        return '기타';
+    }
+  };
+
   // 결제 수단별 스타일 클래스 반환
-  const getPaymentMethodClass = (paymentMethod: string) => {
-    switch (paymentMethod) {
+  const getPaymentMethodClass = (paymentMethodId: string) => {
+    const label = getPaymentMethodLabel(paymentMethodId);
+    switch (label) {
       case '현금':
         return {
           icon: 'cash-outline',
@@ -71,15 +73,14 @@ export default function TransactionItem({
     }
   };
 
-  // 날짜 포맷팅
-  const formatDate = (dateString: string) => {
-    const date = dayjs(dateString);
+  // 날짜 포맷팅 (Date 객체 처리)
+  const formatDate = (date: Date) => {
+    const dayjsDate = dayjs(date);
     return {
-      date: date.format('YYYY.MM.DD'),
-      time: date.format('HH:mm'),
-      relative: date.fromNow(),
-      isToday: date.isSame(dayjs(), 'day'),
-      isYesterday: date.isSame(dayjs().subtract(1, 'day'), 'day'),
+      date: dayjsDate.format('YYYY.MM.DD'),
+      time: dayjsDate.format('HH:mm'),
+      isToday: dayjsDate.isSame(dayjs(), 'day'),
+      isYesterday: dayjsDate.isSame(dayjs().subtract(1, 'day'), 'day'),
     };
   };
 
@@ -94,8 +95,9 @@ export default function TransactionItem({
     }
   };
 
+  const paymentMethodLabel = getPaymentMethodLabel(transaction.paymentMethod);
   const paymentStyle = getPaymentMethodClass(transaction.paymentMethod);
-  const formattedDate = formatDate(transaction.date);
+  const formattedDate = formatDate(transaction.timestamp);
 
   return (
     <Pressable
@@ -121,7 +123,7 @@ export default function TransactionItem({
           <View className='flex-1'>
             <View className='flex flex-row items-center gap-2 mb-1'>
               <Text className='text-gray-600 text-sm'>
-                #{transaction.id.split('_')[1]}
+                #{transaction.id.substring(4, 12)}
               </Text>
               <View
                 className={clsx('px-2 py-1 rounded-full', paymentStyle.bgClass)}
@@ -132,7 +134,7 @@ export default function TransactionItem({
                     paymentStyle.textClass
                   )}
                 >
-                  {transaction.paymentMethod}
+                  {paymentMethodLabel}
                 </Text>
               </View>
             </View>
@@ -144,9 +146,6 @@ export default function TransactionItem({
               <Text className='text-gray-400 text-sm'>
                 {formattedDate.time}
               </Text>
-              <Text className='text-gray-400 text-xs'>
-                ({formattedDate.relative})
-              </Text>
             </View>
           </View>
         </View>
@@ -154,7 +153,7 @@ export default function TransactionItem({
         {/* 우측: 금액 및 화살표 */}
         <View className='flex flex-row items-center gap-2'>
           <Text className='text-lg font-bold text-gray-800'>
-            {transaction.amount.toLocaleString()}원
+            {transaction.totalAmount.toLocaleString()}원
           </Text>
           <Ionicons name='chevron-forward' size={20} color='#9CA3AF' />
         </View>

@@ -16,11 +16,25 @@ export const calculateOptionPrice = (options: string[]): number => {
 };
 
 /**
- * 개별 주문 아이템의 총 가격 계산 (옵션 포함)
+ * 개별 주문 아이템의 총 가격 계산 (옵션 및 할인 포함)
  */
 export const calculateItemPrice = (item: OrderItem): number => {
   const optionPrice = calculateOptionPrice(item.options);
-  return (item.menuItem.price + optionPrice) * item.quantity;
+  const basePrice = item.menuItem.price + optionPrice;
+
+  // 할인이 적용된 경우
+  if (item.discount) {
+    if (item.discount.type === 'fixed') {
+      // 고정가격으로 변경
+      return item.discount.value * item.quantity;
+    } else if (item.discount.type === 'deduction') {
+      // 차감 적용 (최소 0원)
+      const discountedPrice = Math.max(0, basePrice - item.discount.value);
+      return discountedPrice * item.quantity;
+    }
+  }
+
+  return basePrice * item.quantity;
 };
 
 /**
@@ -39,4 +53,25 @@ export const calculateUnitPrice = (
 ): number => {
   const optionPrice = calculateOptionPrice(options);
   return menuPrice + optionPrice;
+};
+
+/**
+ * 할인이 적용된 개별 아이템의 단위 가격 계산 (수량 제외)
+ */
+export const calculateDiscountedUnitPrice = (item: OrderItem): number => {
+  const optionPrice = calculateOptionPrice(item.options);
+  const basePrice = item.menuItem.price + optionPrice;
+
+  // 할인이 적용된 경우
+  if (item.discount) {
+    if (item.discount.type === 'fixed') {
+      // 고정가격으로 변경
+      return item.discount.value;
+    } else if (item.discount.type === 'deduction') {
+      // 차감 적용 (최소 0원)
+      return Math.max(0, basePrice - item.discount.value);
+    }
+  }
+
+  return basePrice;
 };

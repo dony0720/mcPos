@@ -1,3 +1,5 @@
+export { default as CashAmountModal } from './CashAmountModal';
+export { default as CouponAmountModal } from './CouponAmountModal';
 export { default as DiscountModal } from './DiscountModal';
 export { default as DiscountSection } from './DiscountSection';
 export { default as Keypad } from './Keypad';

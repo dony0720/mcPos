@@ -15,6 +15,7 @@ import { CashTransactionModalProps } from '../../types';
 export default function CashTransactionModal({
   visible,
   onClose,
+  onConfirm,
   type,
 }: CashTransactionModalProps) {
   const [amount, setAmount] = useState('');
@@ -30,6 +31,10 @@ export default function CashTransactionModal({
 
   // 확인 버튼 핸들러
   const handleConfirm = () => {
+    const amountNumber = parseFloat(amount) || 0;
+    if (amountNumber > 0) {
+      onConfirm(amountNumber, memo);
+    }
     onClose();
   };
 
