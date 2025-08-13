@@ -17,7 +17,7 @@ import {
   SelectAllCheckbox,
 } from '../components';
 import { useButtonAnimation, useModal } from '../hooks';
-import { useOrderStore, useTransactionStore } from '../stores';
+import { useCashStore, useOrderStore, useTransactionStore } from '../stores';
 import {
   CashRegisterPaymentId,
   Discount,
@@ -40,6 +40,13 @@ export default function Payment() {
 
   // 거래내역 스토어
   const { addTransaction } = useTransactionStore();
+
+  // 현금 관리 스토어
+  const {
+    applyCashBreakdown,
+    calculateOptimalBreakdown,
+    calculateOptimalChangeBreakdown,
+  } = useCashStore();
 
   // 간단한 상태 관리
   const [isAllChecked, setIsAllChecked] = useState(false);
@@ -106,6 +113,40 @@ export default function Payment() {
           changeAmount: 0,
         };
     }
+  };
+
+  // 결제 방법별 실제 금액 분리 생성
+  const createPaymentBreakdown = () => {
+    const breakdown: {
+      cash?: number;
+      transfer?: number;
+      coupon?: number;
+      ledger?: number;
+    } = {};
+
+    switch (selectedPaymentMethod) {
+      case 'cash':
+        breakdown.cash = totalAmount;
+        break;
+      case 'coupon':
+        if (remainingAmount > 0) {
+          // 쿠폰 + 현금 조합
+          breakdown.coupon = couponAmount;
+          breakdown.cash = remainingAmount;
+        } else {
+          // 쿠폰 전액 결제
+          breakdown.coupon = totalAmount;
+        }
+        break;
+      case 'transfer':
+        breakdown.transfer = totalAmount;
+        break;
+      case 'ledger':
+        breakdown.ledger = totalAmount;
+        break;
+    }
+
+    return breakdown;
   };
 
   // 페이지 포커스 시 모든 할인 제거
@@ -259,13 +300,11 @@ export default function Payment() {
   const handleModalConfirm = (number: string) => {
     if (isLedgerFirstStep) {
       // 장부 번호 입력 완료 → 픽업 번호 입력으로 이동
-      console.log('장부 번호:', number);
       setIsLedgerFirstStep(false);
       setModalType('pickup');
       // 첫 번째 단계 완료 후 모달 상태 유지하여 바로 픽업 번호 입력으로 이동
     } else {
       // 픽업 번호 입력 완료 또는 일반 결제 완료
-      console.log('픽업 번호:', number);
 
       // 거래내역 저장
       const transactionId = addTransaction({
@@ -275,35 +314,37 @@ export default function Payment() {
         totalAmount: totalAmount,
         pickupNumber: number,
         paymentDetails: createPaymentDetails(),
+        paymentBreakdown: createPaymentBreakdown(),
         status: 'completed',
       });
 
       if (selectedPaymentMethod === 'cash') {
-        console.log('현금 결제 완료:', {
-          transactionId,
-          totalAmount,
-          receivedAmount,
-          changeAmount,
-          pickupNumber: number,
-        });
+        // 자동 권종 분리 처리
+        const receivedBreakdown = calculateOptimalBreakdown(receivedAmount);
+        const changeBreakdown = calculateOptimalChangeBreakdown(changeAmount);
+
+        // 현금 서랍에 자동으로 적용
+        applyCashBreakdown(
+          receivedBreakdown,
+          changeBreakdown,
+          'sale',
+          '현금 결제',
+          transactionId
+        );
       } else if (selectedPaymentMethod === 'coupon') {
         if (remainingAmount > 0) {
-          console.log('쿠폰+현금 결제 완료:', {
-            transactionId,
-            totalAmount,
-            couponAmount,
-            remainingAmount,
-            receivedAmount,
-            changeAmount,
-            pickupNumber: number,
-          });
-        } else {
-          console.log('쿠폰 전액 결제 완료:', {
-            transactionId,
-            totalAmount,
-            couponAmount,
-            pickupNumber: number,
-          });
+          // 쿠폰+현금 결제에서 현금 부분 자동 권종 분리
+          const receivedBreakdown = calculateOptimalBreakdown(receivedAmount);
+          const changeBreakdown = calculateOptimalChangeBreakdown(changeAmount);
+
+          // 현금 서랍에 자동으로 적용
+          applyCashBreakdown(
+            receivedBreakdown,
+            changeBreakdown,
+            'sale',
+            '쿠폰+현금 결제',
+            transactionId
+          );
         }
       }
 

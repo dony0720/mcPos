@@ -4,10 +4,10 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import {
   Transaction,
-  TransactionState,
-  TransactionStatus,
   TransactionFilter,
+  TransactionState,
   TransactionStats,
+  TransactionStatus,
 } from '../types';
 
 // 날짜 유틸리티 함수들
@@ -93,6 +93,100 @@ export const useTransactionStore = create<TransactionState>()(
         return transactions.filter(
           t => t.status === 'completed' || t.status === 'picked_up'
         ).length;
+      },
+
+      // 필터링된 거래들 조회
+      getFilteredTransactions: (filter: TransactionFilter) => {
+        return get().transactions.filter(transaction => {
+          const transactionDate = new Date(transaction.timestamp);
+
+          // 날짜 범위 필터
+          if (
+            !isDateInRange(transactionDate, filter.startDate, filter.endDate)
+          ) {
+            return false;
+          }
+
+          // 결제 방법 필터
+          if (
+            filter.paymentMethod &&
+            transaction.paymentMethod !== filter.paymentMethod
+          ) {
+            return false;
+          }
+
+          // 주문 방법 필터
+          if (
+            filter.orderMethod &&
+            transaction.orderMethod !== filter.orderMethod
+          ) {
+            return false;
+          }
+
+          // 상태 필터
+          if (filter.status && transaction.status !== filter.status) {
+            return false;
+          }
+
+          // 수령 번호 필터
+          if (
+            filter.pickupNumber &&
+            !transaction.pickupNumber.includes(filter.pickupNumber)
+          ) {
+            return false;
+          }
+
+          return true;
+        });
+      },
+
+      // 거래 통계 조회
+      getTransactionStats: (filter?: TransactionFilter): TransactionStats => {
+        const transactions = filter
+          ? get().getFilteredTransactions(filter)
+          : get().transactions;
+
+        const completedTransactions = transactions.filter(
+          t => t.status === 'completed' || t.status === 'picked_up'
+        );
+
+        const totalSales = completedTransactions.reduce(
+          (sum, t) => sum + t.totalAmount,
+          0
+        );
+
+        const totalTransactions = completedTransactions.length;
+
+        const averageOrderValue =
+          totalTransactions > 0 ? totalSales / totalTransactions : 0;
+
+        // 결제 방법별 통계
+        const paymentMethodBreakdown = completedTransactions.reduce(
+          (acc, transaction) => {
+            acc[transaction.paymentMethod] =
+              (acc[transaction.paymentMethod] || 0) + transaction.totalAmount;
+            return acc;
+          },
+          {} as Record<string, number>
+        );
+
+        // 주문 방법별 통계
+        const orderMethodBreakdown = completedTransactions.reduce(
+          (acc, transaction) => {
+            acc[transaction.orderMethod] =
+              (acc[transaction.orderMethod] || 0) + transaction.totalAmount;
+            return acc;
+          },
+          {} as Record<string, number>
+        );
+
+        return {
+          totalSales,
+          totalTransactions,
+          averageOrderValue,
+          paymentMethodBreakdown,
+          orderMethodBreakdown,
+        };
       },
 
       // 필터링된 거래들 조회

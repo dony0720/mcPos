@@ -14,6 +14,14 @@ export interface Transaction {
   // 결제 방법별 세부 정보
   paymentDetails: PaymentDetails;
 
+  // 결제 방법별 실제 금액 (조합 결제 대응)
+  paymentBreakdown: {
+    cash?: number;
+    transfer?: number;
+    coupon?: number;
+    ledger?: number;
+  };
+
   // 상태
   status: TransactionStatus;
 }
@@ -69,13 +77,19 @@ export type TransactionStatus =
 
 // 거래내역 스토어 액션들
 export interface TransactionStoreActions {
-  addTransaction: (transaction: Omit<Transaction, 'id' | 'timestamp'>) => void;
+  addTransaction: (
+    transaction: Omit<Transaction, 'id' | 'timestamp'>
+  ) => string;
   getTransactionById: (id: string) => Transaction | undefined;
   getTransactionsByDate: (date: Date) => Transaction[];
   updateTransactionStatus: (id: string, status: TransactionStatus) => void;
   getTodayTransactions: () => Transaction[];
   getTotalSalesAmount: (date?: Date) => number;
   getTransactionCount: (date?: Date) => number;
+  getFilteredTransactions: (filter: TransactionFilter) => Transaction[];
+  getTransactionStats: (filter?: TransactionFilter) => TransactionStats;
+  deleteTransaction: (id: string) => void;
+  clearAllTransactions: () => void;
 }
 
 // 거래내역 스토어 상태
