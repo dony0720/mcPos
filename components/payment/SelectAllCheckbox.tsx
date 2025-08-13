@@ -12,10 +12,10 @@ export default function SelectAllCheckbox({
 }: SelectAllCheckboxProps) {
   return (
     // 전체 선택 체크박스 섹션 - 모든 메뉴 아이템 선택/해제 및 페이지 제목
-    <View className='w-full px-6 box-border mt-6'>
+    <View className='w-full px-[5%] box-border mt-6'>
       <View className='flex flex-row justify-between items-center'>
         {/* 페이지 제목 */}
-        <Text className='text-3xl font-medium mb-6'>{title}</Text>
+        <Text className='text-2xl font-medium mb-6'>{title}</Text>
 
         {/* 전체 선택 체크박스 */}
         <View className='flex flex-row items-center gap-2'>
@@ -34,7 +34,7 @@ export default function SelectAllCheckbox({
               )}
             </View>
           </Pressable>
-          <Text className='text-gray-600 text-2xl'>전체 선택</Text>
+          <Text className='text-gray-600 text-xl'>전체 선택</Text>
         </View>
       </View>
     </View>

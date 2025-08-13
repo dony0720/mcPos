@@ -5,6 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
+import { AdminProtectedRoute } from '../../components';
 import PageHeader from '../../components/common/PageHeader';
 import EmptyState from '../../components/history/EmptyState';
 import FilterTabs, { FilterType } from '../../components/history/FilterTabs';
@@ -107,51 +108,55 @@ export default function History() {
   });
 
   return (
-    <View className='h-full w-full bg-white flex flex-col box-border px-[5%]'>
-      <PageHeader />
+    <AdminProtectedRoute>
+      <View className='h-full w-full bg-white flex flex-col'>
+        <View className='flex-1 max-w-7xl mx-auto w-full box-border px-[5%]'>
+          <PageHeader />
 
-      <View className='w-full mt-[20px] flex flex-col gap-3'>
-        <Text className='text-3xl font-bold'>거래내역</Text>
-        <Text className='text-xl text-gray-500'>
-          {selectedFilter === 'all'
-            ? `총 ${filteredTransactions.length}건의 거래`
-            : `${selectedFilter} ${filteredTransactions.length}건의 거래`}
-        </Text>
-      </View>
-
-      {/* 필터 탭 */}
-      <FilterTabs
-        selectedFilter={selectedFilter}
-        onFilterChange={setSelectedFilter}
-      />
-
-      {/* 거래내역 목록 */}
-      <ScrollView
-        className='flex-1 mt-6'
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      >
-        {filteredTransactions.length === 0 ? (
-          <EmptyState selectedFilter={selectedFilter} />
-        ) : (
-          <View className='flex flex-col gap-3'>
-            {filteredTransactions.map(transaction => (
-              <TransactionItem
-                key={transaction.id}
-                transaction={transaction}
-                onPress={handleTransactionPress}
-              />
-            ))}
+          <View className='w-full mt-[20px] flex flex-col gap-3'>
+            <Text className='text-3xl font-bold'>거래내역</Text>
+            <Text className='text-xl text-gray-500'>
+              {selectedFilter === 'all'
+                ? `총 ${filteredTransactions.length}건의 거래`
+                : `${selectedFilter} ${filteredTransactions.length}건의 거래`}
+            </Text>
           </View>
-        )}
-      </ScrollView>
 
-      {/* 영수증 모달 */}
-      <ReceiptModal
-        visible={receiptModalVisible}
-        onClose={closeReceiptModal}
-        onPrint={handlePrint}
-      />
-    </View>
+          {/* 필터 탭 */}
+          <FilterTabs
+            selectedFilter={selectedFilter}
+            onFilterChange={setSelectedFilter}
+          />
+
+          {/* 거래내역 목록 */}
+          <ScrollView
+            className='flex-1 mt-6'
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          >
+            {filteredTransactions.length === 0 ? (
+              <EmptyState selectedFilter={selectedFilter} />
+            ) : (
+              <View className='flex flex-col gap-3'>
+                {filteredTransactions.map(transaction => (
+                  <TransactionItem
+                    key={transaction.id}
+                    transaction={transaction}
+                    onPress={handleTransactionPress}
+                  />
+                ))}
+              </View>
+            )}
+          </ScrollView>
+
+          {/* 영수증 모달 */}
+          <ReceiptModal
+            visible={receiptModalVisible}
+            onClose={closeReceiptModal}
+            onPrint={handlePrint}
+          />
+        </View>
+      </View>
+    </AdminProtectedRoute>
   );
 }

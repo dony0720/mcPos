@@ -1,49 +1,57 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
+import { MENU_ITEMS } from '../../data/menuItems';
 import { useModal } from '../../hooks';
-import { MenuDetailModal, MenuItem } from './index';
+import type { MenuGridProps, MenuItem } from '../../types';
+import { MenuDetailModal, MenuItem as MenuItemComponent } from './index';
 import PaginationButtons from './PaginationButtons';
 
-/**
- * 메뉴 그리드 컴포넌트
- * - 선택된 카테고리의 메뉴 아이템들을 그리드 형태로 표시
- * - 페이지네이션 및 메뉴 상세 모달 기능 포함
- */
+export default function MenuGrid({
+  selectedCategory,
+  onAddItem,
+}: MenuGridProps) {
+  // 현재 카테고리의 메뉴 아이템들 필터링
+  const filteredMenuItems = MENU_ITEMS.filter(
+    item => item.category === selectedCategory
+  );
 
-// 메뉴 아이템 타입 정의
-interface MenuItemType {
-  id: number;
-  name: string;
-  price: string;
-}
+  // 페이지네이션 상태 관리
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 6; // 3x2 그리드
+  const totalPages = Math.ceil(filteredMenuItems.length / itemsPerPage);
 
-export default function MenuGrid() {
-  // 메뉴 데이터 관리
-  const menuItems = Array(12)
-    .fill(null)
-    .map((_, index) => ({
-      id: index,
-      name: '아메리카노',
-      price: '1,500원',
-    }));
+  // 현재 페이지의 아이템들
+  const currentItems = filteredMenuItems.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+
+  // 카테고리 변경 시 페이지 리셋
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [selectedCategory]);
 
   // 모달 상태 관리
   const { openModal, closeModal, isModalOpen } = useModal();
-  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItemType | null>(
+  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(
     null
   );
 
-  // 이벤트 핸들러
+  // 페이지네이션 핸들러
   const handleUpPress = () => {
-    console.log('Up button pressed');
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   const handleDownPress = () => {
-    console.log('Down button pressed');
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
-  const handleMenuItemPress = (item: MenuItemType) => {
+  const handleMenuItemPress = (item: MenuItem) => {
     setSelectedMenuItem(item);
     openModal('menuDetail');
   };
@@ -54,19 +62,37 @@ export default function MenuGrid() {
   };
 
   return (
-    <View className='flex flex-row w-full h-[65%] box-border px-[5%] py-[3%] items-center'>
-      {/* 메뉴 그리드 섹션 */}
+    <View className='flex flex-row w-full flex-[13] box-border px-[5%] py-[3%] items-center'>
+      {/* 메뉴 그리드 섹션 - 3x2 레이아웃 */}
       <View className='flex-1 h-full'>
-        <View className='flex-row flex-wrap h-full justify-between content-between'>
-          {menuItems.map(item => (
-            <MenuItem
-              key={item.id}
-              id={item.id}
-              name={item.name}
-              price={item.price}
-              onPress={() => handleMenuItemPress(item)}
-            />
-          ))}
+        <View className='h-full flex flex-col justify-between'>
+          {/* 첫 번째 행 (3개) */}
+          <View className='flex-row h-[48%] gap-5'>
+            {currentItems.slice(0, 3).map(item => (
+              <View key={item.id} className='w-[30%]'>
+                <MenuItemComponent
+                  id={item.id}
+                  name={item.name}
+                  price={`${item.price.toLocaleString()}원`}
+                  onPress={() => handleMenuItemPress(item)}
+                />
+              </View>
+            ))}
+          </View>
+
+          {/* 두 번째 행 (3개) */}
+          <View className='flex-row h-[48%] gap-5'>
+            {currentItems.slice(3, 6).map(item => (
+              <View key={item.id} className='w-[30%]'>
+                <MenuItemComponent
+                  id={item.id}
+                  name={item.name}
+                  price={`${item.price.toLocaleString()}원`}
+                  onPress={() => handleMenuItemPress(item)}
+                />
+              </View>
+            ))}
+          </View>
         </View>
       </View>
 
@@ -81,6 +107,7 @@ export default function MenuGrid() {
         visible={isModalOpen('menuDetail')}
         onClose={handleModalClose}
         menuItem={selectedMenuItem}
+        onAddItem={onAddItem}
       />
     </View>
   );

@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
+/**
+ * 메뉴 상세 모달 컴포넌트
+ * - 선택된 메뉴의 상세 정보와 옵션 선택 기능을 제공하는 모달
+ */
+import type { MenuDetailModalProps, Temperature } from '../../types';
+import { calculateOptionPrice } from '../../utils';
 import {
   MenuActionButtons,
   MenuInfoCard,
@@ -8,30 +14,31 @@ import {
   TemperatureSelector,
 } from './index';
 
-/**
- * 메뉴 상세 모달 컴포넌트
- * - 선택된 메뉴의 상세 정보와 옵션 선택 기능을 제공하는 모달
- */
-
-interface MenuDetailModalProps {
-  visible: boolean;
-  onClose: () => void;
-  menuItem: {
-    id: number;
-    name: string;
-    price: string;
-  } | null;
-}
-
 export default function MenuDetailModal({
   visible,
   onClose,
   menuItem,
+  onAddItem,
 }: MenuDetailModalProps) {
   // 상태 관리
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [selectedTemperature, setSelectedTemperature] = useState('Hot');
+  const [selectedTemperature, setSelectedTemperature] =
+    useState<Temperature>('HOT');
   const [quantity, setQuantity] = useState(1);
+
+  // 선택된 옵션들의 총 가격 계산 (유틸리티 함수 사용)
+  const optionPrice = calculateOptionPrice(selectedOptions);
+
+  const totalPrice = menuItem ? (menuItem.price + optionPrice) * quantity : 0;
+
+  // 모달이 열릴 때마다 상태 초기화
+  useEffect(() => {
+    if (visible) {
+      setSelectedOptions([]);
+      setSelectedTemperature('HOT');
+      setQuantity(1);
+    }
+  }, [visible, menuItem]);
 
   // 이벤트 핸들러
   /**
@@ -39,25 +46,22 @@ export default function MenuDetailModal({
    * 선택된 옵션들과 함께 장바구니에 메뉴를 추가
    */
   const handleAddToCart = () => {
-    // 장바구니에 추가하는 로직
-    console.log('Added to cart:', {
-      item: menuItem,
-      options: selectedOptions,
-      temperature: selectedTemperature,
-      quantity,
-    });
+    if (menuItem && onAddItem) {
+      onAddItem(
+        {
+          ...menuItem,
+          temperature: selectedTemperature,
+        },
+        selectedOptions
+      );
+    }
     onClose();
   };
 
   if (!menuItem) return null;
 
   return (
-    <Modal
-      animationType='slide'
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
+    <Modal transparent={true} visible={visible} onRequestClose={onClose}>
       <View className='flex-1 w-full h-full box-border px-[10%] justify-center items-center bg-black/50 '>
         <View className='bg-white rounded-lg w-full h-[60%] box-border p-6 max-w-[600px]'>
           {/* 모달 헤더 */}
@@ -91,7 +95,11 @@ export default function MenuDetailModal({
           </ScrollView>
 
           {/* 액션 버튼 섹션 - 취소/장바구니 추가 */}
-          <MenuActionButtons onClose={onClose} onAddToCart={handleAddToCart} />
+          <MenuActionButtons
+            onClose={onClose}
+            onAddToCart={handleAddToCart}
+            totalPrice={totalPrice}
+          />
         </View>
       </View>
     </Modal>
