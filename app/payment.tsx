@@ -1,5 +1,6 @@
 // payment.tsx - 퍼블리싱 작업용 간소화된 결제 페이지
 
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 
@@ -41,7 +42,7 @@ export default function Payment() {
 
   // 간단한 핸들러들
   const handleBack = () => {
-    console.log('뒤로가기');
+    router.push('/(tabs)');
   };
 
   const handleDelete = () => {
