@@ -53,13 +53,6 @@ export default function CashDrawerCards({
     );
   };
 
-  // 총 현금 보유액 계산
-  const getTotalAmount = () => {
-    return cashDrawerData
-      .reduce((total, item) => total + item.quantity * item.unitValue, 0)
-      .toLocaleString();
-  };
-
   return (
     <View className='mt-8'>
       {/* 헤더 - 제목과 버튼들 */}

@@ -304,7 +304,12 @@ export const useCashStore = create<CashState>()(
             drawer => drawer.unitValue === item.denomination
           );
           if (drawerItem) {
-            drawerItem.quantity += item.quantity; // 이미 음수로 계산되어 있음
+            // 거스름돈은 현금 서랍에서 차감해야 함
+            if (type === CashTransactionType.SALE) {
+              drawerItem.quantity -= Math.abs(item.quantity); // 거스름돈은 차감
+            } else {
+              drawerItem.quantity += item.quantity; // 수동 입출금은 이미 음수로 처리됨
+            }
           }
         });
 
