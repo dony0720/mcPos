@@ -1,7 +1,8 @@
 // payment.tsx - 퍼블리싱 작업용 간소화된 결제 페이지
 
+import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 
 import {
@@ -17,17 +18,26 @@ import { useButtonAnimation, useModal } from '../hooks';
 import { useOrderStore } from '../stores';
 import {
   CashRegisterPaymentId,
+  Discount,
   NumberInputType,
   OrderReceiptMethodId,
 } from '../types';
-import { calculateUnitPrice } from '../utils';
+import { calculateDiscountedUnitPrice } from '../utils';
 
 export default function Payment() {
   // Zustand 스토어에서 주문 데이터 가져오기
-  const { orderItems, totalAmount } = useOrderStore();
+  const {
+    orderItems,
+    totalAmount,
+    removeItem,
+    applyDiscount,
+    removeDiscount,
+    clearAllDiscounts,
+  } = useOrderStore();
 
   // 간단한 상태 관리
-  const [isChecked, setIsChecked] = useState(false);
+  const [isAllChecked, setIsAllChecked] = useState(false);
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<CashRegisterPaymentId>('cash');
   const [selectedOrderMethod, setSelectedOrderMethod] =
@@ -40,21 +50,90 @@ export default function Payment() {
 
   const paymentButtonAnimation = useButtonAnimation();
 
+  // 페이지 포커스 시 모든 할인 제거
+  useFocusEffect(
+    useCallback(() => {
+      clearAllDiscounts();
+      // 선택 상태도 초기화
+      setCheckedItems(new Set());
+      setIsAllChecked(false);
+    }, [clearAllDiscounts])
+  );
+
   // 간단한 핸들러들
   const handleBack = () => {
     router.push('/(tabs)');
   };
 
-  const handleDelete = () => {
-    console.log('삭제');
+  // 전체 선택/해제 핸들러
+  const handleAllCheckboxPress = () => {
+    if (isAllChecked) {
+      // 전체 해제
+      setIsAllChecked(false);
+      setCheckedItems(new Set());
+    } else {
+      // 전체 선택
+      setIsAllChecked(true);
+      const allItemIds = new Set(orderItems.map(item => item.id));
+      setCheckedItems(allItemIds);
+    }
   };
 
-  const handleDiscountSelect = () => {
-    console.log('할인 선택');
+  // 개별 아이템 체크박스 핸들러
+  const handleItemCheckboxPress = (itemId: string) => {
+    const newCheckedItems = new Set(checkedItems);
+
+    if (newCheckedItems.has(itemId)) {
+      newCheckedItems.delete(itemId);
+    } else {
+      newCheckedItems.add(itemId);
+    }
+
+    setCheckedItems(newCheckedItems);
+
+    // 전체 선택 상태 업데이트
+    const isAllSelected =
+      newCheckedItems.size === orderItems.length && orderItems.length > 0;
+    setIsAllChecked(isAllSelected);
+  };
+
+  // 선택된 아이템들 삭제 핸들러
+  const handleDeleteSelected = () => {
+    // 선택된 아이템들을 삭제
+    checkedItems.forEach(itemId => {
+      removeItem(itemId);
+    });
+
+    // 상태 초기화
+    setCheckedItems(new Set());
+    setIsAllChecked(false);
+  };
+
+  const handleDiscountSelect = (discount: Discount | null) => {
+    if (discount && checkedItems.size > 0) {
+      const selectedItemIds = Array.from(checkedItems);
+      applyDiscount(selectedItemIds, {
+        id: discount.id,
+        name: discount.name,
+        value: discount.value,
+        type: discount.type,
+      });
+
+      // 할인 적용 후 선택 해제
+      setCheckedItems(new Set());
+      setIsAllChecked(false);
+    }
   };
 
   const handleDiscountDelete = () => {
-    console.log('할인 삭제');
+    if (checkedItems.size > 0) {
+      const selectedItemIds = Array.from(checkedItems);
+      removeDiscount(selectedItemIds);
+
+      // 할인 제거 후 선택 해제
+      setCheckedItems(new Set());
+      setIsAllChecked(false);
+    }
   };
 
   // 결제 처리 핸들러
@@ -98,8 +177,10 @@ export default function Payment() {
 
         {/* 전체 선택 체크박스 섹션 */}
         <SelectAllCheckbox
-          isChecked={isChecked}
-          onCheckboxPress={() => setIsChecked(!isChecked)}
+          isChecked={isAllChecked}
+          onCheckboxPress={handleAllCheckboxPress}
+          onDeletePress={handleDeleteSelected}
+          hasSelectedItems={checkedItems.size > 0}
           title='결제 정보'
         />
 
@@ -110,22 +191,23 @@ export default function Payment() {
           contentContainerStyle={{ gap: 16, paddingVertical: 16 }}
         >
           {orderItems.map(item => {
-            // 옵션 포함 단위 가격 계산
-            const unitPrice = calculateUnitPrice(
-              item.menuItem.price,
-              item.options
-            );
+            // 할인이 적용된 단위 가격 계산
+            const unitPrice = calculateDiscountedUnitPrice(item);
             const itemTotalPrice = unitPrice * item.quantity;
+
+            // 메뉴명에 할인 정보 추가
+            const menuName = item.discount
+              ? `${item.menuItem.name} (${item.menuItem.temperature}) x${item.quantity} [${item.discount.name}]`
+              : `${item.menuItem.name} (${item.menuItem.temperature}) x${item.quantity}`;
 
             return (
               <PaymentMenuItem
                 key={item.id}
-                isChecked={isChecked}
-                onCheckboxPress={() => setIsChecked(!isChecked)}
-                menuName={`${item.menuItem.name} (${item.menuItem.temperature}) x${item.quantity}`}
+                isChecked={checkedItems.has(item.id)}
+                onCheckboxPress={() => handleItemCheckboxPress(item.id)}
+                menuName={menuName}
                 options={item.options.join(', ')}
                 price={`${itemTotalPrice.toLocaleString()}원`}
-                onDeletePress={handleDelete}
               />
             );
           })}
@@ -151,6 +233,7 @@ export default function Payment() {
           <DiscountSection
             onDiscountSelect={handleDiscountSelect}
             onDiscountDelete={handleDiscountDelete}
+            hasSelectedItems={checkedItems.size > 0}
           />
 
           {/* 최종 결제 버튼 섹션 */}
