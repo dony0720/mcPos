@@ -2,7 +2,7 @@ import 'dayjs/locale/ko';
 
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
 import { AdminProtectedRoute } from '../../components';
@@ -10,77 +10,22 @@ import PageHeader from '../../components/common/PageHeader';
 import EmptyState from '../../components/history/EmptyState';
 import FilterTabs, { FilterType } from '../../components/history/FilterTabs';
 import ReceiptModal from '../../components/history/ReceiptModal';
-import TransactionItem, {
-  Transaction,
-} from '../../components/history/TransactionItem';
+import TransactionItem from '../../components/history/TransactionItem';
+import { useTransactionStore } from '../../stores';
+import { Transaction } from '../../types';
 
 // Day.js 설정
 dayjs.locale('ko');
 dayjs.extend(relativeTime);
 
 export default function History() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  // 거래내역 스토어에서 데이터 가져오기
+  const { transactions: storeTransactions } = useTransactionStore();
+
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
-
-  // 임시 거래내역 데이터 (실제로는 서비스에서 가져올 것)
-  const mockTransactions: Transaction[] = [
-    {
-      id: 'CASH_1734567890123',
-      date: '2024-12-19 14:30:15',
-      paymentMethod: '현금',
-      amount: 15000,
-    },
-    {
-      id: 'LEDGER_1734567890124',
-      date: '2024-12-19 13:25:42',
-      paymentMethod: '장부',
-      amount: 8500,
-    },
-    {
-      id: 'CASH_1734567890125',
-      date: '2024-12-19 12:18:30',
-      paymentMethod: '이체',
-      amount: 12000,
-    },
-    {
-      id: 'CASH_1734567890126',
-      date: '2024-12-19 11:45:20',
-      paymentMethod: '쿠폰',
-      amount: 6000,
-    },
-    {
-      id: 'CASH_1734567890127',
-      date: '2024-12-19 10:30:15',
-      paymentMethod: '현금',
-      amount: 4500,
-    },
-    {
-      id: 'LEDGER_1734567890128',
-      date: '2024-12-18 16:22:35',
-      paymentMethod: '장부',
-      amount: 9000,
-    },
-    {
-      id: 'CASH_1734567890129',
-      date: '2024-12-18 15:10:45',
-      paymentMethod: '이체',
-      amount: 18000,
-    },
-    {
-      id: 'CASH_1734567890130',
-      date: '2024-12-18 14:05:20',
-      paymentMethod: '현금',
-      amount: 7500,
-    },
-  ];
-
-  useEffect(() => {
-    // 거래내역 불러오기 (실제로는 API 호출)
-    setTransactions(mockTransactions);
-  }, []);
 
   // 거래내역 클릭 핸들러
   const handleTransactionPress = (transaction: Transaction) => {
@@ -96,15 +41,31 @@ export default function History() {
 
   // 출력 버튼 핸들러
   const handlePrint = () => {
-    console.log('영수증 출력:', selectedTransaction);
     // 실제 출력 로직 구현
     closeReceiptModal();
   };
 
+  // 결제 방법 ID를 한글로 변환
+  const getPaymentMethodLabel = (paymentMethodId: string) => {
+    switch (paymentMethodId) {
+      case 'cash':
+        return '현금';
+      case 'transfer':
+        return '이체';
+      case 'coupon':
+        return '쿠폰';
+      case 'ledger':
+        return '장부';
+      default:
+        return '기타';
+    }
+  };
+
   // 필터링된 거래내역
-  const filteredTransactions = transactions.filter(transaction => {
+  const filteredTransactions = storeTransactions.filter(transaction => {
     if (selectedFilter === 'all') return true;
-    return transaction.paymentMethod === selectedFilter;
+    const paymentMethodLabel = getPaymentMethodLabel(transaction.paymentMethod);
+    return paymentMethodLabel === selectedFilter;
   });
 
   return (
@@ -152,6 +113,7 @@ export default function History() {
           {/* 영수증 모달 */}
           <ReceiptModal
             visible={receiptModalVisible}
+            transaction={selectedTransaction}
             onClose={closeReceiptModal}
             onPrint={handlePrint}
           />

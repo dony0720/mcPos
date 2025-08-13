@@ -17,7 +17,7 @@ import {
   SelectAllCheckbox,
 } from '../components';
 import { useButtonAnimation, useModal } from '../hooks';
-import { useOrderStore } from '../stores';
+import { useOrderStore, useTransactionStore } from '../stores';
 import {
   CashRegisterPaymentId,
   Discount,
@@ -35,7 +35,11 @@ export default function Payment() {
     applyDiscount,
     removeDiscount,
     clearAllDiscounts,
+    clearOrder,
   } = useOrderStore();
+
+  // 거래내역 스토어
+  const { addTransaction } = useTransactionStore();
 
   // 간단한 상태 관리
   const [isAllChecked, setIsAllChecked] = useState(false);
@@ -61,6 +65,48 @@ export default function Payment() {
   const [shouldOpenCashModal, setShouldOpenCashModal] = useState(false);
 
   const paymentButtonAnimation = useButtonAnimation();
+
+  // 결제 방법별 세부 정보 생성
+  const createPaymentDetails = () => {
+    switch (selectedPaymentMethod) {
+      case 'cash':
+        return {
+          type: 'cash' as const,
+          receivedAmount,
+          changeAmount,
+        };
+      case 'coupon':
+        if (remainingAmount > 0) {
+          return {
+            type: 'coupon_cash' as const,
+            couponAmount,
+            remainingAmount,
+            receivedAmount,
+            changeAmount,
+          };
+        } else {
+          return {
+            type: 'coupon' as const,
+            couponAmount,
+          };
+        }
+      case 'transfer':
+        return {
+          type: 'transfer' as const,
+        };
+      case 'ledger':
+        return {
+          type: 'ledger' as const,
+          phoneNumber: '', // 실제로는 입력받은 전화번호를 사용
+        };
+      default:
+        return {
+          type: 'cash' as const,
+          receivedAmount: 0,
+          changeAmount: 0,
+        };
+    }
+  };
 
   // 페이지 포커스 시 모든 할인 제거
   useFocusEffect(
@@ -221,8 +267,20 @@ export default function Payment() {
       // 픽업 번호 입력 완료 또는 일반 결제 완료
       console.log('픽업 번호:', number);
 
+      // 거래내역 저장
+      const transactionId = addTransaction({
+        orderItems: orderItems,
+        paymentMethod: selectedPaymentMethod,
+        orderMethod: selectedOrderMethod,
+        totalAmount: totalAmount,
+        pickupNumber: number,
+        paymentDetails: createPaymentDetails(),
+        status: 'completed',
+      });
+
       if (selectedPaymentMethod === 'cash') {
         console.log('현금 결제 완료:', {
+          transactionId,
           totalAmount,
           receivedAmount,
           changeAmount,
@@ -231,6 +289,7 @@ export default function Payment() {
       } else if (selectedPaymentMethod === 'coupon') {
         if (remainingAmount > 0) {
           console.log('쿠폰+현금 결제 완료:', {
+            transactionId,
             totalAmount,
             couponAmount,
             remainingAmount,
@@ -240,13 +299,21 @@ export default function Payment() {
           });
         } else {
           console.log('쿠폰 전액 결제 완료:', {
+            transactionId,
             totalAmount,
             couponAmount,
             pickupNumber: number,
           });
         }
       }
+
+      // 결제 완료 후 주문 데이터 초기화
+      clearOrder();
+
       closeModal();
+
+      // 메뉴 선택 페이지로 이동
+      router.push('/(tabs)');
     }
   };
 
