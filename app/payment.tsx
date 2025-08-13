@@ -2,10 +2,12 @@
 
 import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 
 import {
+  CashAmountModal,
+  CouponAmountModal,
   DiscountSection,
   NumberInputModal,
   OrderMethodSelector,
@@ -47,6 +49,16 @@ export default function Payment() {
   const { openModal, closeModal, isModalOpen } = useModal();
   const [modalType, setModalType] = useState<NumberInputType>('pickup');
   const [isLedgerFirstStep, setIsLedgerFirstStep] = useState(false);
+
+  // 현금 결제 관련 상태
+  const [receivedAmount, setReceivedAmount] = useState(0);
+  const [changeAmount, setChangeAmount] = useState(0);
+  const [shouldOpenPickupModal, setShouldOpenPickupModal] = useState(false);
+
+  // 쿠폰 결제 관련 상태
+  const [couponAmount, setCouponAmount] = useState(0);
+  const [remainingAmount, setRemainingAmount] = useState(0);
+  const [shouldOpenCashModal, setShouldOpenCashModal] = useState(false);
 
   const paymentButtonAnimation = useButtonAnimation();
 
@@ -138,7 +150,13 @@ export default function Payment() {
 
   // 결제 처리 핸들러
   const handlePaymentPress = () => {
-    if (selectedPaymentMethod === 'ledger') {
+    if (selectedPaymentMethod === 'cash') {
+      // 현금 결제: 받은 금액 입력 모달 열기
+      openModal('cashAmount');
+    } else if (selectedPaymentMethod === 'coupon') {
+      // 쿠폰 결제: 쿠폰 금액 입력 모달 열기
+      openModal('couponAmount');
+    } else if (selectedPaymentMethod === 'ledger') {
       setModalType('phone');
       setIsLedgerFirstStep(true);
       openModal('numberInput');
@@ -148,6 +166,49 @@ export default function Payment() {
       openModal('numberInput');
     }
   };
+
+  // 쿠폰 결제: 쿠폰 금액 확인 핸들러
+  const handleCouponAmountConfirm = (coupon: number, remaining: number) => {
+    setCouponAmount(coupon);
+    setRemainingAmount(remaining);
+    closeModal();
+
+    if (remaining > 0) {
+      // 남은 금액이 있으면 현금 결제 모달 열기
+      setShouldOpenCashModal(true);
+    } else {
+      // 쿠폰으로 전액 결제 완료시 바로 수령번호 모달 열기
+      setShouldOpenPickupModal(true);
+    }
+  };
+
+  // 현금 결제: 받은 금액 확인 핸들러
+  const handleCashAmountConfirm = (received: number, change: number) => {
+    setReceivedAmount(received);
+    setChangeAmount(change);
+    closeModal();
+
+    // 다음 수령번호 모달을 열기 위한 플래그 설정
+    setShouldOpenPickupModal(true);
+  };
+
+  // 쿠폰 결제 후 현금 모달 열기를 위한 useEffect
+  useEffect(() => {
+    if (shouldOpenCashModal) {
+      openModal('cashAmount');
+      setShouldOpenCashModal(false);
+    }
+  }, [shouldOpenCashModal, openModal]);
+
+  // 수령번호 모달 열기를 위한 useEffect
+  useEffect(() => {
+    if (shouldOpenPickupModal) {
+      setModalType('pickup');
+      setIsLedgerFirstStep(false);
+      openModal('numberInput');
+      setShouldOpenPickupModal(false);
+    }
+  }, [shouldOpenPickupModal, openModal]);
 
   const handleModalConfirm = (number: string) => {
     if (isLedgerFirstStep) {
@@ -159,6 +220,32 @@ export default function Payment() {
     } else {
       // 픽업 번호 입력 완료 또는 일반 결제 완료
       console.log('픽업 번호:', number);
+
+      if (selectedPaymentMethod === 'cash') {
+        console.log('현금 결제 완료:', {
+          totalAmount,
+          receivedAmount,
+          changeAmount,
+          pickupNumber: number,
+        });
+      } else if (selectedPaymentMethod === 'coupon') {
+        if (remainingAmount > 0) {
+          console.log('쿠폰+현금 결제 완료:', {
+            totalAmount,
+            couponAmount,
+            remainingAmount,
+            receivedAmount,
+            changeAmount,
+            pickupNumber: number,
+          });
+        } else {
+          console.log('쿠폰 전액 결제 완료:', {
+            totalAmount,
+            couponAmount,
+            pickupNumber: number,
+          });
+        }
+      }
       closeModal();
     }
   };
@@ -253,6 +340,22 @@ export default function Payment() {
               </Text>
             </Animated.View>
           </Pressable>
+
+          {/* 현금 결제: 받은 금액 입력 모달 */}
+          <CashAmountModal
+            visible={isModalOpen('cashAmount')}
+            totalAmount={remainingAmount > 0 ? remainingAmount : totalAmount}
+            onClose={closeModal}
+            onConfirm={handleCashAmountConfirm}
+          />
+
+          {/* 쿠폰 결제: 쿠폰 금액 입력 모달 */}
+          <CouponAmountModal
+            visible={isModalOpen('couponAmount')}
+            totalAmount={totalAmount}
+            onClose={closeModal}
+            onConfirm={handleCouponAmountConfirm}
+          />
 
           {/* 번호 입력 모달 */}
           <NumberInputModal
