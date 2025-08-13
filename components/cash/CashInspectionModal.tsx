@@ -10,24 +10,31 @@ import {
   View,
 } from 'react-native';
 
-import { CashDrawerMoneyItem, CashInspectionModalProps } from '../../types';
+import { CashDrawerMoneyItem, useCashStore } from '../../stores/useCashStore';
 
 export default function CashInspectionModal({
   visible,
   onClose,
   onConfirm,
-  initialData,
-}: CashInspectionModalProps) {
+}: {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm: (updatedData: CashDrawerMoneyItem[]) => void;
+}) {
   const [cashData, setCashData] = useState<CashDrawerMoneyItem[]>([]);
+  const cashDrawerData = useCashStore(state => state.cashDrawerData);
+  const updateCashDrawerData = useCashStore(
+    state => state.updateCashDrawerData
+  );
 
   // 모달이 열릴 때 초기 데이터 설정
   useEffect(() => {
     if (visible) {
-      setCashData(JSON.parse(JSON.stringify(initialData))); // 깊은 복사
+      setCashData(JSON.parse(JSON.stringify(cashDrawerData))); // 깊은 복사
     }
-  }, [visible, initialData]);
+  }, [visible, cashDrawerData]);
 
-  // 수량 변경 핸들러
+  // 수량 변경 핸들러 (실시간 스토어 업데이트)
   const handleQuantityChange = (index: number, newQuantity: string) => {
     const quantity = parseInt(newQuantity) || 0;
     const newCashData = [...cashData];
@@ -36,6 +43,9 @@ export default function CashInspectionModal({
       quantity,
     };
     setCashData(newCashData);
+
+    // 실시간으로 스토어 업데이트
+    updateCashDrawerData(newCashData);
   };
 
   // 확인 버튼 핸들러
@@ -54,11 +64,13 @@ export default function CashInspectionModal({
     return (quantity * unitValue).toLocaleString();
   };
 
-  // 전체 금액 계산
+  // 전체 금액 계산 (스토어 데이터 기준)
   const getTotalAmount = () => {
-    return cashData
-      .reduce((total, item) => total + item.quantity * item.unitValue, 0)
-      .toLocaleString();
+    const total = cashDrawerData.reduce(
+      (total, item) => total + item.quantity * item.unitValue,
+      0
+    );
+    return total.toLocaleString();
   };
 
   return (
@@ -116,15 +128,18 @@ export default function CashInspectionModal({
                           <Text className='text-sm font-medium text-gray-600'>
                             수량
                           </Text>
-                          <TextInput
-                            className='border border-gray-300 bg-white text-gray-800 rounded-lg px-3 py-2 text-center text-lg font-medium w-20'
-                            value={item.quantity.toString()}
-                            onChangeText={text =>
-                              handleQuantityChange(index, text)
-                            }
-                            keyboardType='numeric'
-                            placeholder='0'
-                          />
+                          <View className='flex-row items-center gap-1'>
+                            <TextInput
+                              className='border border-gray-300 bg-white text-gray-800 rounded-lg text-center text-xl font-semibold w-20 h-10 leading-[20px]'
+                              value={item.quantity.toString()}
+                              onChangeText={text =>
+                                handleQuantityChange(index, text)
+                              }
+                              keyboardType='numeric'
+                              placeholder='0'
+                            />
+                            <Text>매</Text>
+                          </View>
                         </View>
 
                         {/* 금액 표시 */}

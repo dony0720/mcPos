@@ -13,6 +13,8 @@ export enum CashTheme {
   ORANGE = 'orange',
   BLUE = 'blue',
   GRAY = 'gray',
+  INDIGO = 'indigo',
+  EMERALD = 'emerald',
 }
 
 /**
@@ -61,12 +63,7 @@ export type CashDrawerTransactionType = 'deposit' | 'withdraw';
 
 // ===== 컴포넌트 Props 타입들 =====
 
-export interface CashInspectionModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: (updatedData: CashDrawerMoneyItem[]) => void;
-  initialData: CashDrawerMoneyItem[];
-}
+// CashInspectionModal은 더 이상 initialData props가 필요하지 않음 (스토어에서 직접 데이터 가져옴)
 
 export interface CashTransactionModalProps {
   visible: boolean;
@@ -74,9 +71,7 @@ export interface CashTransactionModalProps {
   type: CashDrawerTransactionType;
 }
 
-export interface CashDrawerCardsProps {
-  cashDrawerData: CashDrawerMoneyItem[];
-}
+// CashDrawerCards는 더 이상 props가 필요하지 않음 (스토어에서 직접 데이터 가져옴)
 
 export interface CashDrawerCardProps {
   type: string;

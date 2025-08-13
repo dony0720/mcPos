@@ -2,13 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { CashDrawerCardsProps } from '../../types';
+import { useCashStore } from '../../stores/useCashStore';
 import CashDrawerCard from './CashDrawerCard';
 import CashTransactionModal from './CashTransactionModal';
 
-export default function CashDrawerCards({
-  cashDrawerData,
-}: CashDrawerCardsProps) {
+export default function CashDrawerCards() {
+  const cashDrawerData = useCashStore(state => state.cashDrawerData);
   const [isDepositModalVisible, setIsDepositModalVisible] = useState(false);
   const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
 
@@ -18,13 +17,6 @@ export default function CashDrawerCards({
 
   const handleCashWithdraw = () => {
     setIsWithdrawModalVisible(true);
-  };
-
-  // 총 현금 보유액 계산
-  const getTotalAmount = () => {
-    return cashDrawerData
-      .reduce((total, item) => total + item.quantity * item.unitValue, 0)
-      .toLocaleString();
   };
 
   return (

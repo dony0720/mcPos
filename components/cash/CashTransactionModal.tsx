@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 
+import { useCashStore } from '../../stores/useCashStore';
 import { CashTransactionModalProps } from '../../types';
 
 export default function CashTransactionModal({
@@ -19,6 +20,7 @@ export default function CashTransactionModal({
 }: CashTransactionModalProps) {
   const [amount, setAmount] = useState('');
   const [memo, setMemo] = useState('');
+  const addTransaction = useCashStore(state => state.addTransaction);
 
   // 모달이 열릴 때 초기화
   useEffect(() => {
@@ -30,6 +32,14 @@ export default function CashTransactionModal({
 
   // 확인 버튼 핸들러
   const handleConfirm = () => {
+    const numericAmount = parseInt(amount.replace(/[^0-9]/g, ''), 10) || 0;
+    if (numericAmount > 0) {
+      addTransaction({
+        type,
+        amount: numericAmount,
+        description: memo || (type === 'deposit' ? '현금 입금' : '현금 출금'),
+      });
+    }
     onClose();
   };
 

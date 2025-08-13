@@ -6,7 +6,7 @@ const colorPalette = {
   purple: '#8B5CF6',
   orange: '#F59E0B',
   indigo: '#6366F1',
-  emerald: '#10B981',
+  emerald: '#44D7BE',
   red: '#EF4444',
   yellow: '#F59E0B',
 } as const;
@@ -64,6 +64,24 @@ const createOrangeCardStyle = () => ({
   amountColor: 'text-orange-900',
 });
 
+// 인디고 전용 테마 스타일
+const createIndigoCardStyle = () => ({
+  bg: 'bg-indigo-100',
+  border: 'border-indigo-300',
+  iconColor: colorPalette.indigo,
+  titleColor: 'text-indigo-700',
+  amountColor: 'text-indigo-900',
+});
+
+// 에메랄드 전용 테마 스타일
+const createEmeraldCardStyle = () => ({
+  bg: 'bg-emerald-100',
+  border: 'border-emerald-300',
+  iconColor: colorPalette.emerald,
+  titleColor: 'text-emerald-700',
+  amountColor: 'text-emerald-900',
+});
+
 // 기본 카드 스타일 (흰색 배경 + 컬러 아이콘)
 const createBaseCardStyleWithColor = (color: keyof typeof colorPalette) => ({
   ...createBaseCardStyle(),
@@ -77,8 +95,8 @@ export const cardThemeStyles = {
   green: createGreenCardStyle(),
   purple: createBaseCardStyleWithColor('purple'),
   orange: createOrangeCardStyle(),
-  indigo: createBaseCardStyleWithColor('indigo'),
-  emerald: createBaseCardStyleWithColor('emerald'),
+  indigo: createIndigoCardStyle(),
+  emerald: createEmeraldCardStyle(),
   red: createBaseCardStyleWithColor('red'),
   yellow: createYellowCardStyle(),
 } as const;
