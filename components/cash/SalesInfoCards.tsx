@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 
 import { useCashStore, useTransactionStore } from '../../stores';
-import { SalesTheme } from '../../types';
+import { SalesTheme, TransactionType } from '../../types';
 import SalesInfoCard from './SalesInfoCard';
 
 export default function SalesInfoCards() {
@@ -23,11 +23,14 @@ export default function SalesInfoCards() {
   const todayWithdrawals = getTodayWithdrawals();
 
   // 결제 방법별 매출 계산 (paymentBreakdown 사용)
-  const completedTransactions = todayTransactions.filter(
-    t => t.status === 'completed' || t.status === 'picked_up'
+  // 완료된 주문 거래만 필터링 (입출금 제외)
+  const completedOrderTransactions = todayTransactions.filter(
+    t =>
+      (t.status === 'completed' || t.status === 'picked_up') &&
+      (t.type === TransactionType.ORDER || !t.type) // 기존 거래는 type이 없을 수 있음
   );
 
-  const cashSales = completedTransactions.reduce((sum, t) => {
+  const cashSales = completedOrderTransactions.reduce((sum, t) => {
     if (t.paymentBreakdown?.cash) {
       return sum + t.paymentBreakdown.cash;
     }
@@ -35,21 +38,21 @@ export default function SalesInfoCards() {
     return sum + (t.paymentMethod === 'cash' ? t.totalAmount : 0);
   }, 0);
 
-  const transferSales = completedTransactions.reduce((sum, t) => {
+  const transferSales = completedOrderTransactions.reduce((sum, t) => {
     if (t.paymentBreakdown?.transfer) {
       return sum + t.paymentBreakdown.transfer;
     }
     return sum + (t.paymentMethod === 'transfer' ? t.totalAmount : 0);
   }, 0);
 
-  const couponSales = completedTransactions.reduce((sum, t) => {
+  const couponSales = completedOrderTransactions.reduce((sum, t) => {
     if (t.paymentBreakdown?.coupon) {
       return sum + t.paymentBreakdown.coupon;
     }
     return sum + (t.paymentMethod === 'coupon' ? t.totalAmount : 0);
   }, 0);
 
-  const ledgerSales = completedTransactions.reduce((sum, t) => {
+  const ledgerSales = completedOrderTransactions.reduce((sum, t) => {
     if (t.paymentBreakdown?.ledger) {
       return sum + t.paymentBreakdown.ledger;
     }

@@ -58,3 +58,12 @@ export enum OrderReceiptMethod {
   TAKEOUT = 'takeout',
   DINE_IN = 'dine-in',
 }
+
+/**
+ * 거래 타입 enum
+ */
+export enum TransactionType {
+  ORDER = 'order', // 주문 거래
+  CASH_DEPOSIT = 'cash_deposit', // 현금 입금
+  CASH_WITHDRAWAL = 'cash_withdrawal', // 현금 출금
+}

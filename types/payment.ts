@@ -13,10 +13,7 @@ export interface CashRegisterPayment extends Pick<BaseItem, 'id' | 'name'> {
   icon: string;
 }
 
-export interface OrderReceiptMethod extends Pick<BaseItem, 'id' | 'name'> {
-  id: OrderReceiptMethodId;
-  icon: string;
-}
+// OrderReceiptMethod는 enums.ts에서 enum으로 정의됨
 
 export interface PaymentOrderItem extends Optionable {
   id: number;
@@ -125,7 +122,11 @@ export const CASH_REGISTER_PAYMENTS: CashRegisterPayment[] = [
   { id: PaymentMethod.LEDGER, name: '장부', icon: 'book-outline' },
 ] as const;
 
-export const ORDER_RECEIPT_METHODS: OrderReceiptMethod[] = [
+export const ORDER_RECEIPT_METHODS: Array<{
+  id: OrderReceiptMethodId;
+  name: string;
+  icon: string;
+}> = [
   {
     id: OrderReceiptMethodEnum.TAKEOUT,
     name: '테이크아웃',

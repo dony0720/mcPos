@@ -2,8 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { useCashStore } from '../../stores';
-import { CashDrawerCardsProps, CashTransactionType } from '../../types';
+import { useCashStore, useTransactionStore } from '../../stores';
+import {
+  CashDrawerCardsProps,
+  CashTransactionType,
+  TransactionType,
+} from '../../types';
 import CashDrawerCard from './CashDrawerCard';
 import CashTransactionModal from './CashTransactionModal';
 
@@ -15,6 +19,9 @@ export default function CashDrawerCards({
 
   // 현금 스토어에서 필요한 함수들 가져오기
   const { calculateOptimalBreakdown, applyCashBreakdown } = useCashStore();
+
+  // 거래 스토어에서 입출금 거래 추가 함수 가져오기
+  const { addCashTransaction } = useTransactionStore();
 
   const handleCashDeposit = () => {
     setIsDepositModalVisible(true);
@@ -31,6 +38,14 @@ export default function CashDrawerCards({
 
     // 현금 서랍에 반영 (입금이므로 양수로 적용)
     applyCashBreakdown(breakdown, [], CashTransactionType.MANUAL_DEPOSIT, memo);
+
+    // 거래 내역에도 추가
+    addCashTransaction(
+      TransactionType.CASH_DEPOSIT,
+      amount,
+      memo || '현금 입금',
+      breakdown
+    );
   };
 
   // 출금 확인 처리
@@ -50,6 +65,14 @@ export default function CashDrawerCards({
       negativeBreakdown,
       CashTransactionType.MANUAL_WITHDRAW,
       memo
+    );
+
+    // 거래 내역에도 추가
+    addCashTransaction(
+      TransactionType.CASH_WITHDRAWAL,
+      amount,
+      memo || '현금 출금',
+      breakdown
     );
   };
 

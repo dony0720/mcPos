@@ -8,6 +8,7 @@ import {
   TransactionState,
   TransactionStats,
   TransactionStatus,
+  TransactionType,
 } from '../types';
 
 // 날짜 유틸리티 함수들
@@ -36,7 +37,36 @@ export const useTransactionStore = create<TransactionState>()(
           ...transactionData,
           id: `TXN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           timestamp: new Date(),
-          status: 'completed',
+          status: transactionData.status || TransactionStatus.COMPLETED,
+        };
+
+        set(state => ({
+          transactions: [newTransaction, ...state.transactions],
+        }));
+
+        return newTransaction.id;
+      },
+
+      // 입출금 거래 추가
+      addCashTransaction: (
+        type: TransactionType.CASH_DEPOSIT | TransactionType.CASH_WITHDRAWAL,
+        amount: number,
+        description: string,
+        cashBreakdown: Array<{
+          denomination: number;
+          quantity: number;
+          total: number;
+        }>
+      ) => {
+        const newTransaction: Transaction = {
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+          timestamp: new Date(),
+          type,
+          totalAmount:
+            type === TransactionType.CASH_WITHDRAWAL ? -amount : amount,
+          status: TransactionStatus.COMPLETED,
+          description,
+          cashBreakdown,
         };
 
         set(state => ({
@@ -131,6 +161,7 @@ export const useTransactionStore = create<TransactionState>()(
           // 수령 번호 필터
           if (
             filter.pickupNumber &&
+            transaction.pickupNumber &&
             !transaction.pickupNumber.includes(filter.pickupNumber)
           ) {
             return false;
@@ -163,8 +194,10 @@ export const useTransactionStore = create<TransactionState>()(
         // 결제 방법별 통계
         const paymentMethodBreakdown = completedTransactions.reduce(
           (acc, transaction) => {
-            acc[transaction.paymentMethod] =
-              (acc[transaction.paymentMethod] || 0) + transaction.totalAmount;
+            if (transaction.paymentMethod) {
+              acc[transaction.paymentMethod] =
+                (acc[transaction.paymentMethod] || 0) + transaction.totalAmount;
+            }
             return acc;
           },
           {} as Record<string, number>
@@ -173,8 +206,10 @@ export const useTransactionStore = create<TransactionState>()(
         // 주문 방법별 통계
         const orderMethodBreakdown = completedTransactions.reduce(
           (acc, transaction) => {
-            acc[transaction.orderMethod] =
-              (acc[transaction.orderMethod] || 0) + transaction.totalAmount;
+            if (transaction.orderMethod) {
+              acc[transaction.orderMethod] =
+                (acc[transaction.orderMethod] || 0) + transaction.totalAmount;
+            }
             return acc;
           },
           {} as Record<string, number>
@@ -205,32 +240,7 @@ export const useTransactionStore = create<TransactionState>()(
       name: 'transaction-storage',
       storage: createJSONStorage(() => AsyncStorage),
       // 날짜 객체를 문자열로 변환하여 저장
-      serialize: state => {
-        return JSON.stringify({
-          ...state,
-          state: {
-            ...state.state,
-            transactions: state.state.transactions.map(t => ({
-              ...t,
-              timestamp: t.timestamp.toISOString(),
-            })),
-          },
-        });
-      },
-      // 문자열을 날짜 객체로 복원
-      deserialize: str => {
-        const parsed = JSON.parse(str);
-        return {
-          ...parsed,
-          state: {
-            ...parsed.state,
-            transactions: parsed.state.transactions.map((t: any) => ({
-              ...t,
-              timestamp: new Date(t.timestamp),
-            })),
-          },
-        };
-      },
+      // Date 객체 직렬화는 기본 JSON.stringify/parse로 처리
     }
   )
 );

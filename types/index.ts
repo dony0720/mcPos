@@ -1,5 +1,6 @@
 export * from './common';
 export * from './enums';
+export * from './history';
 export * from './menu';
 export * from './order';
 export * from './payment';

@@ -7,12 +7,14 @@ import { ScrollView, Text, View } from 'react-native';
 
 import { AdminProtectedRoute } from '../../components';
 import PageHeader from '../../components/common/PageHeader';
-import EmptyState from '../../components/history/EmptyState';
-import FilterTabs, { FilterType } from '../../components/history/FilterTabs';
-import ReceiptModal from '../../components/history/ReceiptModal';
-import TransactionItem from '../../components/history/TransactionItem';
+import {
+  EmptyState,
+  FilterTabs,
+  ReceiptModal,
+  TransactionItem,
+} from '../../components/history';
 import { useTransactionStore } from '../../stores';
-import { Transaction } from '../../types';
+import { FilterType, Transaction, TransactionType } from '../../types';
 
 // Day.js 설정
 dayjs.locale('ko');
@@ -22,7 +24,9 @@ export default function History() {
   // 거래내역 스토어에서 데이터 가져오기
   const { transactions: storeTransactions } = useTransactionStore();
 
-  const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>(
+    FilterType.ALL
+  );
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
@@ -61,11 +65,29 @@ export default function History() {
     }
   };
 
+  // 거래 타입별 라벨 가져오기
+  const getTransactionLabel = (transaction: Transaction) => {
+    if (
+      transaction.type === TransactionType.ORDER &&
+      transaction.paymentMethod
+    ) {
+      return getPaymentMethodLabel(transaction.paymentMethod);
+    } else if (transaction.type === TransactionType.CASH_DEPOSIT) {
+      return '입금';
+    } else if (transaction.type === TransactionType.CASH_WITHDRAWAL) {
+      return '출금';
+    } else if (!transaction.type && transaction.paymentMethod) {
+      // 기존 거래 (type 필드가 없는 경우)
+      return getPaymentMethodLabel(transaction.paymentMethod);
+    }
+    return '기타';
+  };
+
   // 필터링된 거래내역
   const filteredTransactions = storeTransactions.filter(transaction => {
-    if (selectedFilter === 'all') return true;
-    const paymentMethodLabel = getPaymentMethodLabel(transaction.paymentMethod);
-    return paymentMethodLabel === selectedFilter;
+    if (selectedFilter === FilterType.ALL) return true;
+    const transactionLabel = getTransactionLabel(transaction);
+    return transactionLabel === selectedFilter;
   });
 
   return (

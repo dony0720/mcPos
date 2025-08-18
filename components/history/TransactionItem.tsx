@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { Transaction } from '../../types';
+import { Transaction, TransactionType } from '../../types';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -31,9 +31,26 @@ export default function TransactionItem({
     }
   };
 
+  // 거래 타입별 라벨 가져오기
+  const getTransactionLabel = (transaction: Transaction) => {
+    if (
+      transaction.type === TransactionType.ORDER &&
+      transaction.paymentMethod
+    ) {
+      return getPaymentMethodLabel(transaction.paymentMethod);
+    } else if (transaction.type === TransactionType.CASH_DEPOSIT) {
+      return '입금';
+    } else if (transaction.type === TransactionType.CASH_WITHDRAWAL) {
+      return '출금';
+    } else if (!transaction.type && transaction.paymentMethod) {
+      // 기존 거래 (type 필드가 없는 경우)
+      return getPaymentMethodLabel(transaction.paymentMethod);
+    }
+    return '기타';
+  };
+
   // 결제 수단별 스타일 클래스 반환
-  const getPaymentMethodClass = (paymentMethodId: string) => {
-    const label = getPaymentMethodLabel(paymentMethodId);
+  const getPaymentMethodClass = (label: string) => {
     switch (label) {
       case '현금':
         return {
@@ -62,6 +79,20 @@ export default function TransactionItem({
           bgClass: 'bg-purple-100',
           textClass: 'text-purple-600',
           iconColor: '#8B5CF6',
+        };
+      case '입금':
+        return {
+          icon: 'add-circle-outline',
+          bgClass: 'bg-emerald-100',
+          textClass: 'text-emerald-600',
+          iconColor: '#10B981',
+        };
+      case '출금':
+        return {
+          icon: 'remove-circle-outline',
+          bgClass: 'bg-red-100',
+          textClass: 'text-red-600',
+          iconColor: '#EF4444',
         };
       default:
         return {
@@ -95,8 +126,8 @@ export default function TransactionItem({
     }
   };
 
-  const paymentMethodLabel = getPaymentMethodLabel(transaction.paymentMethod);
-  const paymentStyle = getPaymentMethodClass(transaction.paymentMethod);
+  const transactionLabel = getTransactionLabel(transaction);
+  const paymentStyle = getPaymentMethodClass(transactionLabel);
   const formattedDate = formatDate(transaction.timestamp);
 
   return (
@@ -134,10 +165,17 @@ export default function TransactionItem({
                     paymentStyle.textClass
                   )}
                 >
-                  {paymentMethodLabel}
+                  {transactionLabel}
                 </Text>
               </View>
             </View>
+            {(transaction.type === TransactionType.CASH_DEPOSIT ||
+              transaction.type === TransactionType.CASH_WITHDRAWAL) &&
+              transaction.description && (
+                <Text className='text-sm text-gray-600 mb-1'>
+                  {transaction.description}
+                </Text>
+              )}
 
             <View className='flex flex-row items-center gap-2'>
               <Text className='text-gray-600 text-sm font-medium'>
@@ -152,7 +190,14 @@ export default function TransactionItem({
 
         {/* 우측: 금액 및 화살표 */}
         <View className='flex flex-row items-center gap-2'>
-          <Text className='text-lg font-bold text-gray-800'>
+          <Text
+            className={clsx(
+              'text-lg font-bold',
+              transaction.type === TransactionType.CASH_WITHDRAWAL
+                ? 'text-red-600'
+                : 'text-gray-800'
+            )}
+          >
             {transaction.totalAmount.toLocaleString()}원
           </Text>
           <Ionicons name='chevron-forward' size={20} color='#9CA3AF' />

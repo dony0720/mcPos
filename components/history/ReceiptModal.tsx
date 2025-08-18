@@ -76,8 +76,13 @@ export default function ReceiptModal({
                 주문번호: #{transaction.pickupNumber}
               </Text>
               <Text className='text-sm text-gray-600 mt-1'>
-                {getOrderMethodLabel(transaction.orderMethod)} |{' '}
-                {getPaymentMethodLabel(transaction.paymentMethod)}
+                {transaction.orderMethod
+                  ? getOrderMethodLabel(transaction.orderMethod)
+                  : '알 수 없음'}{' '}
+                |{' '}
+                {transaction.paymentMethod
+                  ? getPaymentMethodLabel(transaction.paymentMethod)
+                  : '알 수 없음'}
               </Text>
             </View>
 

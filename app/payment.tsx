@@ -24,6 +24,7 @@ import {
   PaymentDetailsType,
   PaymentMethod,
   TransactionStatus,
+  TransactionType,
 } from '../types';
 import {
   CashRegisterPaymentId,
@@ -245,13 +246,13 @@ export default function Payment() {
 
   // 결제 처리 핸들러
   const handlePaymentPress = () => {
-    if (selectedPaymentMethod === 'cash') {
+    if (selectedPaymentMethod === PaymentMethod.CASH) {
       // 현금 결제: 받은 금액 입력 모달 열기
       openModal('cashAmount');
-    } else if (selectedPaymentMethod === 'coupon') {
+    } else if (selectedPaymentMethod === PaymentMethod.COUPON) {
       // 쿠폰 결제: 쿠폰 금액 입력 모달 열기
       openModal('couponAmount');
-    } else if (selectedPaymentMethod === 'ledger') {
+    } else if (selectedPaymentMethod === PaymentMethod.LEDGER) {
       setModalType('phone');
       setIsLedgerFirstStep(true);
       openModal('numberInput');
@@ -316,6 +317,7 @@ export default function Payment() {
 
       // 거래내역 저장
       const transactionId = addTransaction({
+        type: TransactionType.ORDER,
         orderItems: orderItems,
         paymentMethod: selectedPaymentMethod,
         orderMethod: selectedOrderMethod,
