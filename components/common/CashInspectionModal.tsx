@@ -152,9 +152,20 @@ export default function CashInspectionModal({
                         </View>
                       </View>
 
+                      {/* 권종 개수 */}
+                      <View className='flex-row justify-between items-center mb-3'>
+                        <Text className='text-sm font-medium text-blue-600'>
+                          권종 개수
+                        </Text>
+                        <Text className='text-lg font-medium text-blue-800'>
+                          {cashData.length}개 권종
+                        </Text>
+                      </View>
+
                       {/* 총 금액 표시 */}
-                      <View className='flex-1 justify-center'>
-                        <Text className='text-2xl font-bold text-blue-900 text-center'>
+                      <View className='flex-row justify-between items-center'>
+                        <Text className='text-sm text-blue-600'>총액</Text>
+                        <Text className='text-lg font-bold text-blue-800'>
                           {getTotalAmount()}원
                         </Text>
                       </View>
