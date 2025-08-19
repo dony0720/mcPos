@@ -16,6 +16,11 @@ const COLORS = {
 // 탭 구성 데이터
 const TAB_CONFIG = [
   { name: 'index', title: '메뉴', icon: 'restaurant-outline' as const },
+  {
+    name: 'settings',
+    title: '설정',
+    icon: 'settings-outline' as const,
+  },
   { name: 'ledger', title: '장부관리', icon: 'book-outline' as const },
   { name: 'cash', title: '시재관리', icon: 'cash-outline' as const },
   { name: 'history', title: '거래내역', icon: 'time-outline' as const },
