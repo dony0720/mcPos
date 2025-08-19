@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
@@ -10,6 +11,8 @@ import { AdminProtectedRoute } from '../../components';
  * - AdminProtectedRoute로 관리자 권한 검증
  */
 export default function Settings() {
+  const router = useRouter();
+
   // 설정 메뉴 아이템들
   const settingMenuItems = [
     {
@@ -18,7 +21,7 @@ export default function Settings() {
       description: '메뉴 등록, 수정, 삭제',
       icon: 'restaurant-outline' as const,
       onPress: () => {
-        // TODO: 메뉴 관리 화면으로 이동
+        router.push('/menu-management');
       },
     },
     {
