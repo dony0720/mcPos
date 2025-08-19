@@ -3,11 +3,10 @@ import { clsx } from 'clsx';
 import React from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
+import { useLedgerStore } from '../../stores';
 import {
-  CustomerAccountPaymentMethod as PaymentMethod,
-  CustomerAccountTransactionType as TransactionType,
-  CustomerTransaction as Transaction,
   HistoryModalProps,
+  CustomerAccountTransactionType as TransactionType,
 } from '../../types';
 
 export default function HistoryModal({
@@ -16,175 +15,11 @@ export default function HistoryModal({
   onDeleteTransaction,
   customerInfo,
 }: HistoryModalProps) {
-  // 임의의 거래 내역 데이터 (고객별로 다른 데이터)
-  const getTransactionData = (memberNumber: string): Transaction[] => {
-    const baseData: Record<string, Transaction[]> = {
-      M001: [
-        {
-          id: '1',
-          date: '2024-12-15 14:30',
-          type: TransactionType.REGISTER,
-          amount: '50,000원',
-          receptionist: '홍길동',
-          paymentMethod: PaymentMethod.CASH,
-        },
-        {
-          id: '2',
-          date: '2024-12-14 16:45',
-          type: TransactionType.USE,
-          amount: '4,500원',
-          receptionist: '김직원',
-          paymentMethod: PaymentMethod.LEDGER,
-        },
-        {
-          id: '3',
-          date: '2024-12-13 11:20',
-          type: TransactionType.CHARGE,
-          amount: '30,000원',
-          receptionist: '이사장',
-          paymentMethod: PaymentMethod.BANK_TRANSFER,
-        },
-        {
-          id: '4',
-          date: '2024-12-12 09:15',
-          type: TransactionType.USE,
-          amount: '3,000원',
-          receptionist: '박매니저',
-          paymentMethod: PaymentMethod.LEDGER,
-        },
-        {
-          id: '5',
-          date: '2024-12-12 09:15',
-          type: TransactionType.USE,
-          amount: '3,000원',
-          receptionist: '박매니저',
-          paymentMethod: PaymentMethod.LEDGER,
-        },
-        {
-          id: '6',
-          date: '2024-12-12 09:15',
-          type: TransactionType.USE,
-          amount: '3,000원',
-          receptionist: '박매니저',
-          paymentMethod: PaymentMethod.LEDGER,
-        },
-        {
-          id: '7',
-          date: '2024-12-12 09:15',
-          type: TransactionType.USE,
-          amount: '3,000원',
-          receptionist: '박매니저',
-          paymentMethod: PaymentMethod.LEDGER,
-        },
-      ],
-      M002: [
-        {
-          id: '1',
-          date: '2024-12-14 10:30',
-          type: TransactionType.REGISTER,
-          amount: '30,000원',
-          receptionist: '김직원',
-          paymentMethod: PaymentMethod.CARD,
-        },
-        {
-          id: '2',
-          date: '2024-12-13 15:20',
-          type: TransactionType.USE,
-          amount: '5,500원',
-          receptionist: '홍길동',
-          paymentMethod: PaymentMethod.LEDGER,
-        },
-        {
-          id: '3',
-          date: '2024-12-11 14:10',
-          type: TransactionType.EDIT,
-          amount: '25,000원',
-          receptionist: '최대리',
-          paymentMethod: PaymentMethod.CASH,
-        },
-      ],
-      M003: [
-        {
-          id: '1',
-          date: '2024-12-10 16:00',
-          type: TransactionType.REGISTER,
-          amount: '100,000원',
-          receptionist: '홍길동',
-          paymentMethod: PaymentMethod.BANK_TRANSFER,
-        },
-        {
-          id: '2',
-          date: '2024-12-09 13:45',
-          type: TransactionType.USE,
-          amount: '8,000원',
-          receptionist: '이사장',
-          paymentMethod: PaymentMethod.LEDGER,
-        },
-      ],
-      M004: [
-        {
-          id: '1',
-          date: '2024-12-12 11:30',
-          type: TransactionType.REGISTER,
-          amount: '25,000원',
-          receptionist: '이사장',
-          paymentMethod: PaymentMethod.CARD,
-        },
-        {
-          id: '2',
-          date: '2024-12-11 14:20',
-          type: TransactionType.CHARGE,
-          amount: '15,000원',
-          receptionist: '박매니저',
-          paymentMethod: PaymentMethod.CASH,
-        },
-        {
-          id: '3',
-          date: '2024-12-10 16:50',
-          type: TransactionType.USE,
-          amount: '2,500원',
-          receptionist: '김직원',
-          paymentMethod: PaymentMethod.LEDGER,
-        },
-        {
-          id: '4',
-          date: '2024-12-09 12:15',
-          type: TransactionType.EDIT,
-          amount: '35,000원',
-          receptionist: '홍길동',
-          paymentMethod: PaymentMethod.BANK_TRANSFER,
-        },
-      ],
-      M005: [
-        {
-          id: '1',
-          date: '2024-12-13 09:45',
-          type: TransactionType.REGISTER,
-          amount: '75,000원',
-          receptionist: '김직원',
-          paymentMethod: PaymentMethod.CASH,
-        },
-        {
-          id: '2',
-          date: '2024-12-12 17:30',
-          type: TransactionType.CHARGE,
-          amount: '25,000원',
-          receptionist: '홍길동',
-          paymentMethod: PaymentMethod.BANK_TRANSFER,
-        },
-        {
-          id: '3',
-          date: '2024-12-11 10:20',
-          type: TransactionType.USE,
-          amount: '6,500원',
-          receptionist: '최대리',
-          paymentMethod: PaymentMethod.LEDGER,
-        },
-      ],
-    };
-
-    return baseData[memberNumber as keyof typeof baseData] || [];
-  };
+  // Zustand store에서 거래 내역 가져오기
+  const { getTransactionsByMemberNumber } = useLedgerStore();
+  const transactionHistory = getTransactionsByMemberNumber(
+    customerInfo.memberNumber
+  );
 
   const getTransactionIcon = (type: TransactionType) => {
     switch (type) {
@@ -215,8 +50,6 @@ export default function HistoryModal({
         return { color: 'text-gray-800', sign: '' };
     }
   };
-
-  const transactionHistory = getTransactionData(customerInfo.memberNumber);
 
   return (
     <Modal transparent={true} visible={visible} onRequestClose={onClose}>
