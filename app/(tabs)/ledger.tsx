@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 
 import {
@@ -10,15 +10,11 @@ import {
   LedgerRegistrationModal,
   LedgerTable,
   PageHeader,
+  TransactionDeleteConfirmModal,
 } from '../../components';
 import { useLedgerStore } from '../../stores';
 import { LedgerData } from '../../types';
 
-/**
- * 장부 관리 페이지
- * - Zustand store를 사용한 상태 관리
- * - 장부 등록, 충전, 내역 조회, 삭제 기능
- */
 /**
  * 장부 관리 페이지
  * - Zustand store를 사용한 상태 관리
@@ -33,8 +29,10 @@ export default function LedgerManagement() {
     isChargeModalVisible,
     isHistoryModalVisible,
     isDeleteConfirmModalVisible,
+    isTransactionDeleteConfirmModalVisible,
     selectedCustomer,
     selectedLedgerForDelete,
+    selectedTransactionForDelete,
 
     // 액션
     registerLedger,
@@ -49,6 +47,8 @@ export default function LedgerManagement() {
     closeHistoryModal,
     openDeleteConfirmModal,
     closeDeleteConfirmModal,
+    openTransactionDeleteConfirmModal,
+    closeTransactionDeleteConfirmModal,
   } = useLedgerStore();
 
   // 장부 등록 핸들러
@@ -92,9 +92,53 @@ export default function LedgerManagement() {
     }
   };
 
+  // 강제 리렌더링을 위한 상태
+  const [forceUpdate, setForceUpdate] = React.useState(0);
+
+  // ledgerData가 변경될 때마다 강제 리렌더링
+  useEffect(() => {
+    setForceUpdate(prev => prev + 1);
+  }, [ledgerData]);
+
+  // Zustand store 구독
+  useEffect(() => {
+    const unsubscribe = useLedgerStore.subscribe(state => {
+      setForceUpdate(prev => prev + 1);
+    });
+
+    return unsubscribe;
+  }, []);
+
   const handleDeleteTransaction = (transactionId: string) => {
     if (selectedCustomer) {
       deleteTransaction(selectedCustomer.memberNumber, transactionId);
+    }
+  };
+
+  const handleConfirmDeleteTransaction = () => {
+    // console.log('🔥🔥🔥 handleConfirmDeleteTransaction 호출됨 🔥🔥🔥');
+    // console.log('selectedCustomer:', selectedCustomer);
+    // console.log('selectedTransactionForDelete:', selectedTransactionForDelete);
+
+    if (selectedCustomer && selectedTransactionForDelete) {
+      // console.log('✅ 거래 내역 삭제 실행 시작');
+      // console.log('memberNumber:', selectedCustomer.memberNumber);
+      // console.log('transactionId:', selectedTransactionForDelete.id);
+
+      deleteTransaction(
+        selectedCustomer.memberNumber,
+        selectedTransactionForDelete.id
+      );
+
+      // console.log('✅ deleteTransaction 함수 호출 완료');
+      // 모달은 deleteTransaction에서 자동으로 닫힘
+    } else {
+      // console.log('❌ 삭제할 거래 정보가 없습니다.');
+      // console.log('selectedCustomer 존재:', !!selectedCustomer);
+      // console.log(
+      // 'selectedTransactionForDelete 존재:',
+      // !!selectedTransactionForDelete
+      // );
     }
   };
 
@@ -107,6 +151,7 @@ export default function LedgerManagement() {
           <LedgerHeader onShowRegistrationModal={openRegistrationModal} />
 
           <LedgerTable
+            key={forceUpdate} // 강제 리렌더링을 위한 key
             ledgerData={ledgerData}
             onCharge={handleCharge}
             onHistory={handleHistory}
@@ -146,6 +191,14 @@ export default function LedgerManagement() {
             onClose={closeDeleteConfirmModal}
             onConfirm={handleConfirmDelete}
             item={selectedLedgerForDelete}
+          />
+
+          {/* 거래 내역 삭제 확인 모달 */}
+          <TransactionDeleteConfirmModal
+            visible={isTransactionDeleteConfirmModalVisible}
+            onClose={closeTransactionDeleteConfirmModal}
+            onConfirm={handleConfirmDeleteTransaction}
+            transaction={selectedTransactionForDelete}
           />
         </View>
       </View>

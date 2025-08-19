@@ -15,11 +15,9 @@ export default function HistoryModal({
   onDeleteTransaction,
   customerInfo,
 }: HistoryModalProps) {
-  // Zustand store에서 거래 내역 가져오기
-  const { getTransactionsByMemberNumber } = useLedgerStore();
-  const transactionHistory = getTransactionsByMemberNumber(
-    customerInfo.memberNumber
-  );
+  // Zustand store에서 거래 내역 가져오기 (상태 구독)
+  const { transactions } = useLedgerStore();
+  const transactionHistory = transactions[customerInfo.memberNumber] || [];
 
   const getTransactionIcon = (type: TransactionType) => {
     switch (type) {
@@ -127,9 +125,9 @@ export default function HistoryModal({
                         </View>
                         <Pressable
                           onPress={() => onDeleteTransaction(transaction.id)}
-                          className='w-6 h-6 bg-gray-200 rounded-full items-center justify-center'
+                          className='w-8 h-8 bg-red-500 rounded-full items-center justify-center'
                         >
-                          <Ionicons name='close' size={14} color='#666' />
+                          <Ionicons name='close' size={16} color='white' />
                         </Pressable>
                       </View>
 

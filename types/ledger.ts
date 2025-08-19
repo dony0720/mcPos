@@ -10,6 +10,7 @@ export enum CustomerAccountTransactionType {
   USE = '사용',
   CHARGE = '충전',
   EDIT = '수정',
+  type = "type",
 }
 
 /**

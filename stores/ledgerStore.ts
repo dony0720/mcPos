@@ -25,10 +25,12 @@ interface LedgerState {
   isChargeModalVisible: boolean;
   isHistoryModalVisible: boolean;
   isDeleteConfirmModalVisible: boolean;
+  isTransactionDeleteConfirmModalVisible: boolean;
 
   // 선택된 고객 정보
   selectedCustomer: CustomerInfo | null;
   selectedLedgerForDelete: LedgerData | null;
+  selectedTransactionForDelete: Transaction | null;
 
   // Actions
   // 장부 등록
@@ -64,6 +66,8 @@ interface LedgerState {
   closeHistoryModal: () => void;
   openDeleteConfirmModal: (ledger: LedgerData) => void;
   closeDeleteConfirmModal: () => void;
+  openTransactionDeleteConfirmModal: (transaction: Transaction) => void;
+  closeTransactionDeleteConfirmModal: () => void;
 
   // 유틸리티
   getLedgerByMemberNumber: (memberNumber: string) => LedgerData | undefined;
@@ -71,6 +75,7 @@ interface LedgerState {
   generateMemberNumber: () => string;
   formatAmount: (amount: number) => string;
   parseAmount: (amountString: string) => number;
+  debugState: () => Promise<void>;
 }
 
 // ===== Store Implementation =====
@@ -84,8 +89,10 @@ export const useLedgerStore = create<LedgerState>()(
       isChargeModalVisible: false,
       isHistoryModalVisible: false,
       isDeleteConfirmModalVisible: false,
+      isTransactionDeleteConfirmModalVisible: false,
       selectedCustomer: null,
       selectedLedgerForDelete: null,
+      selectedTransactionForDelete: null,
 
       // 장부 등록
       registerLedger: (data: LedgerRegistrationData) => {
@@ -104,6 +111,7 @@ export const useLedgerStore = create<LedgerState>()(
         };
 
         // 등록 거래 내역 생성
+        const transactionId = Date.now().toString();
         const registrationTransaction: Omit<Transaction, 'id'> = {
           date: new Date().toLocaleString('ko-KR'),
           type: TransactionType.REGISTER,
@@ -116,9 +124,30 @@ export const useLedgerStore = create<LedgerState>()(
           ledgerData: [...state.ledgerData, newLedger],
           transactions: {
             ...state.transactions,
-            [memberNumber]: [registrationTransaction],
+            [memberNumber]: [{ ...registrationTransaction, id: transactionId }],
           },
         }));
+
+        // 등록 후 상태 확인 (Promise 사용)
+        Promise.resolve().then(async () => {
+          const newState = get();
+          console.log(
+            '📝 등록 후 거래 내역:',
+            newState.transactions[memberNumber]
+          );
+          console.log(
+            '📝 등록 후 장부 데이터:',
+            newState.ledgerData.find(l => l.memberNumber === memberNumber)
+          );
+
+          // AsyncStorage에 실제로 저장되었는지 확인
+          try {
+            const storedData = await AsyncStorage.getItem('ledger-storage');
+            console.log('💾 등록 후 AsyncStorage 데이터:', storedData);
+          } catch (error) {
+            console.log('💾 등록 후 AsyncStorage 읽기 오류:', error);
+          }
+        });
       },
 
       // 장부 충전
@@ -131,6 +160,7 @@ export const useLedgerStore = create<LedgerState>()(
         const newAmount = currentAmount + chargeAmount;
 
         // 충전 거래 내역 생성
+        const transactionId = Date.now().toString();
         const chargeTransaction: Omit<Transaction, 'id'> = {
           date: new Date().toLocaleString('ko-KR'),
           type: TransactionType.CHARGE,
@@ -149,10 +179,36 @@ export const useLedgerStore = create<LedgerState>()(
             ...state.transactions,
             [memberNumber]: [
               ...(state.transactions[memberNumber] || []),
-              chargeTransaction,
+              { ...chargeTransaction, id: transactionId },
             ],
           },
         }));
+
+        // 충전 후 상태 확인 (Promise 사용)
+        Promise.resolve().then(async () => {
+          const newState = get();
+          console.log(
+            '💰 충전 후 거래 내역:',
+            newState.transactions[memberNumber]
+          );
+          console.log(
+            '💰 충전 후 장부 데이터:',
+            newState.ledgerData.find(l => l.memberNumber === memberNumber)
+          );
+          console.log('💰 전체 transactions 객체:', newState.transactions);
+
+          // AsyncStorage에 실제로 저장되었는지 확인
+          try {
+            const storedData = await AsyncStorage.getItem('ledger-storage');
+            // console.log('💾 AsyncStorage에 저장된 데이터:', storedData);
+            if (storedData) {
+              const parsedData = JSON.parse(storedData);
+              console.log('💾 파싱된 저장 데이터:', parsedData);
+            }
+          } catch (error) {
+            console.log('💾 AsyncStorage 읽기 오류:', error);
+          }
+        });
       },
 
       // 장부 사용
@@ -173,6 +229,7 @@ export const useLedgerStore = create<LedgerState>()(
         const newAmount = currentAmount - useAmount;
 
         // 사용 거래 내역 생성
+        const transactionId = Date.now().toString();
         const useTransaction: Omit<Transaction, 'id'> = {
           date: new Date().toLocaleString('ko-KR'),
           type: TransactionType.USE,
@@ -191,7 +248,7 @@ export const useLedgerStore = create<LedgerState>()(
             ...state.transactions,
             [memberNumber]: [
               ...(state.transactions[memberNumber] || []),
-              useTransaction,
+              { ...useTransaction, id: transactionId },
             ],
           },
         }));
@@ -213,16 +270,95 @@ export const useLedgerStore = create<LedgerState>()(
         }));
       },
 
-      // 거래 내역 삭제
+      // 거래 내역 삭제 (금액도 함께 조정)
       deleteTransaction: (memberNumber: string, transactionId: string) => {
-        set(state => ({
-          transactions: {
-            ...state.transactions,
-            [memberNumber]: (state.transactions[memberNumber] || []).filter(
-              transaction => transaction.id !== transactionId
-            ),
-          },
-        }));
+        const currentState = get();
+
+        const currentTransactions =
+          currentState.transactions[memberNumber] || [];
+
+        // 삭제할 거래 내역 찾기
+        const transactionToDelete = currentTransactions.find(
+          transaction => transaction.id === transactionId
+        );
+
+        if (!transactionToDelete) {
+          console.log('❌ 삭제할 거래 내역을 찾을 수 없습니다.');
+          console.log('❌ 찾고 있는 ID:', transactionId);
+          console.log(
+            '❌ 사용 가능한 ID들:',
+            currentTransactions.map(t => t.id)
+          );
+          return;
+        }
+
+        console.log('✅ 삭제할 거래 찾음:', transactionToDelete);
+
+        // 현재 장부 데이터 찾기
+        const currentLedger = currentState.ledgerData.find(
+          ledger => ledger.memberNumber === memberNumber
+        );
+
+        if (!currentLedger) {
+          return;
+        }
+
+        // 금액 조정 계산
+        const { parseAmount, formatAmount } = get();
+        const currentAmount = parseAmount(currentLedger.chargeAmount);
+        const transactionAmount = parseAmount(transactionToDelete.amount);
+
+        let newAmount = currentAmount;
+
+        // 거래 타입에 따라 금액 조정
+        // 거래 타입에 따라 금액 조정 (타입 안전하게 상수로 비교)
+        if (
+          transactionToDelete.type === TransactionType.REGISTER ||
+          transactionToDelete.type === TransactionType.CHARGE
+        ) {
+          // 등록/충전 거래 삭제 시 해당 금액만큼 차감
+          newAmount = currentAmount - transactionAmount;
+        } else if (transactionToDelete.type === TransactionType.USE) {
+          // 사용 거래 삭제 시 해당 금액만큼 증가 (환불)
+          newAmount = currentAmount + transactionAmount;
+        }
+
+        // 음수 방지
+        if (newAmount < 0) {
+          newAmount = 0;
+        }
+
+        // 삭제 실행
+        const filteredTransactions = currentTransactions.filter(
+          transaction => transaction.id !== transactionId
+        );
+
+        // 새로운 상태 객체 생성
+        const newTransactions = {
+          ...currentState.transactions,
+          [memberNumber]: filteredTransactions,
+        };
+
+        const updatedLedgerData = currentState.ledgerData.map(ledger => {
+          if (ledger.memberNumber === memberNumber) {
+            const updatedLedger = {
+              ...ledger,
+              chargeAmount: formatAmount(newAmount),
+            };
+            return updatedLedger;
+          }
+          return ledger;
+        });
+
+        // 상태 업데이트
+        set({
+          ...currentState,
+          transactions: newTransactions,
+          ledgerData: updatedLedgerData,
+          // 모달 상태 초기화
+          isTransactionDeleteConfirmModalVisible: false,
+          selectedTransactionForDelete: null,
+        });
       },
 
       // 장부 삭제
@@ -279,15 +415,30 @@ export const useLedgerStore = create<LedgerState>()(
           selectedLedgerForDelete: null,
         }),
 
+      openTransactionDeleteConfirmModal: (transaction: Transaction) => {
+        set({
+          isTransactionDeleteConfirmModalVisible: true,
+          selectedTransactionForDelete: transaction,
+        });
+      },
+      closeTransactionDeleteConfirmModal: () => {
+        set({
+          isTransactionDeleteConfirmModalVisible: false,
+          selectedTransactionForDelete: null,
+        });
+      },
+
       // 유틸리티 함수들
       getLedgerByMemberNumber: (memberNumber: string) => {
-        return get().ledgerData.find(
+        const ledger = get().ledgerData.find(
           ledger => ledger.memberNumber === memberNumber
         );
+        return ledger;
       },
 
       getTransactionsByMemberNumber: (memberNumber: string) => {
-        return get().transactions[memberNumber] || [];
+        const transactions = get().transactions[memberNumber] || [];
+        return transactions;
       },
 
       generateMemberNumber: () => {
@@ -312,6 +463,12 @@ export const useLedgerStore = create<LedgerState>()(
       parseAmount: (amountString: string) => {
         const numbersOnly = amountString.replace(/[^\d]/g, '');
         return parseInt(numbersOnly, 10) || 0;
+      },
+
+      // 디버깅용: 전체 상태 출력
+      debugState: async () => {
+        const state = get();
+        console.log('📊 전체 상태:', state);
       },
     }),
     {
