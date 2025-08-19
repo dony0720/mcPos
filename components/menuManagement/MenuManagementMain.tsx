@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { MENU_ITEMS } from '../../data/menuItems';
-// import { useModal } from '../../hooks';
+import { useModal } from '../../hooks';
+import type { MenuFormData } from '../../schemas/menuSchema';
 import type { MenuCategory, MenuItem } from '../../types';
 import { MENU_CATEGORIES } from '../../types/menu';
+import MenuAddModal from './MenuAddModal';
 
 /**
  * 메뉴 관리 메인 화면 컴포넌트
@@ -16,7 +18,7 @@ export default function MenuManagementMain() {
   const [selectedCategory, setSelectedCategory] = useState<
     MenuCategory | 'ALL'
   >('ALL');
-  // const { openModal, closeModal, isModalOpen } = useModal();
+  const { openModal, closeModal, isModalOpen } = useModal();
 
   // 카테고리별 메뉴 필터링
   const filteredMenus =
@@ -26,7 +28,13 @@ export default function MenuManagementMain() {
 
   // 이벤트 핸들러
   const handleAddMenu = () => {
-    // TODO: 메뉴 등록 모달 열기
+    openModal('menuAdd');
+  };
+
+  const handleAddMenuConfirm = (_menuData: MenuFormData) => {
+    // TODO: 실제 메뉴 추가 로직 구현
+    // console.log('새 메뉴 추가:', menuData);
+    closeModal();
   };
 
   const handleEditMenu = (_menu: MenuItem) => {
@@ -201,6 +209,13 @@ export default function MenuManagementMain() {
         {/* 하단 여백 */}
         <View className='h-16' />
       </View>
+
+      {/* 메뉴 추가 모달 */}
+      <MenuAddModal
+        visible={isModalOpen('menuAdd')}
+        onClose={closeModal}
+        onConfirm={handleAddMenuConfirm}
+      />
     </View>
   );
 }
