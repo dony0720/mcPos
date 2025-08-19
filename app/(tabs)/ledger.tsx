@@ -19,6 +19,11 @@ import { LedgerData } from '../../types';
  * - Zustand store를 사용한 상태 관리
  * - 장부 등록, 충전, 내역 조회, 삭제 기능
  */
+/**
+ * 장부 관리 페이지
+ * - Zustand store를 사용한 상태 관리
+ * - 장부 등록, 충전, 내역 조회, 삭제 기능
+ */
 export default function LedgerManagement() {
   // Zustand store에서 상태와 액션 가져오기
   const {
@@ -99,7 +104,7 @@ export default function LedgerManagement() {
         <View className='flex-1 max-w-7xl mx-auto w-full box-border px-[5%]'>
           <PageHeader />
 
-      <LedgerHeader onShowRegistrationModal={openRegistrationModal} />
+          <LedgerHeader onShowRegistrationModal={openRegistrationModal} />
 
           <LedgerTable
             ledgerData={ledgerData}
@@ -125,19 +130,25 @@ export default function LedgerManagement() {
             />
           )}
 
-      {/* 거래 내역 모달 */}
-      {selectedCustomer && (
-        <HistoryModal
-          visible={isModalOpen('history')}
-          onClose={handleCloseModal}
-          onDeleteTransaction={handleDeleteTransaction}
-          customerInfo={{
-            name: selectedCustomer.name,
-            memberNumber: selectedCustomer.memberNumber,
-            phoneNumber: selectedCustomer.phoneNumber,
-          }}
-        />
-      )}
-    </View>
+          {/* 거래 내역 모달 */}
+          {selectedCustomer && (
+            <HistoryModal
+              visible={isHistoryModalVisible}
+              onClose={closeHistoryModal}
+              onDeleteTransaction={handleDeleteTransaction}
+              customerInfo={selectedCustomer}
+            />
+          )}
+
+          {/* 삭제 확인 모달 */}
+          <DeleteConfirmModal
+            visible={isDeleteConfirmModalVisible}
+            onClose={closeDeleteConfirmModal}
+            onConfirm={handleConfirmDelete}
+            item={selectedLedgerForDelete}
+          />
+        </View>
+      </View>
+    </AdminProtectedRoute>
   );
 }
