@@ -58,6 +58,60 @@ export const useOrderStore = create<OrderState>(set => ({
     });
   },
 
+  // 할인 적용
+  applyDiscount: (
+    itemIds: string[],
+    discount: {
+      id: string;
+      name: string;
+      value: number;
+      type: 'fixed' | 'deduction';
+    }
+  ) => {
+    set(state => {
+      const newOrderItems = state.orderItems.map(item =>
+        itemIds.includes(item.id) ? { ...item, discount } : item
+      );
+
+      return {
+        orderItems: newOrderItems,
+        totalAmount: calculateTotalPrice(newOrderItems),
+        itemCount: newOrderItems.reduce((sum, item) => sum + item.quantity, 0),
+      };
+    });
+  },
+
+  // 할인 제거
+  removeDiscount: (itemIds: string[]) => {
+    set(state => {
+      const newOrderItems = state.orderItems.map(item =>
+        itemIds.includes(item.id) ? { ...item, discount: undefined } : item
+      );
+
+      return {
+        orderItems: newOrderItems,
+        totalAmount: calculateTotalPrice(newOrderItems),
+        itemCount: newOrderItems.reduce((sum, item) => sum + item.quantity, 0),
+      };
+    });
+  },
+
+  // 모든 할인 제거
+  clearAllDiscounts: () => {
+    set(state => {
+      const newOrderItems = state.orderItems.map(item => ({
+        ...item,
+        discount: undefined,
+      }));
+
+      return {
+        orderItems: newOrderItems,
+        totalAmount: calculateTotalPrice(newOrderItems),
+        itemCount: newOrderItems.reduce((sum, item) => sum + item.quantity, 0),
+      };
+    });
+  },
+
   // 주문 전체 초기화
   clearOrder: () => {
     set({

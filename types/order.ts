@@ -24,6 +24,17 @@ export interface OrderStoreActions {
   addItem: (menuItem: MenuItem, options: string[]) => void;
   updateQuantity: (itemId: string, change: number) => void;
   removeItem: (itemId: string) => void;
+  applyDiscount: (
+    itemIds: string[],
+    discount: {
+      id: string;
+      name: string;
+      value: number;
+      type: 'fixed' | 'deduction';
+    }
+  ) => void;
+  removeDiscount: (itemIds: string[]) => void;
+  clearAllDiscounts: () => void;
   clearOrder: () => void;
 }
 

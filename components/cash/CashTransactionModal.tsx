@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
   Modal,
   Pressable,
@@ -10,38 +12,60 @@ import {
   View,
 } from 'react-native';
 
+import {
+  CashTransactionFormData,
+  cashTransactionSchema,
+  createWithdrawalSchema,
+} from '../../schemas/cashTransactionSchema';
+import { useCashStore } from '../../stores';
 import { CashTransactionModalProps } from '../../types';
 
 export default function CashTransactionModal({
   visible,
   onClose,
+  onConfirm,
   type,
 }: CashTransactionModalProps) {
-  const [amount, setAmount] = useState('');
-  const [memo, setMemo] = useState('');
+  // 현금 스토어에서 현재 보유 현금 정보 가져오기
+  const { getTotalCashAmount } = useCashStore();
+  const totalCash = getTotalCashAmount();
 
-  // 모달이 열릴 때 초기화
+  // 출금인 경우 현금 부족 체크가 포함된 스키마 사용
+  const schema =
+    type === 'withdraw'
+      ? createWithdrawalSchema(totalCash)
+      : cashTransactionSchema;
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CashTransactionFormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      amount: '',
+      memo: '',
+    },
+  });
+
+  // 모달이 열릴 때 폼 초기화
   useEffect(() => {
     if (visible) {
-      setAmount('');
-      setMemo('');
+      reset({ amount: '', memo: '' });
     }
-  }, [visible]);
+  }, [visible, reset]);
 
-  // 확인 버튼 핸들러
-  const handleConfirm = () => {
+  // 폼 제출 핸들러
+  const onSubmit = (data: CashTransactionFormData) => {
+    const amountNumber = parseFloat(data.amount.replace(/,/g, ''));
+    onConfirm(amountNumber, data.memo || '');
     onClose();
   };
 
   // 취소 버튼 핸들러
   const handleCancel = () => {
     onClose();
-  };
-
-  // 금액 포맷팅
-  const formatAmount = (value: string) => {
-    const numValue = parseFloat(value) || 0;
-    return numValue.toLocaleString();
   };
 
   const isDeposit = type === 'deposit';
@@ -79,19 +103,33 @@ export default function CashTransactionModal({
                   <Text className='text-lg font-medium text-gray-700'>
                     금액
                   </Text>
-                  <View className='relative'>
-                    <TextInput
-                      className='border-2 border-gray-300 bg-white text-gray-800 rounded-xl px-4 py-3 text-right text-2xl font-bold pr-12'
-                      value={amount}
-                      onChangeText={setAmount}
-                      keyboardType='numeric'
-                      placeholder='0'
-                      placeholderTextColor='#9CA3AF'
-                    />
-                    <Text className='absolute right-4 top-4 text-lg font-medium text-gray-600'>
-                      원
+                  <Controller
+                    control={control}
+                    name='amount'
+                    render={({ field: { onChange, value } }) => (
+                      <View className='relative'>
+                        <TextInput
+                          className={clsx(
+                            'border-2 bg-white text-gray-800 rounded-xl px-4 py-3 text-right text-2xl font-bold pr-12',
+                            errors.amount ? 'border-red-300' : 'border-gray-300'
+                          )}
+                          value={value}
+                          onChangeText={onChange}
+                          keyboardType='numeric'
+                          placeholder='0'
+                          placeholderTextColor='#9CA3AF'
+                        />
+                        <Text className='absolute right-4 top-4 text-lg font-medium text-gray-600'>
+                          원
+                        </Text>
+                      </View>
+                    )}
+                  />
+                  {errors.amount && (
+                    <Text className='text-red-500 text-sm mt-1'>
+                      {errors.amount.message}
                     </Text>
-                  </View>
+                  )}
                 </View>
 
                 {/* 메모 입력 */}
@@ -99,15 +137,29 @@ export default function CashTransactionModal({
                   <Text className='text-lg font-medium text-gray-700'>
                     메모 (선택사항)
                   </Text>
-                  <TextInput
-                    className='border-2 border-gray-300 bg-white text-gray-800 rounded-xl px-4 py-3 text-base h-24'
-                    value={memo}
-                    onChangeText={setMemo}
-                    placeholder='메모를 입력하세요...'
-                    placeholderTextColor='#9CA3AF'
-                    multiline
-                    textAlignVertical='top'
+                  <Controller
+                    control={control}
+                    name='memo'
+                    render={({ field: { onChange, value } }) => (
+                      <TextInput
+                        className={clsx(
+                          'border-2 bg-white text-gray-800 rounded-xl px-4 py-3 text-base h-24',
+                          errors.memo ? 'border-red-300' : 'border-gray-300'
+                        )}
+                        value={value || ''}
+                        onChangeText={onChange}
+                        placeholder='메모를 입력하세요...'
+                        placeholderTextColor='#9CA3AF'
+                        multiline
+                        textAlignVertical='top'
+                      />
+                    )}
                   />
+                  {errors.memo && (
+                    <Text className='text-red-500 text-sm mt-1'>
+                      {errors.memo.message}
+                    </Text>
+                  )}
                 </View>
               </View>
 
@@ -122,7 +174,7 @@ export default function CashTransactionModal({
                   </Text>
                 </Pressable>
                 <Pressable
-                  onPress={handleConfirm}
+                  onPress={handleSubmit(onSubmit)}
                   className={clsx(
                     'flex-1 rounded-xl p-3 items-center',
                     buttonColor

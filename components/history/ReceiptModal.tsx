@@ -2,70 +2,52 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
-import { Transaction } from './TransactionItem';
+import { Transaction } from '../../types';
 
 interface ReceiptModalProps {
   visible: boolean;
+  transaction?: Transaction | null;
   onClose: () => void;
   onPrint: () => void;
 }
 
 export default function ReceiptModal({
   visible,
+  transaction,
   onClose,
   onPrint,
 }: ReceiptModalProps) {
-  // 목업 데이터 생성
-  const mockTransaction: Transaction = {
-    id: 'TXN_1234',
-    date: '2025-04-14T14:32:00Z',
-    paymentMethod: '현금',
-    amount: 10100,
-    orderMethod: '테이크아웃',
-    orderItems: [
-      {
-        id: 'item_1',
-        menuName: '아메리카노 (HOT)',
-        options: '샷 추가',
-        price: 3000,
-        quantity: 1,
-      },
-      {
-        id: 'item_2',
-        menuName: '카페라떼 (ICE)',
-        options: '연하게, 휘핑 추가',
-        price: 3000,
-        quantity: 2,
-      },
-      {
-        id: 'item_3',
-        menuName: '카페라떼 (ICE)',
-        options: '연하게, 휘핑 추가',
-        price: 3000,
-        quantity: 2,
-      },
-      {
-        id: 'item_4',
-        menuName: '카페라떼 (ICE)',
-        options: '연하게, 휘핑 추가',
-        price: 3000,
-        quantity: 2,
-      },
-      {
-        id: 'item_5',
-        menuName: '카페라떼 (ICE)',
-        options: '연하게, 휘핑 추가',
-        price: 3000,
-        quantity: 2,
-      },
-      {
-        id: 'item_6',
-        menuName: '카페라떼 (ICE)',
-        options: '연하게, 휘핑 추가',
-        price: 3000,
-        quantity: 2,
-      },
-    ],
+  // 거래 정보가 없으면 빈 모달 표시
+  if (!transaction) {
+    return null;
+  }
+
+  // 결제 방법 ID를 한글로 변환
+  const getPaymentMethodLabel = (paymentMethodId: string) => {
+    switch (paymentMethodId) {
+      case 'cash':
+        return '현금';
+      case 'transfer':
+        return '이체';
+      case 'coupon':
+        return '쿠폰';
+      case 'ledger':
+        return '장부';
+      default:
+        return '기타';
+    }
+  };
+
+  // 주문 방법 ID를 한글로 변환
+  const getOrderMethodLabel = (orderMethodId: string) => {
+    switch (orderMethodId) {
+      case 'takeout':
+        return '테이크아웃';
+      case 'store':
+        return '매장';
+      default:
+        return '기타';
+    }
   };
 
   return (
@@ -83,10 +65,24 @@ export default function ReceiptModal({
             {/* 가게 정보 */}
             <View className='items-center mb-6'>
               <Text className='text-lg font-bold mb-2'>
-                목천카페 2025-04-14 14:32
+                목천카페{' '}
+                {new Date(transaction.timestamp).toLocaleDateString('ko-KR')}{' '}
+                {new Date(transaction.timestamp).toLocaleTimeString('ko-KR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </Text>
               <Text className='text-base font-medium'>
-                주문번호: #{mockTransaction.id.split('_')[1]}
+                주문번호: #{transaction.pickupNumber}
+              </Text>
+              <Text className='text-sm text-gray-600 mt-1'>
+                {transaction.orderMethod
+                  ? getOrderMethodLabel(transaction.orderMethod)
+                  : '알 수 없음'}{' '}
+                |{' '}
+                {transaction.paymentMethod
+                  ? getPaymentMethodLabel(transaction.paymentMethod)
+                  : '알 수 없음'}
               </Text>
             </View>
 
@@ -94,61 +90,88 @@ export default function ReceiptModal({
             <View className='w-full h-px bg-gray-300 mb-4' />
 
             {/* 주문 내역 */}
-            {mockTransaction.orderItems?.map((item, index) => (
-              <View key={item.id} className='mb-4'>
-                {/* 메인 메뉴 */}
-                <View className='flex-row justify-between items-center mb-2'>
-                  <View className='flex-1'>
-                    <Text className='font-medium text-base'>
-                      {item.menuName}
-                    </Text>
-                  </View>
-                  <View className='flex-row items-center gap-4'>
-                    <Text className='text-gray-600 text-sm w-6 text-center'>
-                      {item.quantity}
-                    </Text>
-                    <Text className='font-medium text-base w-16 text-right'>
-                      {item.price.toLocaleString()}원
-                    </Text>
-                  </View>
-                </View>
+            {transaction.orderItems?.map((item, index) => {
+              // 할인이 적용된 경우 실제 가격 계산
+              const actualPrice = item.discount
+                ? item.discount.type === 'fixed'
+                  ? item.discount.value
+                  : item.menuItem.price - item.discount.value
+                : item.menuItem.price;
 
-                {/* 옵션들 */}
-                {item.options && (
-                  <View className='ml-3'>
-                    {item.options.split(', ').map((option, optionIndex) => (
-                      <View
-                        key={optionIndex}
-                        className='flex-row justify-between items-center mb-1'
-                      >
-                        <Text className='text-gray-600 text-sm flex-1'>
-                          - {option}
-                        </Text>
-                        <View className='flex-row items-center gap-4'>
-                          <Text className='text-gray-600 text-sm w-6 text-center'>
-                            {item.quantity}
+              return (
+                <View key={`${item.id}-${index}`} className='mb-4'>
+                  {/* 메인 메뉴 */}
+                  <View className='flex-row justify-between items-center mb-2'>
+                    <View className='flex-1'>
+                      <Text className='font-medium text-base'>
+                        {item.menuItem.name}
+                      </Text>
+                      <Text className='text-sm text-gray-600'>
+                        {item.menuItem.temperature || 'HOT'}
+                        {item.discount && (
+                          <Text className='text-red-500 ml-2'>
+                            ({item.discount.name} 적용)
                           </Text>
-                          <Text className='text-gray-600 text-sm w-16 text-right'>
-                            {option === '샷 추가'
-                              ? '500원'
-                              : option === '휘핑 추가'
-                                ? '300원'
-                                : '0원'}
-                          </Text>
-                        </View>
-                      </View>
-                    ))}
+                        )}
+                      </Text>
+                    </View>
+                    <View className='flex-row items-center gap-4'>
+                      <Text className='text-gray-600 text-sm w-6 text-center'>
+                        {item.quantity}
+                      </Text>
+                      <Text className='font-medium text-base w-16 text-right'>
+                        {actualPrice.toLocaleString()}원
+                      </Text>
+                    </View>
                   </View>
-                )}
-              </View>
-            ))}
+
+                  {/* 옵션들 */}
+                  {item.options && item.options.length > 0 && (
+                    <View className='ml-3'>
+                      {item.options.map((optionName, optionIndex) => {
+                        // 옵션 가격 찾기 (MENU_OPTIONS에서)
+                        const optionPrice =
+                          optionName === '샷추가'
+                            ? 500
+                            : optionName === '시럽추가'
+                              ? 300
+                              : optionName === '휘핑크림'
+                                ? 700
+                                : 0;
+
+                        return (
+                          <View
+                            key={optionIndex}
+                            className='flex-row justify-between items-center mb-1'
+                          >
+                            <Text className='text-gray-600 text-sm flex-1'>
+                              - {optionName}
+                            </Text>
+                            <View className='flex-row items-center gap-4'>
+                              <Text className='text-gray-600 text-sm w-6 text-center'>
+                                {item.quantity}
+                              </Text>
+                              <Text className='text-gray-600 text-sm w-16 text-right'>
+                                {optionPrice > 0
+                                  ? `${optionPrice.toLocaleString()}원`
+                                  : '0원'}
+                              </Text>
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
           </ScrollView>
           {/* 구분선 */}
           <View className='w-full h-px bg-gray-300 mb-4' />
           {/* 하단 정보 */}
           <View className='items-center mb-6'>
             <Text className='text-xl font-bold mb-3'>
-              총 결제금액: {mockTransaction.amount.toLocaleString()}원
+              총 결제금액: {transaction.totalAmount.toLocaleString()}원
             </Text>
           </View>
           {/* 출력 버튼 */}

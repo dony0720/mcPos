@@ -3,60 +3,16 @@ import clsx from 'clsx';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-export type FilterType = 'all' | '현금' | '이체' | '쿠폰' | '장부';
-
-interface FilterOption {
-  key: FilterType;
-  label: string;
-  icon: string;
-  color: string;
-}
-
-interface FilterTabsProps {
-  selectedFilter: FilterType;
-  onFilterChange: (filter: FilterType) => void;
-}
+import { FILTER_OPTIONS } from '../../data/filterOptions';
+import { FilterTabsProps } from '../../types';
 
 export default function FilterTabs({
   selectedFilter,
   onFilterChange,
 }: FilterTabsProps) {
-  const filterOptions: FilterOption[] = [
-    {
-      key: 'all',
-      label: '전체',
-      icon: 'apps-outline',
-      color: '#6B7280',
-    },
-    {
-      key: '현금',
-      label: '현금',
-      icon: 'cash-outline',
-      color: '#10B981',
-    },
-    {
-      key: '이체',
-      label: '이체',
-      icon: 'card-outline',
-      color: '#3B82F6',
-    },
-    {
-      key: '쿠폰',
-      label: '쿠폰',
-      icon: 'ticket-outline',
-      color: '#F59E0B',
-    },
-    {
-      key: '장부',
-      label: '장부',
-      icon: 'book-outline',
-      color: '#8B5CF6',
-    },
-  ];
-
   return (
     <View className='flex flex-row gap-3 mt-6'>
-      {filterOptions.map(option => (
+      {FILTER_OPTIONS.map(option => (
         <Pressable
           key={option.key}
           onPress={() => onFilterChange(option.key)}

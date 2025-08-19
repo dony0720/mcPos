@@ -1,4 +1,10 @@
 import { BaseItem, ModalProps, Optionable } from './common';
+import {
+  PaymentMethod,
+  PaymentDetailsType,
+  DiscountType,
+  OrderReceiptMethod as OrderReceiptMethodEnum,
+} from './enums';
 
 // ===== 기본 엔티티 타입들 =====
 
@@ -7,10 +13,7 @@ export interface CashRegisterPayment extends Pick<BaseItem, 'id' | 'name'> {
   icon: string;
 }
 
-export interface OrderReceiptMethod extends Pick<BaseItem, 'id' | 'name'> {
-  id: OrderReceiptMethodId;
-  icon: string;
-}
+// OrderReceiptMethod는 enums.ts에서 enum으로 정의됨
 
 export interface PaymentOrderItem extends Optionable {
   id: number;
@@ -20,6 +23,7 @@ export interface PaymentOrderItem extends Optionable {
 
 export interface Discount extends Pick<BaseItem, 'id' | 'name'> {
   value: number;
+  type: DiscountType; // fixed: 고정가격으로 변경, deduction: 차감
   description?: string;
 }
 
@@ -41,7 +45,6 @@ export interface PaymentMenuItemProps {
   menuName: string;
   options: string;
   price: string;
-  onDeletePress: () => void;
 }
 
 export interface DiscountModalProps extends ModalProps {
@@ -56,6 +59,8 @@ export interface NumberInputModalProps extends ModalProps {
 export interface SelectAllCheckboxProps {
   isChecked: boolean;
   onCheckboxPress: () => void;
+  onDeletePress: () => void;
+  hasSelectedItems: boolean;
   title?: string;
 }
 
@@ -78,8 +83,8 @@ export interface DiscountSectionProps {
 // ===== 유틸리티 타입들 =====
 
 export type NumberInputType = 'phone' | 'pickup';
-export type CashRegisterPaymentId = 'cash' | 'transfer' | 'coupon' | 'ledger';
-export type OrderReceiptMethodId = 'takeout' | 'dine-in';
+export type CashRegisterPaymentId = PaymentMethod;
+export type OrderReceiptMethodId = OrderReceiptMethodEnum;
 export type DiscountId =
   | 'senior'
   | 'student'
@@ -111,53 +116,43 @@ export interface PaymentModalState {
 // ===== 상수 데이터 =====
 
 export const CASH_REGISTER_PAYMENTS: CashRegisterPayment[] = [
-  { id: 'cash', name: '현금', icon: 'cash-outline' },
-  { id: 'transfer', name: '이체', icon: 'card-outline' },
-  { id: 'coupon', name: '쿠폰', icon: 'ticket-outline' },
-  { id: 'ledger', name: '장부', icon: 'book-outline' },
+  { id: PaymentMethod.CASH, name: '현금', icon: 'cash-outline' },
+  { id: PaymentMethod.TRANSFER, name: '이체', icon: 'card-outline' },
+  { id: PaymentMethod.COUPON, name: '쿠폰', icon: 'ticket-outline' },
+  { id: PaymentMethod.LEDGER, name: '장부', icon: 'book-outline' },
 ] as const;
 
-export const ORDER_RECEIPT_METHODS: OrderReceiptMethod[] = [
-  { id: 'takeout', name: '테이크아웃', icon: 'bag-outline' },
-  { id: 'dine-in', name: '매장', icon: 'restaurant-outline' },
+export const ORDER_RECEIPT_METHODS: Array<{
+  id: OrderReceiptMethodId;
+  name: string;
+  icon: string;
+}> = [
+  {
+    id: OrderReceiptMethodEnum.TAKEOUT,
+    name: '테이크아웃',
+    icon: 'bag-outline',
+  },
+  {
+    id: OrderReceiptMethodEnum.DINE_IN,
+    name: '매장',
+    icon: 'restaurant-outline',
+  },
 ] as const;
 
 export const DISCOUNT_OPTIONS: Discount[] = [
   {
-    id: 'senior',
-    name: '경로우대',
-    value: 3000,
-    description: '65세 이상 3,000원 고정가',
+    id: 'fixed-1500',
+    name: '1500원 고정가',
+    value: 1500,
+    type: DiscountType.FIXED,
+    description: '선택된 메뉴를 1,500원으로 변경',
   },
   {
-    id: 'student',
-    name: '학생할인',
-    value: 4000,
-    description: '학생증 제시 시 4,000원 고정가',
-  },
-  {
-    id: 'employee',
-    name: '직원할인',
-    value: 2000,
-    description: '직원 2,000원 고정가',
-  },
-  {
-    id: 'special1',
-    name: '특가 5,000원',
-    value: 5000,
-    description: '특별 할인가 5,000원',
-  },
-  {
-    id: 'special2',
-    name: '특가 6,000원',
-    value: 6000,
-    description: '특별 할인가 6,000원',
-  },
-  {
-    id: 'special3',
-    name: '특가 7,000원',
-    value: 7000,
-    description: '특별 할인가 7,000원',
+    id: 'deduction-1000',
+    name: '1000원 차감',
+    value: 1000,
+    type: DiscountType.DEDUCTION,
+    description: '선택된 메뉴에서 1,000원 차감',
   },
 ] as const;
 

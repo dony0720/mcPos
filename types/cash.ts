@@ -71,6 +71,7 @@ export interface CashInspectionModalProps {
 export interface CashTransactionModalProps {
   visible: boolean;
   onClose: () => void;
+  onConfirm: (amount: number, memo: string) => void;
   type: CashDrawerTransactionType;
 }
 

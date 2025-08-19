@@ -2,7 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import { CashDrawerCardsProps } from '../../types';
+import { useCashStore, useTransactionStore } from '../../stores';
+import {
+  CashDrawerCardsProps,
+  CashTransactionType,
+  TransactionType,
+} from '../../types';
 import CashDrawerCard from './CashDrawerCard';
 import CashTransactionModal from './CashTransactionModal';
 
@@ -12,6 +17,12 @@ export default function CashDrawerCards({
   const [isDepositModalVisible, setIsDepositModalVisible] = useState(false);
   const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
 
+  // 현금 스토어에서 필요한 함수들 가져오기
+  const { calculateOptimalBreakdown, applyCashBreakdown } = useCashStore();
+
+  // 거래 스토어에서 입출금 거래 추가 함수 가져오기
+  const { addCashTransaction } = useTransactionStore();
+
   const handleCashDeposit = () => {
     setIsDepositModalVisible(true);
   };
@@ -20,11 +31,49 @@ export default function CashDrawerCards({
     setIsWithdrawModalVisible(true);
   };
 
-  // 총 현금 보유액 계산
-  const getTotalAmount = () => {
-    return cashDrawerData
-      .reduce((total, item) => total + item.quantity * item.unitValue, 0)
-      .toLocaleString();
+  // 입금 확인 처리
+  const handleDepositConfirm = (amount: number, memo: string) => {
+    // 입금 금액을 권종별로 자동 분리
+    const breakdown = calculateOptimalBreakdown(amount);
+
+    // 현금 서랍에 반영 (입금이므로 양수로 적용)
+    applyCashBreakdown(breakdown, [], CashTransactionType.MANUAL_DEPOSIT, memo);
+
+    // 거래 내역에도 추가
+    addCashTransaction(
+      TransactionType.CASH_DEPOSIT,
+      amount,
+      memo || '현금 입금',
+      breakdown
+    );
+  };
+
+  // 출금 확인 처리
+  const handleWithdrawConfirm = (amount: number, memo: string) => {
+    // 출금 금액을 권종별로 자동 분리
+    const breakdown = calculateOptimalBreakdown(amount);
+
+    // 현금 서랍에서 차감 (출금이므로 음수로 적용)
+    const negativeBreakdown = breakdown.map(item => ({
+      ...item,
+      quantity: -item.quantity, // 음수로 변환
+      total: -item.total, // 음수로 변환
+    }));
+
+    applyCashBreakdown(
+      [],
+      negativeBreakdown,
+      CashTransactionType.MANUAL_WITHDRAW,
+      memo
+    );
+
+    // 거래 내역에도 추가
+    addCashTransaction(
+      TransactionType.CASH_WITHDRAWAL,
+      amount,
+      memo || '현금 출금',
+      breakdown
+    );
   };
 
   return (
@@ -103,6 +152,7 @@ export default function CashDrawerCards({
       <CashTransactionModal
         visible={isDepositModalVisible}
         onClose={() => setIsDepositModalVisible(false)}
+        onConfirm={handleDepositConfirm}
         type='deposit'
       />
 
@@ -110,6 +160,7 @@ export default function CashDrawerCards({
       <CashTransactionModal
         visible={isWithdrawModalVisible}
         onClose={() => setIsWithdrawModalVisible(false)}
+        onConfirm={handleWithdrawConfirm}
         type='withdraw'
       />
     </View>

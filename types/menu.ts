@@ -18,6 +18,12 @@ export interface MenuItem extends BaseItem {
 export interface OrderItem extends Quantifiable, Optionable {
   id: string;
   menuItem: MenuItem;
+  discount?: {
+    id: string;
+    name: string;
+    value: number;
+    type: 'fixed' | 'deduction';
+  };
 }
 
 export interface MenuItemProps {
