@@ -1,5 +1,4 @@
-import { useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Text, View } from 'react-native';
 
 import { useAuthStore } from '../../stores';
@@ -12,14 +11,6 @@ export default function AdminProtectedRoute({
   children,
 }: AdminProtectedRouteProps) {
   const { isAdminAuthenticated } = useAuthStore();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isAdminAuthenticated) {
-      // 관리자 인증이 안된 경우 메뉴 페이지로 리다이렉트
-      router.replace('/');
-    }
-  }, [isAdminAuthenticated, router]);
 
   // 인증되지 않은 경우 접근 차단 메시지 표시
   if (!isAdminAuthenticated) {
