@@ -8,7 +8,12 @@ import { useModal } from '../../hooks';
 import type { MenuFormData } from '../../schemas';
 import type { MenuCategory, MenuItem } from '../../types';
 import { MENU_CATEGORIES } from '../../types/menu';
-import { MenuAddModal, MenuDeleteModal, MenuEditModal } from './index';
+import {
+  MenuAddModal,
+  MenuCard,
+  MenuDeleteModal,
+  MenuEditModal,
+} from './index';
 
 /**
  * 메뉴 관리 메인 화면 컴포넌트
@@ -135,88 +140,54 @@ export default function MenuManagementMain() {
           </ScrollView>
         </View>
 
-        {/* 메뉴 테이블 섹션 */}
-        <View className='flex-[0.9] box-border px-[5%]'>
-          {/* 테이블 헤더 */}
-          <View className='bg-gray-50 rounded-t-lg p-3 flex-row items-center'>
-            <Text className='flex-1 font-bold text-gray-700'>메뉴명</Text>
-            <Text className='w-20 font-bold text-gray-700 text-center'>
-              가격
-            </Text>
-            <Text className='w-20 font-bold text-gray-700 text-center'>
-              카테고리
-            </Text>
-            <Text className='w-24 font-bold text-gray-700 text-center'>
-              액션
-            </Text>
-          </View>
-
-          {/* 메뉴 목록 */}
-          <ScrollView className='bg-white border-l border-r border-b border-gray-200 rounded-b-lg'>
+        {/* 메뉴 카드 그리드 섹션 */}
+        <View className='flex-1 box-border px-[5%]'>
+          <ScrollView showsVerticalScrollIndicator={false}>
             {filteredMenus.length > 0 ? (
-              filteredMenus.map((menu, index) => {
-                const categoryName =
-                  MENU_CATEGORIES.find(cat => cat.id === menu.category)?.name ||
-                  menu.category;
-
-                return (
-                  <View
-                    key={menu.id}
-                    className={clsx(
-                      'p-3 flex-row items-center',
-                      index !== filteredMenus.length - 1 &&
-                        'border-b border-gray-100'
-                    )}
-                  >
-                    {/* 메뉴명 */}
-                    <Text className='flex-1 text-gray-800 font-medium text-sm'>
-                      {menu.name}
-                    </Text>
-
-                    {/* 가격 */}
-                    <Text className='w-20 text-center text-gray-600 text-sm'>
-                      {menu.price.toLocaleString()}원
-                    </Text>
-
-                    {/* 카테고리 */}
-                    <Text className='w-20 text-center text-gray-600 text-xs'>
-                      {categoryName}
-                    </Text>
-
-                    {/* 액션 버튼들 */}
-                    <View className='w-24 flex-row justify-center gap-1'>
-                      {/* 편집 버튼 */}
-                      <TouchableOpacity
-                        className='p-1.5'
-                        onPress={() => handleEditMenu(menu)}
-                      >
-                        <Ionicons
-                          name='pencil-outline'
-                          size={16}
-                          color='#6B7280'
-                        />
-                      </TouchableOpacity>
-
-                      {/* 삭제 버튼 */}
-                      <TouchableOpacity
-                        className='p-1.5'
-                        onPress={() => handleDeleteMenu(menu)}
-                      >
-                        <Ionicons
-                          name='trash-outline'
-                          size={16}
-                          color='#EF4444'
-                        />
-                      </TouchableOpacity>
+              <View className='pb-4'>
+                {Array.from(
+                  { length: Math.ceil(filteredMenus.length / 3) },
+                  (_, rowIndex) => (
+                    <View key={rowIndex} className='flex-row gap-4 mb-4'>
+                      {filteredMenus
+                        .slice(rowIndex * 3, (rowIndex + 1) * 3)
+                        .map(menu => (
+                          <MenuCard
+                            key={menu.id}
+                            menu={menu}
+                            onEdit={handleEditMenu}
+                            onDelete={handleDeleteMenu}
+                          />
+                        ))}
+                      {/* 빈 공간 채우기 (3개 미만인 경우) */}
+                      {Array.from(
+                        {
+                          length:
+                            3 -
+                            filteredMenus.slice(
+                              rowIndex * 3,
+                              (rowIndex + 1) * 3
+                            ).length,
+                        },
+                        (_, emptyIndex) => (
+                          <View
+                            key={`empty-${emptyIndex}`}
+                            className='flex-1'
+                          />
+                        )
+                      )}
                     </View>
-                  </View>
-                );
-              })
+                  )
+                )}
+              </View>
             ) : (
-              <View className='p-6 items-center'>
-                <Ionicons name='restaurant-outline' size={40} color='#D1D5DB' />
-                <Text className='text-gray-500 mt-2 text-sm'>
+              <View className='p-8 items-center justify-center'>
+                <Ionicons name='restaurant-outline' size={48} color='#9CA3AF' />
+                <Text className='text-gray-500 mt-4 text-base text-center'>
                   해당 카테고리에 메뉴가 없습니다
+                </Text>
+                <Text className='text-gray-400 mt-1 text-sm text-center'>
+                  메뉴 추가 버튼을 눌러 새로운 메뉴를 등록해보세요
                 </Text>
               </View>
             )}
