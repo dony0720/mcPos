@@ -10,6 +10,9 @@ export * from './categoryManagement';
 // Common components
 export * from './common';
 
+// Discount Management components
+export * from './discountManagement';
+
 // Ledger components
 export * from './ledger';
 

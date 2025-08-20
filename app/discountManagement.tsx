@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-import { AdminProtectedRoute } from '../components';
+import { AdminProtectedRoute, DiscountManagementMain } from '../components';
 
 /**
  * 할인 관리 페이지
@@ -35,13 +35,7 @@ export default function DiscountManagementPage() {
 
         {/* 할인 관리 메인 컨텐츠 */}
         <View className='flex-1'>
-          {/* TODO: DiscountManagementMain 컴포넌트 추가 예정 */}
-          <View className='flex-1 items-center justify-center'>
-            <Ionicons name='pricetag-outline' size={64} color='#D1D5DB' />
-            <Text className='text-gray-500 mt-4 text-lg'>
-              할인 관리 기능 준비 중
-            </Text>
-          </View>
+          <DiscountManagementMain />
         </View>
       </View>
     </AdminProtectedRoute>
