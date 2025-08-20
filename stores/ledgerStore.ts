@@ -75,7 +75,6 @@ interface LedgerState {
   generateMemberNumber: () => string;
   formatAmount: (amount: number) => string;
   parseAmount: (amountString: string) => number;
-  debugState: () => Promise<void>;
 }
 
 // ===== Store Implementation =====
@@ -130,23 +129,7 @@ export const useLedgerStore = create<LedgerState>()(
 
         // 등록 후 상태 확인 (Promise 사용)
         Promise.resolve().then(async () => {
-          const newState = get();
-          console.log(
-            '📝 등록 후 거래 내역:',
-            newState.transactions[memberNumber]
-          );
-          console.log(
-            '📝 등록 후 장부 데이터:',
-            newState.ledgerData.find(l => l.memberNumber === memberNumber)
-          );
-
           // AsyncStorage에 실제로 저장되었는지 확인
-          try {
-            const storedData = await AsyncStorage.getItem('ledger-storage');
-            console.log('💾 등록 후 AsyncStorage 데이터:', storedData);
-          } catch (error) {
-            console.log('💾 등록 후 AsyncStorage 읽기 오류:', error);
-          }
         });
       },
 
@@ -186,28 +169,7 @@ export const useLedgerStore = create<LedgerState>()(
 
         // 충전 후 상태 확인 (Promise 사용)
         Promise.resolve().then(async () => {
-          const newState = get();
-          console.log(
-            '💰 충전 후 거래 내역:',
-            newState.transactions[memberNumber]
-          );
-          console.log(
-            '💰 충전 후 장부 데이터:',
-            newState.ledgerData.find(l => l.memberNumber === memberNumber)
-          );
-          console.log('💰 전체 transactions 객체:', newState.transactions);
-
           // AsyncStorage에 실제로 저장되었는지 확인
-          try {
-            const storedData = await AsyncStorage.getItem('ledger-storage');
-            // console.log('💾 AsyncStorage에 저장된 데이터:', storedData);
-            if (storedData) {
-              const parsedData = JSON.parse(storedData);
-              console.log('💾 파싱된 저장 데이터:', parsedData);
-            }
-          } catch (error) {
-            console.log('💾 AsyncStorage 읽기 오류:', error);
-          }
         });
       },
 
@@ -283,16 +245,8 @@ export const useLedgerStore = create<LedgerState>()(
         );
 
         if (!transactionToDelete) {
-          console.log('❌ 삭제할 거래 내역을 찾을 수 없습니다.');
-          console.log('❌ 찾고 있는 ID:', transactionId);
-          console.log(
-            '❌ 사용 가능한 ID들:',
-            currentTransactions.map(t => t.id)
-          );
           return;
         }
-
-        console.log('✅ 삭제할 거래 찾음:', transactionToDelete);
 
         // 현재 장부 데이터 찾기
         const currentLedger = currentState.ledgerData.find(
@@ -463,12 +417,6 @@ export const useLedgerStore = create<LedgerState>()(
       parseAmount: (amountString: string) => {
         const numbersOnly = amountString.replace(/[^\d]/g, '');
         return parseInt(numbersOnly, 10) || 0;
-      },
-
-      // 디버깅용: 전체 상태 출력
-      debugState: async () => {
-        const state = get();
-        console.log('📊 전체 상태:', state);
       },
     }),
     {

@@ -26,13 +26,7 @@ export default function TransactionDeleteConfirmModal({
   onConfirm,
   transaction,
 }: TransactionDeleteConfirmModalProps) {
-  console.log('TransactionDeleteConfirmModal 렌더링:', {
-    visible,
-    transaction,
-  });
-
   if (!transaction) {
-    console.log('거래 내역이 없어서 모달을 렌더링하지 않습니다.');
     return null;
   }
 
@@ -159,11 +153,7 @@ export default function TransactionDeleteConfirmModal({
             <Pressable
               className='flex-1 p-3 bg-red-500 rounded-lg'
               onPress={() => {
-                console.log('🔥 삭제 버튼 클릭됨!');
-                console.log('onConfirm 함수 호출');
                 onConfirm();
-                console.log('onConfirm 함수 호출 완료');
-                // onClose는 onConfirm에서 처리됨
               }}
             >
               <Text className='text-white text-center font-semibold text-lg'>

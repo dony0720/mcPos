@@ -29,7 +29,6 @@ export default function CashManagement() {
 
   const handleInspectionConfirm = (updatedData: CashDrawerMoneyItem[]) => {
     updateCashDrawer(updatedData);
-    console.log('시재 점검 완료:', updatedData);
   };
 
   const handleInspectionClose = () => {

@@ -4,9 +4,9 @@
   "editor.formatOnPaste": true,
   "editor.formatOnType": false,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-    "source.organizeImports": true,
-    "source.removeUnusedImports": true
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit",
+    "source.removeUnusedImports": "explicit"
   },
 
   // 기본 포매터 설정

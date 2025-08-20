@@ -47,7 +47,6 @@ export default function LedgerManagement() {
     closeHistoryModal,
     openDeleteConfirmModal,
     closeDeleteConfirmModal,
-    openTransactionDeleteConfirmModal,
     closeTransactionDeleteConfirmModal,
   } = useLedgerStore();
 
@@ -116,29 +115,12 @@ export default function LedgerManagement() {
   };
 
   const handleConfirmDeleteTransaction = () => {
-    // console.log('🔥🔥🔥 handleConfirmDeleteTransaction 호출됨 🔥🔥🔥');
-    // console.log('selectedCustomer:', selectedCustomer);
-    // console.log('selectedTransactionForDelete:', selectedTransactionForDelete);
-
     if (selectedCustomer && selectedTransactionForDelete) {
-      // console.log('✅ 거래 내역 삭제 실행 시작');
-      // console.log('memberNumber:', selectedCustomer.memberNumber);
-      // console.log('transactionId:', selectedTransactionForDelete.id);
-
       deleteTransaction(
         selectedCustomer.memberNumber,
         selectedTransactionForDelete.id
       );
-
-      // console.log('✅ deleteTransaction 함수 호출 완료');
-      // 모달은 deleteTransaction에서 자동으로 닫힘
-    } else {
-      // console.log('❌ 삭제할 거래 정보가 없습니다.');
-      // console.log('selectedCustomer 존재:', !!selectedCustomer);
-      // console.log(
-      // 'selectedTransactionForDelete 존재:',
-      // !!selectedTransactionForDelete
-      // );
+      closeTransactionDeleteConfirmModal();
     }
   };
 
