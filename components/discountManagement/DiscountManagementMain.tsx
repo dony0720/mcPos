@@ -7,14 +7,14 @@ import { DISCOUNTS } from '../../data/discounts';
 import { useModal } from '../../hooks';
 import type { DiscountFormSchemaType } from '../../schemas/discountSchema';
 import type { Discount } from '../../types';
-import DiscountAddModal from './DiscountAddModal';
+import { DiscountAddModal, DiscountEditModal } from './index';
 
 /**
  * 할인 관리 메인 화면 컴포넌트
  * - 할인 목록 테이블과 액션 버튼들을 포함하는 메인 화면
  */
 export default function DiscountManagementMain() {
-  const [_selectedDiscount, _setSelectedDiscount] = useState<Discount | null>(
+  const [selectedDiscount, setSelectedDiscount] = useState<Discount | null>(
     null
   );
   const { openModal, closeModal, isModalOpen } = useModal();
@@ -44,17 +44,15 @@ export default function DiscountManagementMain() {
     closeModal();
   };
 
-  const _handleEditDiscount = (_discount: Discount) => {
-    // _setSelectedDiscount(discount);
-    // openModal('discountEdit');
+  const handleEditDiscount = (discount: Discount) => {
+    setSelectedDiscount(discount);
+    openModal('discountEdit');
   };
 
-  const _handleEditDiscountConfirm = (
-    _discountData: DiscountFormSchemaType
-  ) => {
+  const handleEditDiscountConfirm = (_discountData: DiscountFormSchemaType) => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
-    // closeModal();
-    // _setSelectedDiscount(null);
+    closeModal();
+    setSelectedDiscount(null);
   };
 
   const _handleDeleteDiscount = (_discount: Discount) => {
@@ -165,7 +163,7 @@ export default function DiscountManagementMain() {
                       {/* 편집 버튼 */}
                       <TouchableOpacity
                         className='w-8 h-8 rounded-full bg-blue-100 items-center justify-center'
-                        onPress={() => _handleEditDiscount(discount)}
+                        onPress={() => handleEditDiscount(discount)}
                       >
                         <Ionicons
                           name='pencil-outline'
@@ -211,7 +209,17 @@ export default function DiscountManagementMain() {
         onConfirm={handleAddDiscountConfirm}
       />
 
-      {/* TODO: 할인 편집 모달 */}
+      {/* 할인 편집 모달 */}
+      <DiscountEditModal
+        visible={isModalOpen('discountEdit')}
+        onClose={() => {
+          closeModal();
+          setSelectedDiscount(null);
+        }}
+        onConfirm={handleEditDiscountConfirm}
+        discount={selectedDiscount}
+      />
+
       {/* TODO: 할인 삭제 확인 모달 */}
     </View>
   );

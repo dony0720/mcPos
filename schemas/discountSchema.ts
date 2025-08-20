@@ -23,14 +23,6 @@ export const discountFormSchema = z.object({
       }
       return true;
     }, '퍼센트 할인은 100% 이하여야 합니다'),
-  isActive: z.boolean(),
-  minOrderAmount: z.number().min(0).optional(),
-  maxDiscountAmount: z.number().min(0).optional(),
-  description: z
-    .string()
-    .max(100, '설명은 100자 이하로 입력해주세요')
-    .optional()
-    .or(z.literal('')),
 });
 
 export type DiscountFormSchemaType = z.infer<typeof discountFormSchema>;

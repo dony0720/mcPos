@@ -17,24 +17,26 @@ import {
   discountFormSchema,
   type DiscountFormSchemaType,
 } from '../../schemas/discountSchema';
-import type { DiscountType } from '../../types';
+import type { Discount, DiscountType } from '../../types';
 import { formatPrice, handlePriceInput } from '../../utils';
 
-interface DiscountAddModalProps {
+interface DiscountEditModalProps {
   visible: boolean;
   onClose: () => void;
   onConfirm: (discountData: DiscountFormSchemaType) => void;
+  discount: Discount | null;
 }
 
 /**
- * 할인 추가 모달 컴포넌트
- * - 새로운 할인을 추가할 수 있는 폼 모달
+ * 할인 편집 모달 컴포넌트
+ * - 기존 할인 정보를 수정할 수 있는 폼 모달
  */
-export default function DiscountAddModal({
+export default function DiscountEditModal({
   visible,
   onClose,
   onConfirm,
-}: DiscountAddModalProps) {
+  discount,
+}: DiscountEditModalProps) {
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
 
   const {
@@ -62,22 +64,24 @@ export default function DiscountAddModal({
     { value: 'FIXED_AMOUNT' as DiscountType, label: '고정금액 할인 (원)' },
   ];
 
-  // 모달이 열릴 때마다 폼 초기화
+  // 모달이 열릴 때 기존 할인 정보로 폼 초기화
   useEffect(() => {
-    if (visible) {
-      reset();
+    if (visible && discount) {
+      reset({
+        name: discount.name,
+        type: discount.type,
+        value: discount.value,
+      });
       setShowTypeDropdown(false);
     }
-  }, [visible, reset]);
+  }, [visible, discount, reset]);
 
   const onSubmit = (data: DiscountFormSchemaType) => {
     onConfirm(data);
-    reset();
     onClose();
   };
 
   const handleClose = () => {
-    reset();
     setShowTypeDropdown(false);
     onClose();
   };
@@ -92,6 +96,8 @@ export default function DiscountAddModal({
     option => option.value === selectedType
   )?.label;
 
+  if (!discount) return null;
+
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
@@ -99,15 +105,13 @@ export default function DiscountAddModal({
           {/* 헤더 */}
           <View className='p-6 border-b border-gray-200'>
             <View className='flex-row justify-between items-center'>
-              <Text className='text-xl font-bold text-gray-800'>
-                새 할인 추가
-              </Text>
+              <Text className='text-xl font-bold text-gray-800'>할인 편집</Text>
               <TouchableOpacity onPress={handleClose}>
                 <Ionicons name='close-outline' size={24} color='#6B7280' />
               </TouchableOpacity>
             </View>
             <Text className='text-sm text-gray-500 mt-1'>
-              새로운 할인 정책을 등록합니다
+              할인 정보를 수정합니다
             </Text>
           </View>
 
@@ -279,7 +283,7 @@ export default function DiscountAddModal({
                     isValid ? 'text-white' : 'text-gray-500'
                   )}
                 >
-                  추가
+                  수정
                 </Text>
               </Pressable>
             </View>
