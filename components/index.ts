@@ -4,6 +4,9 @@ export { default as AdminModal } from './AdminModal';
 // Cash components
 export * from './cash';
 
+// Category Management components
+export * from './categoryManagement';
+
 // Common components
 export * from './common';
 

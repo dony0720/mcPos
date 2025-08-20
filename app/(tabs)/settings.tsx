@@ -21,7 +21,7 @@ export default function Settings() {
       description: '메뉴 등록, 수정, 삭제',
       icon: 'restaurant-outline' as const,
       onPress: () => {
-        router.push('/menu-management');
+        router.push('/menuManagement');
       },
     },
     {
@@ -30,7 +30,7 @@ export default function Settings() {
       description: '카테고리 추가, 수정, 삭제',
       icon: 'list-outline' as const,
       onPress: () => {
-        // TODO: 카테고리 관리 화면으로 이동
+        router.push('/categoryManagement');
       },
     },
     {
