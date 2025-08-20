@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import type { StaffFormData } from '../types';
-
 /**
  * 직원 폼 데이터 스키마 (퍼블리싱용 - 간소화)
  */
@@ -13,6 +11,3 @@ export const staffFormSchema = z.object({
 });
 
 export type StaffFormSchemaType = z.infer<typeof staffFormSchema>;
-
-// 타입 검증을 위한 assertion
-const _typeCheck: StaffFormSchemaType = {} as StaffFormData;

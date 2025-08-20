@@ -6,14 +6,19 @@ import { STAFF } from '../../data/staff';
 import { useModal } from '../../hooks';
 import type { StaffFormSchemaType } from '../../schemas/staffSchema';
 import type { Staff } from '../../types';
-import { StaffAddModal, StaffCard } from './index';
+import {
+  StaffAddModal,
+  StaffCard,
+  StaffDeleteModal,
+  StaffEditModal,
+} from './index';
 
 /**
  * 직원 관리 메인 화면 컴포넌트
  * - 직원 목록 테이블과 액션 버튼들을 포함하는 메인 화면
  */
 export default function StaffManagementMain() {
-  const [_selectedStaff, _setSelectedStaff] = useState<Staff | null>(null);
+  const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const { openModal, closeModal, isModalOpen } = useModal();
 
   // 재직 상태별로 정렬 (재직자 먼저)
@@ -33,26 +38,26 @@ export default function StaffManagementMain() {
     closeModal();
   };
 
-  const _handleEditStaff = (_staff: Staff) => {
-    // _setSelectedStaff(staff);
-    // openModal('staffEdit');
+  const handleEditStaff = (staff: Staff) => {
+    setSelectedStaff(staff);
+    openModal('staffEdit');
   };
 
-  const _handleEditStaffConfirm = (_staffData: StaffFormSchemaType) => {
+  const handleEditStaffConfirm = (_staffData: StaffFormSchemaType) => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
-    // closeModal();
-    // _setSelectedStaff(null);
+    closeModal();
+    setSelectedStaff(null);
   };
 
-  const _handleDeleteStaff = (_staff: Staff) => {
-    // _setSelectedStaff(staff);
-    // openModal('staffDelete');
+  const handleDeleteStaff = (staff: Staff) => {
+    setSelectedStaff(staff);
+    openModal('staffDelete');
   };
 
-  const _handleDeleteStaffConfirm = () => {
+  const handleDeleteStaffConfirm = () => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
-    // closeModal();
-    // _setSelectedStaff(null);
+    closeModal();
+    setSelectedStaff(null);
   };
 
   return (
@@ -81,8 +86,8 @@ export default function StaffManagementMain() {
                   <StaffCard
                     key={staff.id}
                     staff={staff}
-                    onEdit={_handleEditStaff}
-                    onDelete={_handleDeleteStaff}
+                    onEdit={handleEditStaff}
+                    onDelete={handleDeleteStaff}
                   />
                 ))}
               </View>
@@ -111,8 +116,21 @@ export default function StaffManagementMain() {
         onConfirm={handleAddStaffConfirm}
       />
 
-      {/* TODO: 직원 편집 모달 */}
-      {/* TODO: 직원 삭제 확인 모달 */}
+      {/* 직원 편집 모달 */}
+      <StaffEditModal
+        visible={isModalOpen('staffEdit')}
+        onClose={closeModal}
+        onConfirm={handleEditStaffConfirm}
+        staff={selectedStaff}
+      />
+
+      {/* 직원 삭제 확인 모달 */}
+      <StaffDeleteModal
+        visible={isModalOpen('staffDelete')}
+        onClose={closeModal}
+        onConfirm={handleDeleteStaffConfirm}
+        staff={selectedStaff}
+      />
     </View>
   );
 }
