@@ -39,7 +39,7 @@ export default function Settings() {
       description: '할인 정책 설정 및 관리',
       icon: 'pricetag-outline' as const,
       onPress: () => {
-        // TODO: 할인 관리 화면으로 이동
+        router.push('/discountManagement');
       },
     },
     {

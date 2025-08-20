@@ -1,6 +1,7 @@
 export * from './cash';
 export * from './category';
 export * from './common';
+export * from './discount';
 export * from './enums';
 export * from './history';
 export * from './ledger';
