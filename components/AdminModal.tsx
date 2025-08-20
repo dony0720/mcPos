@@ -11,10 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import {
-  type AdminLoginFormData,
-  adminLoginSchema,
-} from '../schemas/adminSchema';
+import { type AdminLoginFormData, adminLoginSchema } from '../schemas';
 
 interface AdminModalProps {
   visible: boolean;

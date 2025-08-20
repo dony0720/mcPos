@@ -16,7 +16,7 @@ import {
   CashTransactionFormData,
   cashTransactionSchema,
   createWithdrawalSchema,
-} from '../../schemas/cashTransactionSchema';
+} from '../../schemas';
 import { useCashStore } from '../../stores';
 import { CashTransactionModalProps } from '../../types';
 
