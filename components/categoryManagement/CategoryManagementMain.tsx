@@ -7,8 +7,11 @@ import { CATEGORIES } from '../../data/categories';
 import { useModal } from '../../hooks';
 import type { CategoryFormSchemaType } from '../../schemas/categorySchema';
 import type { Category } from '../../types';
-import CategoryAddModal from './CategoryAddModal';
-import CategoryEditModal from './CategoryEditModal';
+import {
+  CategoryAddModal,
+  CategoryDeleteModal,
+  CategoryEditModal,
+} from './index';
 
 /**
  * 카테고리 관리 메인 화면 컴포넌트
@@ -46,15 +49,15 @@ export default function CategoryManagementMain() {
     setSelectedCategory(null);
   };
 
-  const _handleDeleteCategory = (_category: Category) => {
-    // _setSelectedCategory(category);
-    // openModal('categoryDelete');
+  const handleDeleteCategory = (category: Category) => {
+    setSelectedCategory(category);
+    openModal('categoryDelete');
   };
 
-  const _handleDeleteCategoryConfirm = () => {
+  const handleDeleteCategoryConfirm = () => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
-    // closeModal();
-    // _setSelectedCategory(null);
+    closeModal();
+    setSelectedCategory(null);
   };
 
   return (
@@ -97,7 +100,6 @@ export default function CategoryManagementMain() {
             {sortedCategories.length > 0 ? (
               sortedCategories.map((category, index) => {
                 const isLastItem = index === sortedCategories.length - 1;
-                const isDefaultCategory = category.isDefault;
 
                 return (
                   <View
@@ -112,11 +114,6 @@ export default function CategoryManagementMain() {
                       <Text className='text-gray-800 text-base font-medium'>
                         {category.name}
                       </Text>
-                      {isDefaultCategory && (
-                        <Text className='text-xs text-blue-600 mt-1'>
-                          기본 카테고리
-                        </Text>
-                      )}
                     </View>
 
                     {/* 표시순서 */}
@@ -147,21 +144,15 @@ export default function CategoryManagementMain() {
                         />
                       </TouchableOpacity>
 
-                      {/* 삭제 버튼 - 기본 카테고리는 비활성화 */}
+                      {/* 삭제 버튼 */}
                       <TouchableOpacity
-                        className={clsx(
-                          'w-8 h-8 rounded-full items-center justify-center',
-                          isDefaultCategory ? 'bg-gray-100' : 'bg-red-100'
-                        )}
-                        onPress={() =>
-                          !isDefaultCategory && _handleDeleteCategory(category)
-                        }
-                        disabled={isDefaultCategory}
+                        className='w-8 h-8 rounded-full bg-red-100 items-center justify-center'
+                        onPress={() => handleDeleteCategory(category)}
                       >
                         <Ionicons
                           name='trash-outline'
                           size={14}
-                          color={isDefaultCategory ? '#9CA3AF' : '#EF4444'}
+                          color='#EF4444'
                         />
                       </TouchableOpacity>
                     </View>
@@ -201,7 +192,16 @@ export default function CategoryManagementMain() {
         category={selectedCategory}
       />
 
-      {/* TODO: 카테고리 삭제 확인 모달 */}
+      {/* 카테고리 삭제 확인 모달 */}
+      <CategoryDeleteModal
+        visible={isModalOpen('categoryDelete')}
+        onClose={() => {
+          closeModal();
+          setSelectedCategory(null);
+        }}
+        onConfirm={handleDeleteCategoryConfirm}
+        category={selectedCategory}
+      />
     </View>
   );
 }
