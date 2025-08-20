@@ -48,7 +48,7 @@ export default function Settings() {
       description: '직원 등록, 권한 설정, 근무 관리',
       icon: 'people-outline' as const,
       onPress: () => {
-        // TODO: 직원 관리 화면으로 이동
+        router.push('/staffManagement');
       },
     },
   ];

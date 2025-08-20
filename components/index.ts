@@ -27,3 +27,6 @@ export * from './order';
 
 // Payment components
 export * from './payment';
+
+// Staff Management components
+export * from './staffManagement';

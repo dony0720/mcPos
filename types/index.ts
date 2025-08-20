@@ -8,4 +8,5 @@ export * from './ledger';
 export * from './menu';
 export * from './order';
 export * from './payment';
+export * from './staff';
 export * from './transaction';
