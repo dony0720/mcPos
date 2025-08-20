@@ -7,6 +7,7 @@ import { DISCOUNTS } from '../../data/discounts';
 import { useModal } from '../../hooks';
 import type { DiscountFormSchemaType } from '../../schemas/discountSchema';
 import type { Discount } from '../../types';
+import DiscountAddModal from './DiscountAddModal';
 
 /**
  * 할인 관리 메인 화면 컴포넌트
@@ -16,11 +17,7 @@ export default function DiscountManagementMain() {
   const [_selectedDiscount, _setSelectedDiscount] = useState<Discount | null>(
     null
   );
-  const {
-    openModal,
-    closeModal: _closeModal,
-    isModalOpen: _isModalOpen,
-  } = useModal();
+  const { openModal, closeModal, isModalOpen } = useModal();
 
   // 활성화 상태별로 정렬된 할인 (활성화된 것 먼저)
   const sortedDiscounts = [...DISCOUNTS].sort((a, b) => {
@@ -42,9 +39,9 @@ export default function DiscountManagementMain() {
     openModal('discountAdd');
   };
 
-  const _handleAddDiscountConfirm = (_discountData: DiscountFormSchemaType) => {
+  const handleAddDiscountConfirm = (_discountData: DiscountFormSchemaType) => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
-    // closeModal();
+    closeModal();
   };
 
   const _handleEditDiscount = (_discount: Discount) => {
@@ -207,7 +204,13 @@ export default function DiscountManagementMain() {
         <View className='h-16' />
       </View>
 
-      {/* TODO: 할인 추가 모달 */}
+      {/* 할인 추가 모달 */}
+      <DiscountAddModal
+        visible={isModalOpen('discountAdd')}
+        onClose={closeModal}
+        onConfirm={handleAddDiscountConfirm}
+      />
+
       {/* TODO: 할인 편집 모달 */}
       {/* TODO: 할인 삭제 확인 모달 */}
     </View>

@@ -10,7 +10,7 @@ import { REGEX_PATTERNS } from '../constants';
  * @returns 콤마가 포함된 문자열 (예: 5000 → "5,000")
  */
 export const formatPrice = (value: number | null | undefined): string => {
-  if (!value || value === 0) return '';
+  if (value === null || value === undefined) return '';
   return value.toLocaleString();
 };
 
