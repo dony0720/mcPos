@@ -7,7 +7,11 @@ import { DISCOUNTS } from '../../data/discounts';
 import { useModal } from '../../hooks';
 import type { DiscountFormSchemaType } from '../../schemas/discountSchema';
 import type { Discount } from '../../types';
-import { DiscountAddModal, DiscountEditModal } from './index';
+import {
+  DiscountAddModal,
+  DiscountDeleteModal,
+  DiscountEditModal,
+} from './index';
 
 /**
  * 할인 관리 메인 화면 컴포넌트
@@ -55,15 +59,15 @@ export default function DiscountManagementMain() {
     setSelectedDiscount(null);
   };
 
-  const _handleDeleteDiscount = (_discount: Discount) => {
-    // _setSelectedDiscount(discount);
-    // openModal('discountDelete');
+  const handleDeleteDiscount = (discount: Discount) => {
+    setSelectedDiscount(discount);
+    openModal('discountDelete');
   };
 
-  const _handleDeleteDiscountConfirm = () => {
+  const handleDeleteDiscountConfirm = () => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
-    // closeModal();
-    // _setSelectedDiscount(null);
+    closeModal();
+    setSelectedDiscount(null);
   };
 
   const handleToggleActive = (_discount: Discount) => {
@@ -175,7 +179,7 @@ export default function DiscountManagementMain() {
                       {/* 삭제 버튼 */}
                       <TouchableOpacity
                         className='w-8 h-8 rounded-full bg-red-100 items-center justify-center'
-                        onPress={() => _handleDeleteDiscount(discount)}
+                        onPress={() => handleDeleteDiscount(discount)}
                       >
                         <Ionicons
                           name='trash-outline'
@@ -220,7 +224,16 @@ export default function DiscountManagementMain() {
         discount={selectedDiscount}
       />
 
-      {/* TODO: 할인 삭제 확인 모달 */}
+      {/* 할인 삭제 확인 모달 */}
+      <DiscountDeleteModal
+        visible={isModalOpen('discountDelete')}
+        onClose={() => {
+          closeModal();
+          setSelectedDiscount(null);
+        }}
+        onConfirm={handleDeleteDiscountConfirm}
+        discount={selectedDiscount}
+      />
     </View>
   );
 }
