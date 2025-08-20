@@ -9,6 +9,7 @@ import type { CategoryFormSchemaType } from '../../schemas';
 import type { Category } from '../../types';
 import {
   CategoryAddModal,
+  CategoryCard,
   CategoryDeleteModal,
   CategoryEditModal,
 } from './index';
@@ -80,91 +81,54 @@ export default function CategoryManagementMain() {
           </TouchableOpacity>
         </View>
 
-        {/* 카테고리 테이블 섹션 */}
+        {/* 카테고리 카드 그리드 섹션 */}
         <View className='flex-1 box-border px-[5%]'>
-          {/* 테이블 헤더 */}
-          <View className='bg-gray-50 rounded-t-lg p-3 flex-row items-center'>
-            <Text className='flex-1 font-bold text-gray-700'>카테고리명</Text>
-            <Text className='w-20 font-bold text-gray-700 text-center'>
-              표시순서
-            </Text>
-            <Text className='w-20 font-bold text-gray-700 text-center'>
-              메뉴개수
-            </Text>
-            <Text className='w-24 font-bold text-gray-700 text-center'>
-              액션
-            </Text>
-          </View>
-
-          {/* 카테고리 목록 */}
-          <ScrollView className='bg-white border-l border-r border-b border-gray-200 rounded-b-lg'>
+          <ScrollView showsVerticalScrollIndicator={false}>
             {sortedCategories.length > 0 ? (
-              sortedCategories.map((category, index) => {
-                const isLastItem = index === sortedCategories.length - 1;
-
-                return (
-                  <View
-                    key={category.id}
-                    className={clsx(
-                      'flex-row items-center p-3',
-                      !isLastItem && 'border-b border-gray-100'
-                    )}
-                  >
-                    {/* 카테고리명 */}
-                    <View className='flex-1'>
-                      <Text className='text-gray-800 text-base font-medium'>
-                        {category.name}
-                      </Text>
+              <View className='pb-4'>
+                {Array.from(
+                  { length: Math.ceil(sortedCategories.length / 3) },
+                  (_, rowIndex) => (
+                    <View key={rowIndex} className='flex-row gap-4 mb-4'>
+                      {sortedCategories
+                        .slice(rowIndex * 3, (rowIndex + 1) * 3)
+                        .map(category => (
+                          <CategoryCard
+                            key={category.id}
+                            category={category}
+                            onEdit={handleEditCategory}
+                            onDelete={handleDeleteCategory}
+                          />
+                        ))}
+                      {/* 빈 공간 채우기 (3개 미만인 경우) */}
+                      {Array.from(
+                        {
+                          length:
+                            3 -
+                            sortedCategories.slice(
+                              rowIndex * 3,
+                              (rowIndex + 1) * 3
+                            ).length,
+                        },
+                        (_, emptyIndex) => (
+                          <View
+                            key={`empty-${emptyIndex}`}
+                            className='flex-1'
+                          />
+                        )
+                      )}
                     </View>
-
-                    {/* 표시순서 */}
-                    <View className='w-20 items-center'>
-                      <Text className='text-gray-600 text-sm'>
-                        {category.displayOrder}
-                      </Text>
-                    </View>
-
-                    {/* 메뉴개수 */}
-                    <View className='w-20 items-center'>
-                      <Text className='text-gray-600 text-sm'>
-                        {category.menuCount || 0}개
-                      </Text>
-                    </View>
-
-                    {/* 액션 버튼들 */}
-                    <View className='w-24 flex-row items-center justify-center gap-2'>
-                      {/* 편집 버튼 */}
-                      <TouchableOpacity
-                        className='w-8 h-8 rounded-full bg-blue-100 items-center justify-center'
-                        onPress={() => handleEditCategory(category)}
-                      >
-                        <Ionicons
-                          name='pencil-outline'
-                          size={14}
-                          color='#3B82F6'
-                        />
-                      </TouchableOpacity>
-
-                      {/* 삭제 버튼 */}
-                      <TouchableOpacity
-                        className='w-8 h-8 rounded-full bg-red-100 items-center justify-center'
-                        onPress={() => handleDeleteCategory(category)}
-                      >
-                        <Ionicons
-                          name='trash-outline'
-                          size={14}
-                          color='#EF4444'
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                );
-              })
+                  )
+                )}
+              </View>
             ) : (
-              <View className='p-6 items-center justify-center'>
-                <Ionicons name='list-outline' size={40} color='#9CA3AF' />
-                <Text className='text-gray-500 mt-3 text-sm'>
-                  등록된 카테고리가 없습니다.
+              <View className='p-8 items-center justify-center'>
+                <Ionicons name='list-outline' size={48} color='#9CA3AF' />
+                <Text className='text-gray-500 mt-4 text-base text-center'>
+                  등록된 카테고리가 없습니다
+                </Text>
+                <Text className='text-gray-400 mt-1 text-sm text-center'>
+                  카테고리 추가 버튼을 눌러 새로운 카테고리를 등록해보세요
                 </Text>
               </View>
             )}
