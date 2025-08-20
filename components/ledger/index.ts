@@ -8,4 +8,3 @@ export { default as LedgerTable } from './LedgerTable';
 export { default as LedgerTableHeader } from './LedgerTableHeader';
 export { default as LedgerTableRow } from './LedgerTableRow';
 export { default as LedgerPageHeader } from './PageHeader';
-export { default as TransactionDeleteConfirmModal } from './TransactionDeleteConfirmModal';

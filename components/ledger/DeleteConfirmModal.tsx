@@ -2,14 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 
-import { LedgerData } from '../../types';
-
-interface DeleteConfirmModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  item: LedgerData | null;
-}
+import { DeleteConfirmModalProps } from '../../types/ledger';
 
 /**
  * 장부 삭제 확인 모달

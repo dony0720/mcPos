@@ -25,7 +25,6 @@ interface LedgerState {
   isChargeModalVisible: boolean;
   isHistoryModalVisible: boolean;
   isDeleteConfirmModalVisible: boolean;
-  isTransactionDeleteConfirmModalVisible: boolean;
 
   // 선택된 고객 정보
   selectedCustomer: CustomerInfo | null;
@@ -66,8 +65,6 @@ interface LedgerState {
   closeHistoryModal: () => void;
   openDeleteConfirmModal: (ledger: LedgerData) => void;
   closeDeleteConfirmModal: () => void;
-  openTransactionDeleteConfirmModal: (transaction: Transaction) => void;
-  closeTransactionDeleteConfirmModal: () => void;
 
   // 유틸리티
   getLedgerByMemberNumber: (memberNumber: string) => LedgerData | undefined;
@@ -88,7 +85,6 @@ export const useLedgerStore = create<LedgerState>()(
       isChargeModalVisible: false,
       isHistoryModalVisible: false,
       isDeleteConfirmModalVisible: false,
-      isTransactionDeleteConfirmModalVisible: false,
       selectedCustomer: null,
       selectedLedgerForDelete: null,
       selectedTransactionForDelete: null,
@@ -309,8 +305,6 @@ export const useLedgerStore = create<LedgerState>()(
           ...currentState,
           transactions: newTransactions,
           ledgerData: updatedLedgerData,
-          // 모달 상태 초기화
-          isTransactionDeleteConfirmModalVisible: false,
           selectedTransactionForDelete: null,
         });
       },
@@ -368,19 +362,6 @@ export const useLedgerStore = create<LedgerState>()(
           isDeleteConfirmModalVisible: false,
           selectedLedgerForDelete: null,
         }),
-
-      openTransactionDeleteConfirmModal: (transaction: Transaction) => {
-        set({
-          isTransactionDeleteConfirmModalVisible: true,
-          selectedTransactionForDelete: transaction,
-        });
-      },
-      closeTransactionDeleteConfirmModal: () => {
-        set({
-          isTransactionDeleteConfirmModalVisible: false,
-          selectedTransactionForDelete: null,
-        });
-      },
 
       // 유틸리티 함수들
       getLedgerByMemberNumber: (memberNumber: string) => {

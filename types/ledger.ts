@@ -238,3 +238,22 @@ export type ProcessTransaction = (
   customerInfo: CustomerInfo,
   transactionData: Partial<CustomerTransaction>
 ) => Promise<{ success: boolean; message: string }>;
+
+// 장부 등록 데이터
+export interface LedgerData {
+  id: number;
+  memberNumber: string;
+  name: string;
+  phoneNumber: string;
+  receptionist: string;
+  chargeAmount: string;
+  paymentMethod: string;
+}
+
+// 거래내역 삭제
+export interface DeleteConfirmModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  item: LedgerData | null;
+}

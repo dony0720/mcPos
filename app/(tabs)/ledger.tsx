@@ -10,10 +10,13 @@ import {
   LedgerRegistrationModal,
   LedgerTable,
   PageHeader,
-  TransactionDeleteConfirmModal,
 } from '../../components';
 import { useLedgerStore } from '../../stores';
-import { LedgerData } from '../../types';
+import {
+  ChargeData,
+  LedgerData,
+  LedgerRegistrationData,
+} from '../../types/ledger';
 
 /**
  * 장부 관리 페이지
@@ -29,10 +32,8 @@ export default function LedgerManagement() {
     isChargeModalVisible,
     isHistoryModalVisible,
     isDeleteConfirmModalVisible,
-    isTransactionDeleteConfirmModalVisible,
     selectedCustomer,
     selectedLedgerForDelete,
-    selectedTransactionForDelete,
 
     // 액션
     registerLedger,
@@ -47,17 +48,16 @@ export default function LedgerManagement() {
     closeHistoryModal,
     openDeleteConfirmModal,
     closeDeleteConfirmModal,
-    closeTransactionDeleteConfirmModal,
   } = useLedgerStore();
 
   // 장부 등록 핸들러
-  const handleRegistrationConfirm = (data: any) => {
+  const handleRegistrationConfirm = (data: LedgerRegistrationData) => {
     registerLedger(data);
     closeRegistrationModal();
   };
 
   // 장부 충전 핸들러
-  const handleChargeConfirm = (chargeData: any) => {
+  const handleChargeConfirm = (chargeData: ChargeData) => {
     if (selectedCustomer) {
       chargeLedger(selectedCustomer.memberNumber, chargeData);
       closeChargeModal();
@@ -114,16 +114,6 @@ export default function LedgerManagement() {
     }
   };
 
-  const handleConfirmDeleteTransaction = () => {
-    if (selectedCustomer && selectedTransactionForDelete) {
-      deleteTransaction(
-        selectedCustomer.memberNumber,
-        selectedTransactionForDelete.id
-      );
-      closeTransactionDeleteConfirmModal();
-    }
-  };
-
   return (
     <AdminProtectedRoute>
       <View className='h-full w-full bg-white flex flex-col'>
@@ -173,14 +163,6 @@ export default function LedgerManagement() {
             onClose={closeDeleteConfirmModal}
             onConfirm={handleConfirmDelete}
             item={selectedLedgerForDelete}
-          />
-
-          {/* 거래 내역 삭제 확인 모달 */}
-          <TransactionDeleteConfirmModal
-            visible={isTransactionDeleteConfirmModalVisible}
-            onClose={closeTransactionDeleteConfirmModal}
-            onConfirm={handleConfirmDeleteTransaction}
-            transaction={selectedTransactionForDelete}
           />
         </View>
       </View>
