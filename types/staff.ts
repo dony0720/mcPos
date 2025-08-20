@@ -26,6 +26,4 @@ export interface Staff {
 // 직원 폼 데이터 인터페이스 (퍼블리싱용 - 간소화)
 export interface StaffFormData {
   name: string;
-  role: StaffRole;
-  phone: string;
 }

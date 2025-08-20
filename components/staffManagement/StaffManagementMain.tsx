@@ -6,7 +6,7 @@ import { STAFF } from '../../data/staff';
 import { useModal } from '../../hooks';
 import type { StaffFormSchemaType } from '../../schemas/staffSchema';
 import type { Staff } from '../../types';
-import StaffCard from './StaffCard';
+import { StaffAddModal, StaffCard } from './index';
 
 /**
  * 직원 관리 메인 화면 컴포넌트
@@ -14,7 +14,7 @@ import StaffCard from './StaffCard';
  */
 export default function StaffManagementMain() {
   const [_selectedStaff, _setSelectedStaff] = useState<Staff | null>(null);
-  const { openModal, closeModal, isModalOpen: _isModalOpen } = useModal();
+  const { openModal, closeModal, isModalOpen } = useModal();
 
   // 재직 상태별로 정렬 (재직자 먼저)
   const sortedStaff = [...STAFF].sort((a, b) => {
@@ -28,7 +28,7 @@ export default function StaffManagementMain() {
     openModal('staffAdd');
   };
 
-  const _handleAddStaffConfirm = (_staffData: StaffFormSchemaType) => {
+  const handleAddStaffConfirm = (_staffData: StaffFormSchemaType) => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
     closeModal();
   };
@@ -104,7 +104,13 @@ export default function StaffManagementMain() {
         <View className='h-16' />
       </View>
 
-      {/* TODO: 직원 추가 모달 */}
+      {/* 직원 추가 모달 */}
+      <StaffAddModal
+        visible={isModalOpen('staffAdd')}
+        onClose={closeModal}
+        onConfirm={handleAddStaffConfirm}
+      />
+
       {/* TODO: 직원 편집 모달 */}
       {/* TODO: 직원 삭제 확인 모달 */}
     </View>
