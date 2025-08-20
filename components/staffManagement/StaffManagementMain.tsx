@@ -83,24 +83,38 @@ export default function StaffManagementMain() {
           <ScrollView showsVerticalScrollIndicator={false}>
             {sortedStaff.length > 0 ? (
               <View className='pb-4'>
-                {Array.from({ length: Math.ceil(sortedStaff.length / 3) }, (_, rowIndex) => (
-                  <View key={rowIndex} className='flex-row gap-4 mb-4'>
-                    {sortedStaff.slice(rowIndex * 3, (rowIndex + 1) * 3).map(staff => (
-                      <StaffCard
-                        key={staff.id}
-                        staff={staff}
-                        onEdit={handleEditStaff}
-                        onDelete={handleDeleteStaff}
-                      />
-                    ))}
-                    {/* 빈 공간 채우기 (3개 미만인 경우) */}
-                    {Array.from({ 
-                      length: 3 - sortedStaff.slice(rowIndex * 3, (rowIndex + 1) * 3).length 
-                    }, (_, emptyIndex) => (
-                      <View key={`empty-${emptyIndex}`} className='flex-1' />
-                    ))}
-                  </View>
-                ))}
+                {Array.from(
+                  { length: Math.ceil(sortedStaff.length / 3) },
+                  (_, rowIndex) => (
+                    <View key={rowIndex} className='flex-row gap-4 mb-4'>
+                      {sortedStaff
+                        .slice(rowIndex * 3, (rowIndex + 1) * 3)
+                        .map(staff => (
+                          <StaffCard
+                            key={staff.id}
+                            staff={staff}
+                            onEdit={handleEditStaff}
+                            onDelete={handleDeleteStaff}
+                          />
+                        ))}
+                      {/* 빈 공간 채우기 (3개 미만인 경우) */}
+                      {Array.from(
+                        {
+                          length:
+                            3 -
+                            sortedStaff.slice(rowIndex * 3, (rowIndex + 1) * 3)
+                              .length,
+                        },
+                        (_, emptyIndex) => (
+                          <View
+                            key={`empty-${emptyIndex}`}
+                            className='flex-1'
+                          />
+                        )
+                      )}
+                    </View>
+                  )
+                )}
               </View>
             ) : (
               <View className='p-8 items-center justify-center'>
