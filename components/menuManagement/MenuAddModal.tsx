@@ -51,6 +51,7 @@ export default function MenuAddModal({
       name: '',
       price: 0,
       category: 'COFFEE',
+      image: undefined,
     },
   });
 
@@ -90,7 +91,7 @@ export default function MenuAddModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl w-4/5 h-3/5  max-w-lg max-h-[1500px]'>
+        <View className='bg-white rounded-2xl w-4/5 h-4/5  max-w-lg max-h-[1500px]'>
           {/* 헤더 */}
           <View className='p-6 border-b border-gray-200'>
             <View className='flex-row justify-between items-center'>
@@ -217,6 +218,52 @@ export default function MenuAddModal({
                   {errors.category.message}
                 </Text>
               )}
+            </View>
+
+            {/* 이미지 선택 */}
+            <View className='mb-4'>
+              <Text className='text-sm font-medium text-gray-700 mb-2'>
+                메뉴 이미지
+              </Text>
+              <Controller
+                control={control}
+                name='image'
+                render={({ field: { onChange: _onChange, value } }) => (
+                  <TouchableOpacity
+                    className='border border-dashed border-gray-300 rounded-lg items-center justify-center bg-gray-50 aspect-square'
+                    onPress={() => {
+                      // 퍼블리싱 단계 - 실제 이미지 선택 기능은 추후 구현
+                      // console.log('이미지 선택 기능 (퍼블리싱 단계)');
+                    }}
+                  >
+                    {value ? (
+                      <View className='flex-1 items-center justify-center'>
+                        <Ionicons name='image' size={32} color='#10B981' />
+                        <Text className='text-primaryGreen text-sm font-medium mt-2 text-center'>
+                          이미지가 선택되었습니다
+                        </Text>
+                        <Text className='text-gray-500 text-xs mt-1 text-center'>
+                          다른 이미지를 선택하려면 탭하세요
+                        </Text>
+                      </View>
+                    ) : (
+                      <View className='items-center justify-center'>
+                        <Ionicons
+                          name='camera-outline'
+                          size={32}
+                          color='#9CA3AF'
+                        />
+                        <Text className='text-gray-500 text-sm font-medium mt-2 text-center'>
+                          이미지 선택
+                        </Text>
+                        <Text className='text-gray-400 text-xs mt-1 text-center'>
+                          탭하여 갤러리에서 이미지를 선택하세요
+                        </Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                )}
+              />
             </View>
           </ScrollView>
 

@@ -21,25 +21,38 @@ export default function MenuCard({ menu, onEdit, onDelete }: MenuCardProps) {
 
   return (
     <View className='bg-white rounded-lg border border-gray-100 p-4 flex-1 relative'>
-      {/* 액션 버튼들 - 오른쪽 상단 */}
-      <View className='absolute top-2 right-2 flex-row gap-1'>
-        <TouchableOpacity
-          className='w-6 h-6 items-center justify-center'
-          onPress={() => onEdit(menu)}
-        >
-          <Ionicons name='pencil-outline' size={14} color='#6B7280' />
-        </TouchableOpacity>
+      {/* 이미지 영역 */}
+      <View className='w-full aspect-square bg-gray-100 rounded-lg mb-3 items-center justify-center relative'>
+        {/* 액션 버튼들 - 이미지 영역 우상단 */}
+        <View className='absolute top-2 right-2 flex-row gap-1 z-10'>
+          <TouchableOpacity
+            className='w-6 h-6 bg-white rounded-full items-center justify-center shadow-sm'
+            onPress={() => onEdit(menu)}
+          >
+            <Ionicons name='pencil-outline' size={14} color='#6B7280' />
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          className='w-6 h-6 items-center justify-center'
-          onPress={() => onDelete(menu)}
-        >
-          <Ionicons name='trash-outline' size={14} color='#6B7280' />
-        </TouchableOpacity>
+          <TouchableOpacity
+            className='w-6 h-6 bg-white rounded-full items-center justify-center shadow-sm'
+            onPress={() => onDelete(menu)}
+          >
+            <Ionicons name='trash-outline' size={14} color='#6B7280' />
+          </TouchableOpacity>
+        </View>
+
+        {menu.image ? (
+          <View className='items-center justify-center'>
+            <Ionicons name='image' size={24} color='#10B981' />
+          </View>
+        ) : (
+          <View className='items-center justify-center'>
+            <Ionicons name='image-outline' size={24} color='#9CA3AF' />
+          </View>
+        )}
       </View>
 
       {/* 메뉴 정보 */}
-      <View className='pr-8'>
+      <View>
         {/* 메뉴명 */}
         <Text className='text-gray-900 text-base font-semibold mb-1'>
           {menu.name}
