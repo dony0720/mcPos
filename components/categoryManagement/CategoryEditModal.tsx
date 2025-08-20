@@ -17,26 +17,30 @@ import {
   categoryFormSchema,
   type CategoryFormSchemaType,
 } from '../../schemas/categorySchema';
+import type { Category } from '../../types';
 
-interface CategoryAddModalProps {
+interface CategoryEditModalProps {
   visible: boolean;
   onClose: () => void;
   onConfirm: (categoryData: CategoryFormSchemaType) => void;
+  category: Category | null;
 }
 
 /**
- * 카테고리 추가 모달 컴포넌트
- * - 새로운 카테고리를 추가할 수 있는 폼 모달
+ * 카테고리 편집 모달 컴포넌트
+ * - 기존 카테고리 정보를 수정할 수 있는 폼 모달
  */
-export default function CategoryAddModal({
+export default function CategoryEditModal({
   visible,
   onClose,
   onConfirm,
-}: CategoryAddModalProps) {
+  category,
+}: CategoryEditModalProps) {
   const {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isValid },
   } = useForm<CategoryFormSchemaType>({
     resolver: zodResolver(categoryFormSchema),
@@ -47,12 +51,15 @@ export default function CategoryAddModal({
     },
   });
 
-  // 모달이 열릴 때마다 폼 초기화
+  // 모달이 열릴 때마다 폼을 카테고리 데이터로 초기화
   useEffect(() => {
-    if (visible) {
+    if (visible && category) {
+      setValue('name', category.name);
+      setValue('displayOrder', category.displayOrder);
+    } else if (visible) {
       reset();
     }
-  }, [visible, reset]);
+  }, [visible, category, setValue, reset]);
 
   const onSubmit = (data: CategoryFormSchemaType) => {
     onConfirm(data);
@@ -65,6 +72,8 @@ export default function CategoryAddModal({
     onClose();
   };
 
+  if (!category) return null;
+
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
@@ -73,14 +82,14 @@ export default function CategoryAddModal({
           <View className='p-6 border-b border-gray-200'>
             <View className='flex-row justify-between items-center'>
               <Text className='text-xl font-bold text-gray-800'>
-                새 카테고리 추가
+                카테고리 편집
               </Text>
               <TouchableOpacity onPress={handleClose}>
                 <Ionicons name='close-outline' size={24} color='#6B7280' />
               </TouchableOpacity>
             </View>
             <Text className='text-sm text-gray-500 mt-1'>
-              새로운 카테고리를 등록합니다
+              "{category.name}" 카테고리를 편집합니다
             </Text>
           </View>
 
@@ -157,12 +166,12 @@ export default function CategoryAddModal({
                 <Ionicons name='information-circle' size={20} color='#3B82F6' />
                 <View className='flex-1'>
                   <Text className='text-blue-800 text-sm font-medium mb-1'>
-                    카테고리 추가 안내
+                    카테고리 편집 안내
                   </Text>
                   <Text className='text-blue-700 text-xs leading-4'>
-                    • 카테고리명은 20자 이하로 입력해주세요{'\n'}• 표시순서는
-                    메뉴 선택 화면의 탭 순서를 결정합니다{'\n'}• 추가된
-                    카테고리는 언제든 수정/삭제할 수 있습니다
+                    • 카테고리명은 20자 이하로 입력해주세요{'\n'}• 표시순서 변경
+                    시 메뉴 화면의 탭 순서가 바뀝니다{'\n'}• 이 카테고리에 속한
+                    메뉴들은 영향받지 않습니다
                   </Text>
                 </View>
               </View>
@@ -195,7 +204,7 @@ export default function CategoryAddModal({
                     isValid ? 'text-white' : 'text-gray-500'
                   )}
                 >
-                  추가
+                  수정
                 </Text>
               </Pressable>
             </View>

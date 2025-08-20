@@ -8,13 +8,14 @@ import { useModal } from '../../hooks';
 import type { CategoryFormSchemaType } from '../../schemas/categorySchema';
 import type { Category } from '../../types';
 import CategoryAddModal from './CategoryAddModal';
+import CategoryEditModal from './CategoryEditModal';
 
 /**
  * 카테고리 관리 메인 화면 컴포넌트
  * - 카테고리 목록 테이블과 액션 버튼들을 포함하는 메인 화면
  */
 export default function CategoryManagementMain() {
-  const [_selectedCategory, _setSelectedCategory] = useState<Category | null>(
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
   const { openModal, closeModal, isModalOpen } = useModal();
@@ -34,17 +35,15 @@ export default function CategoryManagementMain() {
     closeModal();
   };
 
-  const _handleEditCategory = (_category: Category) => {
-    // _setSelectedCategory(category);
-    // openModal('categoryEdit');
+  const handleEditCategory = (category: Category) => {
+    setSelectedCategory(category);
+    openModal('categoryEdit');
   };
 
-  const _handleEditCategoryConfirm = (
-    _categoryData: CategoryFormSchemaType
-  ) => {
+  const handleEditCategoryConfirm = (_categoryData: CategoryFormSchemaType) => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
-    // closeModal();
-    // _setSelectedCategory(null);
+    closeModal();
+    setSelectedCategory(null);
   };
 
   const _handleDeleteCategory = (_category: Category) => {
@@ -139,7 +138,7 @@ export default function CategoryManagementMain() {
                       {/* 편집 버튼 */}
                       <TouchableOpacity
                         className='w-8 h-8 rounded-full bg-blue-100 items-center justify-center'
-                        onPress={() => _handleEditCategory(category)}
+                        onPress={() => handleEditCategory(category)}
                       >
                         <Ionicons
                           name='pencil-outline'
@@ -191,7 +190,17 @@ export default function CategoryManagementMain() {
         onConfirm={handleAddCategoryConfirm}
       />
 
-      {/* TODO: 카테고리 편집 모달 */}
+      {/* 카테고리 편집 모달 */}
+      <CategoryEditModal
+        visible={isModalOpen('categoryEdit')}
+        onClose={() => {
+          closeModal();
+          setSelectedCategory(null);
+        }}
+        onConfirm={handleEditCategoryConfirm}
+        category={selectedCategory}
+      />
+
       {/* TODO: 카테고리 삭제 확인 모달 */}
     </View>
   );
