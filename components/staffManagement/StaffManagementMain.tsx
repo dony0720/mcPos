@@ -4,7 +4,7 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { STAFF } from '../../data/staff';
 import { useModal } from '../../hooks';
-import type { StaffFormSchemaType } from '../../schemas/staffSchema';
+import type { StaffFormSchemaType } from '../../schemas';
 import type { Staff } from '../../types';
 import {
   StaffAddModal,

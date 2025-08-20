@@ -5,7 +5,7 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { MENU_ITEMS } from '../../data/menuItems';
 import { useModal } from '../../hooks';
-import type { MenuFormData } from '../../schemas/menuSchema';
+import type { MenuFormData } from '../../schemas';
 import type { MenuCategory, MenuItem } from '../../types';
 import { MENU_CATEGORIES } from '../../types/menu';
 import { MenuAddModal, MenuDeleteModal, MenuEditModal } from './index';

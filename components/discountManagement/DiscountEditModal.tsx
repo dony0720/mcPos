@@ -13,10 +13,7 @@ import {
   View,
 } from 'react-native';
 
-import {
-  discountFormSchema,
-  type DiscountFormSchemaType,
-} from '../../schemas/discountSchema';
+import { discountFormSchema, type DiscountFormSchemaType } from '../../schemas';
 import type { Discount, DiscountType } from '../../types';
 import { formatPrice, handlePriceInput } from '../../utils';
 

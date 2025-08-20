@@ -5,7 +5,7 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { DISCOUNTS } from '../../data/discounts';
 import { useModal } from '../../hooks';
-import type { DiscountFormSchemaType } from '../../schemas/discountSchema';
+import type { DiscountFormSchemaType } from '../../schemas';
 import type { Discount } from '../../types';
 import {
   DiscountAddModal,

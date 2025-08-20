@@ -13,10 +13,7 @@ import {
   View,
 } from 'react-native';
 
-import {
-  categoryFormSchema,
-  type CategoryFormSchemaType,
-} from '../../schemas/categorySchema';
+import { categoryFormSchema, type CategoryFormSchemaType } from '../../schemas';
 import type { Category } from '../../types';
 
 interface CategoryEditModalProps {

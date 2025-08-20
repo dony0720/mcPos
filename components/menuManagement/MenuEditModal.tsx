@@ -17,7 +17,7 @@ import {
   CATEGORY_OPTIONS,
   type MenuFormData,
   menuFormSchema,
-} from '../../schemas/menuSchema';
+} from '../../schemas';
 import type { MenuItem } from '../../types';
 import { formatPrice, handlePriceInput } from '../../utils';
 

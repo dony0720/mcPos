@@ -5,7 +5,7 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { CATEGORIES } from '../../data/categories';
 import { useModal } from '../../hooks';
-import type { CategoryFormSchemaType } from '../../schemas/categorySchema';
+import type { CategoryFormSchemaType } from '../../schemas';
 import type { Category } from '../../types';
 import {
   CategoryAddModal,

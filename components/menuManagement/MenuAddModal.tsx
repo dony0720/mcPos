@@ -17,7 +17,7 @@ import {
   CATEGORY_OPTIONS,
   type MenuFormData,
   menuFormSchema,
-} from '../../schemas/menuSchema';
+} from '../../schemas';
 import { formatPrice, handlePriceInput } from '../../utils';
 
 interface MenuAddModalProps {
