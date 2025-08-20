@@ -64,21 +64,22 @@ export default function StaffManagementMain() {
     <View className='h-full w-full bg-white flex flex-col'>
       <View className='flex-1 max-w-7xl mx-auto w-full'>
         {/* 헤더 섹션 */}
-        <View className='w-full box-border px-[5%] my-7 flex flex-row justify-between items-center'>
+        <View className='w-full box-border px-[5%] mb-6 flex flex-row justify-between items-center'>
+          {/* 페이지 제목 */}
           <Text className='text-3xl font-bold text-gray-800'>직원 관리</Text>
+
+          {/* 직원 추가 버튼 */}
           <TouchableOpacity
-            className='bg-primaryGreen rounded-lg px-4 py-2 flex-row items-center gap-2'
+            className='bg-primaryGreen rounded-lg px-6 py-3 flex-row items-center'
             onPress={handleAddStaff}
           >
-            <Ionicons name='add-circle-outline' size={20} color='white' />
-            <Text className='text-white text-base font-semibold'>
-              직원 추가
-            </Text>
+            <Ionicons name='add-outline' size={20} color='white' />
+            <Text className='text-white font-bold ml-2'>직원 추가</Text>
           </TouchableOpacity>
         </View>
 
         {/* 직원 카드 그리드 섹션 */}
-        <View className='flex-[0.9] box-border px-[5%]'>
+        <View className='flex-1 box-border px-[5%]'>
           <ScrollView showsVerticalScrollIndicator={false}>
             {sortedStaff.length > 0 ? (
               <View className='flex-row flex-wrap gap-4 pb-4'>

@@ -65,7 +65,8 @@ export default function MenuManagementMain() {
     <View className='h-full w-full bg-white flex flex-col'>
       <View className='flex-1 max-w-7xl mx-auto w-full'>
         {/* 헤더 섹션 */}
-        <View className='w-full box-border px-[5%] my-7 flex flex-row justify-between items-center'>
+        <View className='w-full box-border px-[5%] mb-6 flex flex-row justify-between items-center'>
+          {/* 페이지 제목 */}
           <Text className='text-3xl font-bold text-gray-800'>메뉴 관리</Text>
 
           {/* 메뉴 추가 버튼 */}
@@ -79,7 +80,7 @@ export default function MenuManagementMain() {
         </View>
 
         {/* 카테고리 필터 섹션 */}
-        <View className='w-full box-border px-[5%] mb-7'>
+        <View className='w-full box-border px-[5%] mb-6'>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className='flex-row gap-3'>
               {/* 전체 카테고리 */}

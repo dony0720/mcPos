@@ -20,7 +20,7 @@ export default function StaffManagement() {
     <AdminProtectedRoute>
       <View className='h-full w-full bg-white flex flex-col'>
         {/* 뒤로가기 버튼 */}
-        <View className='w-full box-border px-[5%] pt-16 pb-8'>
+        <View className='w-full box-border px-[5%] pt-14 pb-6'>
           <TouchableOpacity
             className='w-10 h-10 rounded-full bg-gray-100 justify-center items-center'
             onPress={handleGoBack}
