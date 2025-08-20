@@ -9,6 +9,7 @@ import type { DiscountFormSchemaType } from '../../schemas';
 import type { Discount } from '../../types';
 import {
   DiscountAddModal,
+  DiscountCard,
   DiscountDeleteModal,
   DiscountEditModal,
 } from './index';
@@ -92,111 +93,55 @@ export default function DiscountManagementMain() {
           </TouchableOpacity>
         </View>
 
-        {/* 할인 테이블 섹션 */}
+        {/* 할인 카드 그리드 섹션 */}
         <View className='flex-1 box-border px-[5%]'>
-          {/* 테이블 헤더 */}
-          <View className='bg-gray-50 rounded-t-lg p-3 flex-row items-center'>
-            <Text className='flex-1 font-bold text-gray-700'>할인명</Text>
-            <Text className='w-20 font-bold text-gray-700 text-center'>
-              할인값
-            </Text>
-            <Text className='w-24 font-bold text-gray-700 text-center'>
-              상태
-            </Text>
-            <Text className='w-24 font-bold text-gray-700 text-center'>
-              액션
-            </Text>
-          </View>
-
-          {/* 할인 목록 */}
-          <ScrollView className='bg-white border-l border-r border-b border-gray-200 rounded-b-lg'>
+          <ScrollView showsVerticalScrollIndicator={false}>
             {sortedDiscounts.length > 0 ? (
-              sortedDiscounts.map((discount, index) => {
-                const isLastItem = index === sortedDiscounts.length - 1;
-
-                return (
-                  <View
-                    key={discount.id}
-                    className={clsx(
-                      'flex-row items-center p-3',
-                      !isLastItem && 'border-b border-gray-100'
-                    )}
-                  >
-                    {/* 할인명 */}
-                    <View className='flex-1'>
-                      <Text className='text-gray-800 text-base font-medium'>
-                        {discount.name}
-                      </Text>
-                      {discount.description && (
-                        <Text className='text-xs text-gray-500 mt-1'>
-                          {discount.description}
-                        </Text>
+              <View className='pb-4'>
+                {Array.from(
+                  { length: Math.ceil(sortedDiscounts.length / 3) },
+                  (_, rowIndex) => (
+                    <View key={rowIndex} className='flex-row gap-4 mb-4'>
+                      {sortedDiscounts
+                        .slice(rowIndex * 3, (rowIndex + 1) * 3)
+                        .map(discount => (
+                          <DiscountCard
+                            key={discount.id}
+                            discount={discount}
+                            onEdit={handleEditDiscount}
+                            onDelete={handleDeleteDiscount}
+                            onToggleActive={handleToggleActive}
+                          />
+                        ))}
+                      {/* 빈 공간 채우기 (3개 미만인 경우) */}
+                      {Array.from(
+                        {
+                          length:
+                            3 -
+                            sortedDiscounts.slice(
+                              rowIndex * 3,
+                              (rowIndex + 1) * 3
+                            ).length,
+                        },
+                        (_, emptyIndex) => (
+                          <View
+                            key={`empty-${emptyIndex}`}
+                            className='flex-1'
+                          />
+                        )
                       )}
                     </View>
-
-                    {/* 할인값 */}
-                    <View className='w-20 items-center'>
-                      <Text className='text-primaryGreen font-semibold text-sm'>
-                        {getDiscountTypeText(discount)}
-                      </Text>
-                    </View>
-
-                    {/* 상태 */}
-                    <View className='w-24 items-center'>
-                      <TouchableOpacity
-                        className={clsx(
-                          'px-2 py-1 rounded-full',
-                          discount.isActive ? 'bg-green-100' : 'bg-gray-100'
-                        )}
-                        onPress={() => handleToggleActive(discount)}
-                      >
-                        <Text
-                          className={clsx(
-                            'text-xs font-medium',
-                            discount.isActive
-                              ? 'text-green-700'
-                              : 'text-gray-500'
-                          )}
-                        >
-                          {discount.isActive ? '활성' : '비활성'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {/* 액션 버튼들 */}
-                    <View className='w-24 flex-row items-center justify-center gap-2'>
-                      {/* 편집 버튼 */}
-                      <TouchableOpacity
-                        className='w-8 h-8 rounded-full bg-blue-100 items-center justify-center'
-                        onPress={() => handleEditDiscount(discount)}
-                      >
-                        <Ionicons
-                          name='pencil-outline'
-                          size={14}
-                          color='#3B82F6'
-                        />
-                      </TouchableOpacity>
-
-                      {/* 삭제 버튼 */}
-                      <TouchableOpacity
-                        className='w-8 h-8 rounded-full bg-red-100 items-center justify-center'
-                        onPress={() => handleDeleteDiscount(discount)}
-                      >
-                        <Ionicons
-                          name='trash-outline'
-                          size={14}
-                          color='#EF4444'
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                );
-              })
+                  )
+                )}
+              </View>
             ) : (
-              <View className='p-6 items-center justify-center'>
-                <Ionicons name='pricetag-outline' size={40} color='#9CA3AF' />
-                <Text className='text-gray-500 mt-3 text-sm'>
-                  등록된 할인이 없습니다.
+              <View className='p-8 items-center justify-center'>
+                <Ionicons name='pricetag-outline' size={48} color='#9CA3AF' />
+                <Text className='text-gray-500 mt-4 text-base text-center'>
+                  등록된 할인이 없습니다
+                </Text>
+                <Text className='text-gray-400 mt-1 text-sm text-center'>
+                  할인 추가 버튼을 눌러 새로운 할인을 등록해보세요
                 </Text>
               </View>
             )}
