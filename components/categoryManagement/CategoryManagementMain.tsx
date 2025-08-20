@@ -5,14 +5,16 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { CATEGORIES } from '../../data/categories';
 import { useModal } from '../../hooks';
-import type { Category, CategoryFormData } from '../../types';
+import type { CategoryFormSchemaType } from '../../schemas/categorySchema';
+import type { Category } from '../../types';
+import CategoryAddModal from './CategoryAddModal';
 
 /**
  * 카테고리 관리 메인 화면 컴포넌트
  * - 카테고리 목록 테이블과 액션 버튼들을 포함하는 메인 화면
  */
 export default function CategoryManagementMain() {
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+  const [_selectedCategory, _setSelectedCategory] = useState<Category | null>(
     null
   );
   const { openModal, closeModal, isModalOpen } = useModal();
@@ -27,31 +29,33 @@ export default function CategoryManagementMain() {
     openModal('categoryAdd');
   };
 
-  const handleAddCategoryConfirm = (_categoryData: CategoryFormData) => {
+  const handleAddCategoryConfirm = (_categoryData: CategoryFormSchemaType) => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
     closeModal();
   };
 
-  const handleEditCategory = (category: Category) => {
-    setSelectedCategory(category);
-    openModal('categoryEdit');
+  const _handleEditCategory = (_category: Category) => {
+    // _setSelectedCategory(category);
+    // openModal('categoryEdit');
   };
 
-  const handleEditCategoryConfirm = (_categoryData: CategoryFormData) => {
+  const _handleEditCategoryConfirm = (
+    _categoryData: CategoryFormSchemaType
+  ) => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
-    closeModal();
-    setSelectedCategory(null);
+    // closeModal();
+    // _setSelectedCategory(null);
   };
 
-  const handleDeleteCategory = (category: Category) => {
-    setSelectedCategory(category);
-    openModal('categoryDelete');
+  const _handleDeleteCategory = (_category: Category) => {
+    // _setSelectedCategory(category);
+    // openModal('categoryDelete');
   };
 
-  const handleDeleteCategoryConfirm = () => {
+  const _handleDeleteCategoryConfirm = () => {
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
-    closeModal();
-    setSelectedCategory(null);
+    // closeModal();
+    // _setSelectedCategory(null);
   };
 
   return (
@@ -135,7 +139,7 @@ export default function CategoryManagementMain() {
                       {/* 편집 버튼 */}
                       <TouchableOpacity
                         className='w-8 h-8 rounded-full bg-blue-100 items-center justify-center'
-                        onPress={() => handleEditCategory(category)}
+                        onPress={() => _handleEditCategory(category)}
                       >
                         <Ionicons
                           name='pencil-outline'
@@ -151,7 +155,7 @@ export default function CategoryManagementMain() {
                           isDefaultCategory ? 'bg-gray-100' : 'bg-red-100'
                         )}
                         onPress={() =>
-                          !isDefaultCategory && handleDeleteCategory(category)
+                          !isDefaultCategory && _handleDeleteCategory(category)
                         }
                         disabled={isDefaultCategory}
                       >
@@ -180,7 +184,13 @@ export default function CategoryManagementMain() {
         <View className='h-16' />
       </View>
 
-      {/* TODO: 카테고리 추가 모달 */}
+      {/* 카테고리 추가 모달 */}
+      <CategoryAddModal
+        visible={isModalOpen('categoryAdd')}
+        onClose={closeModal}
+        onConfirm={handleAddCategoryConfirm}
+      />
+
       {/* TODO: 카테고리 편집 모달 */}
       {/* TODO: 카테고리 삭제 확인 모달 */}
     </View>
