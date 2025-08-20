@@ -16,7 +16,7 @@ interface StaffCardProps {
  */
 export default function StaffCard({ staff, onEdit, onDelete }: StaffCardProps) {
   return (
-    <View className='bg-white rounded-xl border border-gray-200 shadow-sm p-4 w-[30%]'>
+    <View className='bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex-1'>
       {/* 직원 아이콘 */}
       <View className='items-center mb-3'>
         <View className='w-12 h-12 bg-gray-100 rounded-full items-center justify-center mb-2'>
