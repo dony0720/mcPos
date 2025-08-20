@@ -8,7 +8,7 @@ import { useModal } from '../../hooks';
 import type { MenuFormData } from '../../schemas/menuSchema';
 import type { MenuCategory, MenuItem } from '../../types';
 import { MENU_CATEGORIES } from '../../types/menu';
-import MenuAddModal from './MenuAddModal';
+import { MenuAddModal, MenuDeleteModal, MenuEditModal } from './index';
 
 /**
  * 메뉴 관리 메인 화면 컴포넌트
@@ -18,6 +18,9 @@ export default function MenuManagementMain() {
   const [selectedCategory, setSelectedCategory] = useState<
     MenuCategory | 'ALL'
   >('ALL');
+  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(
+    null
+  );
   const { openModal, closeModal, isModalOpen } = useModal();
 
   // 카테고리별 메뉴 필터링
@@ -32,17 +35,30 @@ export default function MenuManagementMain() {
   };
 
   const handleAddMenuConfirm = (_menuData: MenuFormData) => {
-    // TODO: 실제 메뉴 추가 로직 구현
-    // console.log('새 메뉴 추가:', menuData);
+    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
     closeModal();
   };
 
-  const handleEditMenu = (_menu: MenuItem) => {
-    // TODO: 메뉴 편집 모달 열기
+  const handleEditMenu = (menu: MenuItem) => {
+    setSelectedMenuItem(menu);
+    openModal('menuEdit');
   };
 
-  const handleDeleteMenu = (_menu: MenuItem) => {
-    // TODO: 메뉴 삭제 확인 모달 열기
+  const handleEditMenuConfirm = (_menuData: MenuFormData) => {
+    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+    closeModal();
+    setSelectedMenuItem(null);
+  };
+
+  const handleDeleteMenu = (menu: MenuItem) => {
+    setSelectedMenuItem(menu);
+    openModal('menuDelete');
+  };
+
+  const handleDeleteMenuConfirm = () => {
+    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+    closeModal();
+    setSelectedMenuItem(null);
   };
 
   return (
@@ -215,6 +231,28 @@ export default function MenuManagementMain() {
         visible={isModalOpen('menuAdd')}
         onClose={closeModal}
         onConfirm={handleAddMenuConfirm}
+      />
+
+      {/* 메뉴 편집 모달 */}
+      <MenuEditModal
+        visible={isModalOpen('menuEdit')}
+        onClose={() => {
+          closeModal();
+          setSelectedMenuItem(null);
+        }}
+        onConfirm={handleEditMenuConfirm}
+        menuItem={selectedMenuItem}
+      />
+
+      {/* 메뉴 삭제 확인 모달 */}
+      <MenuDeleteModal
+        visible={isModalOpen('menuDelete')}
+        onClose={() => {
+          closeModal();
+          setSelectedMenuItem(null);
+        }}
+        onConfirm={handleDeleteMenuConfirm}
+        menuItem={selectedMenuItem}
       />
     </View>
   );
