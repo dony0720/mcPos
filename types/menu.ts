@@ -73,3 +73,48 @@ export const MENU_OPTIONS: MenuOption[] = [
   { name: '시럽추가', price: 300 },
   { name: '휘핑크림', price: 700 },
 ];
+
+// 메뉴 관리 관련 타입들
+export interface MenuFormData {
+  name: string;
+  price: number;
+  category: MenuCategory;
+  image?: string;
+}
+
+// 메뉴 관리 모달 Props
+export interface MenuAddModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm: (menuData: MenuFormData) => void;
+}
+
+export interface MenuEditModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm: (menuData: MenuFormData) => void;
+  menuItem: MenuItem | null;
+}
+
+export interface MenuDeleteModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  menuItem: MenuItem | null;
+}
+
+// 메뉴 카드 Props
+export interface MenuCardProps {
+  menu: MenuItem;
+  onEdit: (menu: MenuItem) => void;
+  onDelete: (menu: MenuItem) => void;
+}
+
+// 카테고리 옵션 (관리용)
+export const CATEGORY_OPTIONS: { value: MenuCategory; label: string }[] = [
+  { value: 'COFFEE', label: '커피' },
+  { value: 'NON_COFFEE', label: '논커피' },
+  { value: 'TEA', label: '차' },
+  { value: 'ADE', label: '에이드' },
+  { value: 'DESSERT', label: '디저트' },
+];

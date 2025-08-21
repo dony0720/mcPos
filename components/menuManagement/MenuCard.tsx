@@ -2,14 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-import type { MenuItem } from '../../types';
-import { MENU_CATEGORIES } from '../../types/menu';
-
-interface MenuCardProps {
-  menu: MenuItem;
-  onEdit: (menu: MenuItem) => void;
-  onDelete: (menu: MenuItem) => void;
-}
+import type { MenuCardProps } from '../../types';
+import { MENU_CATEGORIES } from '../../types';
 
 /**
  * 메뉴 카드 컴포넌트
