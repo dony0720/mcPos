@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -12,11 +13,17 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 import { menuFormSchema } from '../../schemas';
 import type { MenuAddModalProps, MenuFormData } from '../../types';
 import { CATEGORY_OPTIONS } from '../../types';
-import { formatPrice, handlePriceInput } from '../../utils';
+import {
+  formatPrice,
+  handleImageSelection,
+  handlePriceInput,
+  ImageToast,
+} from '../../utils';
 
 /**
  * 메뉴 추가 모달 컴포넌트
@@ -223,20 +230,38 @@ export default function MenuAddModal({
                 render={({ field: { onChange: _onChange, value } }) => (
                   <TouchableOpacity
                     className='border border-dashed border-gray-300 rounded-lg items-center justify-center bg-gray-50 aspect-square'
-                    onPress={() => {
-                      // 퍼블리싱 단계 - 실제 이미지 선택 기능은 추후 구현
-                      // console.log('이미지 선택 기능 (퍼블리싱 단계)');
+                    onPress={async () => {
+                      const result = await handleImageSelection();
+                      if (result.success && result.uri) {
+                        setValue('image', result.uri, { shouldValidate: true });
+                        // 이미지 선택 성공 Toast 표시
+                        if (result.source === 'camera') {
+                          ImageToast.cameraSuccess();
+                        } else if (result.source === 'gallery') {
+                          ImageToast.gallerySuccess();
+                        }
+                      }
                     }}
                   >
                     {value ? (
-                      <View className='flex-1 items-center justify-center'>
-                        <Ionicons name='image' size={32} color='#10B981' />
-                        <Text className='text-primaryGreen text-sm font-medium mt-2 text-center'>
-                          이미지가 선택되었습니다
-                        </Text>
-                        <Text className='text-gray-500 text-xs mt-1 text-center'>
-                          다른 이미지를 선택하려면 탭하세요
-                        </Text>
+                      <View className='flex-1 w-full relative'>
+                        <Image
+                          source={{ uri: value }}
+                          className='flex-1 w-full rounded-lg'
+                          resizeMode='cover'
+                        />
+                        <View className='absolute inset-0 bg-black/20 rounded-lg items-center justify-center'>
+                          <View className='bg-white/90 rounded-full p-2'>
+                            <Ionicons
+                              name='camera-outline'
+                              size={20}
+                              color='#6B7280'
+                            />
+                          </View>
+                          <Text className='text-white text-xs font-medium mt-2 text-center bg-black/50 px-2 py-1 rounded'>
+                            탭하여 변경
+                          </Text>
+                        </View>
                       </View>
                     ) : (
                       <View className='items-center justify-center'>
@@ -292,6 +317,7 @@ export default function MenuAddModal({
           </View>
         </View>
       </View>
+      <Toast />
     </Modal>
   );
 }

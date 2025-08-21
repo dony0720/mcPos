@@ -1,12 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { useModal } from '../../hooks';
 import { useMenuStore } from '../../stores';
 import type { MenuCategory, MenuFormData, MenuItem } from '../../types';
 import { MENU_CATEGORIES } from '../../types';
+import { MenuToast } from '../../utils';
 import {
   MenuAddModal,
   MenuCard,
@@ -25,8 +26,19 @@ export default function MenuManagementMain() {
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(
     null
   );
+  const [pendingSuccessToast, setPendingSuccessToast] = useState<string | null>(
+    null
+  );
   const { openModal, closeModal, isModalOpen } = useModal();
   const { menus, addMenu } = useMenuStore();
+
+  // 모달이 닫힌 후 성공 Toast 표시
+  useEffect(() => {
+    if (!isModalOpen('menuAdd') && pendingSuccessToast) {
+      MenuToast.addSuccess(pendingSuccessToast);
+      setPendingSuccessToast(null);
+    }
+  }, [isModalOpen, pendingSuccessToast]);
 
   // 카테고리별 메뉴 필터링
   const filteredMenus =
@@ -47,6 +59,10 @@ export default function MenuManagementMain() {
       category: menuData.category,
       image: menuData.image,
     });
+
+    // Toast 표시를 위해 메뉴명 저장
+    setPendingSuccessToast(menuData.name);
+
     closeModal();
   };
 
