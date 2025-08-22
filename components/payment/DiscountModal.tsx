@@ -9,13 +9,16 @@ import {
   View,
 } from 'react-native';
 
-import { Discount, DISCOUNT_OPTIONS, DiscountModalProps } from '../../types';
+import { useDiscountStore } from '../../stores/useDiscountStore';
+import { Discount, DiscountModalProps, DiscountType } from '../../types';
 
 export default function DiscountModal({
   visible,
   onClose,
   onSelectDiscount,
 }: DiscountModalProps) {
+  const { discounts } = useDiscountStore();
+
   // 할인 항목 선택 처리 - 선택 후 모달 닫기
   const handleDiscountSelect = (discount: Discount) => {
     onSelectDiscount(discount);
@@ -24,6 +27,9 @@ export default function DiscountModal({
 
   // 할인 금액 표시 형식 처리 - 천 단위 콤마와 원 단위 표시
   const formatDiscountDisplay = (discount: Discount) => {
+    if (discount.type === DiscountType.PERCENTAGE) {
+      return `${discount.value}%`;
+    }
     return `${discount.value.toLocaleString()}원`;
   };
 
@@ -53,7 +59,7 @@ export default function DiscountModal({
                 contentContainerStyle={{ paddingBottom: 16 }}
               >
                 <View className='p-4'>
-                  {DISCOUNT_OPTIONS.map(discount => (
+                  {discounts.map(discount => (
                     <Pressable
                       key={discount.id}
                       onPress={() => handleDiscountSelect(discount)}
@@ -75,11 +81,6 @@ export default function DiscountModal({
                               {discount.name}
                             </Text>
                           </View>
-                          {discount.description && (
-                            <Text className='text-sm text-gray-600 ml-8'>
-                              {discount.description}
-                            </Text>
-                          )}
                         </View>
                         <View className='bg-primaryGreen/10 px-3 py-1 rounded-full'>
                           <Text className='text-primaryGreen font-bold'>

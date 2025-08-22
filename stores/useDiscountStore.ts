@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { DISCOUNTS } from '../data/discounts';
 import type { DiscountFormSchemaType } from '../schemas';
 import type { Discount } from '../types';
 
@@ -27,18 +26,14 @@ interface DiscountStore {
 export const useDiscountStore = create<DiscountStore>()(
   persist(
     (set, get) => ({
-      discounts: DISCOUNTS,
+      discounts: [],
 
       // 할인 추가
       addDiscount: discount => {
-        const now = new Date().toISOString();
         const newDiscount: Discount = {
           ...discount,
           id: `discount-${Date.now()}`, // 할인 ID 생성
           isActive: discount.isActive ?? true, // 기본값: 활성화
-          description: discount.description ?? '', // 기본값: 빈 설명
-          createdAt: now,
-          updatedAt: now,
         };
 
         set(state => ({

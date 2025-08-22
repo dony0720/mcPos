@@ -1,4 +1,5 @@
 import { BaseItem, ModalProps, Optionable, Quantifiable } from './common';
+import { DiscountType } from './enums';
 
 export type MenuCategory = 'COFFEE' | 'NON_COFFEE' | 'TEA' | 'ADE' | 'DESSERT';
 export type Temperature = 'HOT' | 'ICE';
@@ -22,7 +23,7 @@ export interface OrderItem extends Quantifiable, Optionable {
     id: string;
     name: string;
     value: number;
-    type: 'fixed' | 'deduction';
+    type: DiscountType;
   };
 }
 
