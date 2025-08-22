@@ -1,6 +1,7 @@
-import { MenuToastType } from './enums';
+import { ToastActionType, ToastCategoryType } from './enums';
 
 export interface PendingSuccessToast {
-  type: MenuToastType;
+  action: ToastActionType;
+  category: ToastCategoryType;
   name: string;
 }
