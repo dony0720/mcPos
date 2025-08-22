@@ -30,12 +30,8 @@ export default function CategoryManagementMain() {
     null
   );
   const { openModal, closeModal, isModalOpen } = useModal();
-  const {
-    categories,
-    addCategory,
-    updateCategory,
-    deleteCategory: _deleteCategory,
-  } = useCategoryStore();
+  const { categories, addCategory, updateCategory, deleteCategory } =
+    useCategoryStore();
 
   // 모달이 닫힌 후 성공 Toast 표시
   useEffect(() => {
@@ -110,7 +106,15 @@ export default function CategoryManagementMain() {
   };
 
   const handleDeleteCategoryConfirm = () => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+    if (!selectedCategory) return;
+
+    deleteCategory(selectedCategory.id);
+
+    setPendingSuccessToast({
+      action: ToastActionType.DELETE,
+      category: ToastCategoryType.CATEGORY,
+      name: selectedCategory.name,
+    });
     closeModal();
     setSelectedCategory(null);
   };
