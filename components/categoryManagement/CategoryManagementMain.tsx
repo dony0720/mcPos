@@ -1,12 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
-import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
-import { CATEGORIES } from '../../data/categories';
 import { useModal } from '../../hooks';
 import type { CategoryFormSchemaType } from '../../schemas';
-import type { Category } from '../../types';
+import { useCategoryStore } from '../../stores';
+import {
+  Category,
+  PendingSuccessToast,
+  ToastActionType,
+  ToastCategoryType,
+} from '../../types';
+import { ManagementToast } from '../../utils';
 import {
   CategoryAddModal,
   CategoryCard,
@@ -19,13 +24,38 @@ import {
  * - 카테고리 목록 테이블과 액션 버튼들을 포함하는 메인 화면
  */
 export default function CategoryManagementMain() {
+  const [pendingSuccessToast, setPendingSuccessToast] =
+    useState<PendingSuccessToast | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
   const { openModal, closeModal, isModalOpen } = useModal();
+  const {
+    categories,
+    addCategory,
+    updateCategory: _updateCategory,
+    deleteCategory: _deleteCategory,
+  } = useCategoryStore();
+
+  // 모달이 닫힌 후 성공 Toast 표시
+  useEffect(() => {
+    if (
+      !isModalOpen('categoryAdd') &&
+      !isModalOpen('categoryEdit') &&
+      !isModalOpen('categoryDelete') &&
+      pendingSuccessToast
+    ) {
+      ManagementToast.showSuccess(
+        pendingSuccessToast.action,
+        pendingSuccessToast.category,
+        pendingSuccessToast.name
+      );
+      setPendingSuccessToast(null);
+    }
+  }, [isModalOpen, pendingSuccessToast]);
 
   // 표시 순서별로 정렬된 카테고리
-  const sortedCategories = [...CATEGORIES].sort(
+  const sortedCategories = [...categories].sort(
     (a, b) => a.displayOrder - b.displayOrder
   );
 
@@ -34,8 +64,20 @@ export default function CategoryManagementMain() {
     openModal('categoryAdd');
   };
 
-  const handleAddCategoryConfirm = (_categoryData: CategoryFormSchemaType) => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+  const handleAddCategoryConfirm = (categoryData: CategoryFormSchemaType) => {
+    // 새 카테고리를 Store에 추가
+    addCategory({
+      name: categoryData.name,
+      displayOrder: categoryData.displayOrder,
+    });
+
+    // 카테고리 추가 성공 Toast 표시
+    setPendingSuccessToast({
+      action: ToastActionType.ADD,
+      category: ToastCategoryType.CATEGORY,
+      name: categoryData.name,
+    });
+
     closeModal();
   };
 
