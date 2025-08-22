@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-import type { Discount } from '../../types';
+import { Discount, DiscountType } from '../../types';
 
 interface DiscountCardProps {
   discount: Discount;
@@ -22,7 +22,7 @@ export default function DiscountCard({
   onToggleActive,
 }: DiscountCardProps) {
   const getDiscountValueText = () => {
-    if (discount.type === 'PERCENTAGE') {
+    if (discount.type === DiscountType.PERCENTAGE) {
       return `${discount.value}%`;
     }
     return `${discount.value.toLocaleString()}원`;
@@ -67,7 +67,9 @@ export default function DiscountCard({
 
         {/* 할인 타입 */}
         <Text className='text-gray-500 text-sm mb-3'>
-          {discount.type === 'PERCENTAGE' ? '비율 할인' : '금액 할인'}
+          {discount.type === DiscountType.PERCENTAGE
+            ? '비율 할인'
+            : '금액 할인'}
         </Text>
 
         {/* 할인값과 상태 */}

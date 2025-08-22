@@ -5,7 +5,8 @@
 /**
  * 할인 유형
  */
-export type DiscountType = 'PERCENTAGE' | 'FIXED_AMOUNT';
+
+import { DiscountType } from './enums';
 
 /**
  * 할인 인터페이스

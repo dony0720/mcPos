@@ -1,12 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
-import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
-import { DISCOUNTS } from '../../data/discounts';
 import { useModal } from '../../hooks';
 import type { DiscountFormSchemaType } from '../../schemas';
-import type { Discount } from '../../types';
+import { useDiscountStore } from '../../stores';
+import {
+  Discount,
+  PendingSuccessToast,
+  ToastActionType,
+  ToastCategoryType,
+} from '../../types';
+import { DiscountType } from '../../types/';
+import { ManagementToast } from '../../utils';
 import {
   DiscountAddModal,
   DiscountCard,
@@ -19,21 +25,42 @@ import {
  * - 할인 목록 테이블과 액션 버튼들을 포함하는 메인 화면
  */
 export default function DiscountManagementMain() {
+  const [pendingSuccessToast, setPendingSuccessToast] =
+    useState<PendingSuccessToast | null>(null);
   const [selectedDiscount, setSelectedDiscount] = useState<Discount | null>(
     null
   );
   const { openModal, closeModal, isModalOpen } = useModal();
+  const { discounts, addDiscount, updateDiscount, deleteDiscount } =
+    useDiscountStore();
+
+  // 모달이 닫힌 후 성공 Toast 표시
+  useEffect(() => {
+    if (
+      !isModalOpen('discountAdd') &&
+      !isModalOpen('discountEdit') &&
+      !isModalOpen('discountDelete') &&
+      pendingSuccessToast
+    ) {
+      ManagementToast.showSuccess(
+        pendingSuccessToast.action,
+        pendingSuccessToast.category,
+        pendingSuccessToast.name
+      );
+      setPendingSuccessToast(null);
+    }
+  }, [isModalOpen, pendingSuccessToast]);
 
   // 활성화 상태별로 정렬된 할인 (활성화된 것 먼저)
-  const sortedDiscounts = [...DISCOUNTS].sort((a, b) => {
+  const sortedDiscounts = [...discounts].sort((a, b) => {
     if (a.isActive && !b.isActive) return -1;
     if (!a.isActive && b.isActive) return 1;
     return a.name.localeCompare(b.name);
   });
 
   // 할인 유형별 표시 텍스트
-  const getDiscountTypeText = (discount: Discount) => {
-    if (discount.type === 'PERCENTAGE') {
+  const _getDiscountTypeText = (discount: Discount) => {
+    if (discount.type === DiscountType.PERCENTAGE) {
       return `${discount.value}%`;
     }
     return `${discount.value.toLocaleString()}원`;
@@ -44,8 +71,17 @@ export default function DiscountManagementMain() {
     openModal('discountAdd');
   };
 
-  const handleAddDiscountConfirm = (_discountData: DiscountFormSchemaType) => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+  const handleAddDiscountConfirm = (discountData: DiscountFormSchemaType) => {
+    // 새 할인을 Store에 추가
+    addDiscount(discountData);
+
+    // 할인 추가 성공 Toast 표시
+    setPendingSuccessToast({
+      action: ToastActionType.ADD,
+      category: ToastCategoryType.DISCOUNT,
+      name: discountData.name,
+    });
+
     closeModal();
   };
 
@@ -54,8 +90,19 @@ export default function DiscountManagementMain() {
     openModal('discountEdit');
   };
 
-  const handleEditDiscountConfirm = (_discountData: DiscountFormSchemaType) => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+  const handleEditDiscountConfirm = (discountData: DiscountFormSchemaType) => {
+    if (!selectedDiscount) return;
+
+    // 선택된 할인을 Store에서 업데이트
+    updateDiscount(selectedDiscount.id, discountData);
+
+    // 할인 수정 성공 Toast 표시
+    setPendingSuccessToast({
+      action: ToastActionType.EDIT,
+      category: ToastCategoryType.DISCOUNT,
+      name: discountData.name,
+    });
+
     closeModal();
     setSelectedDiscount(null);
   };
@@ -66,13 +113,27 @@ export default function DiscountManagementMain() {
   };
 
   const handleDeleteDiscountConfirm = () => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+    if (!selectedDiscount) return;
+
+    // 할인 삭제
+    deleteDiscount(selectedDiscount.id);
+
+    // 할인 삭제 성공 Toast 표시
+    setPendingSuccessToast({
+      action: ToastActionType.DELETE,
+      category: ToastCategoryType.DISCOUNT,
+      name: selectedDiscount.name,
+    });
+
     closeModal();
     setSelectedDiscount(null);
   };
 
-  const handleToggleActive = (_discount: Discount) => {
-    // 퍼블리싱 단계 - 기능 구현 없이 아무 동작 안 함
+  const handleToggleActive = (discount: Discount) => {
+    // 할인 활성화 상태 토글
+    updateDiscount(discount.id, {
+      isActive: !discount.isActive,
+    });
   };
 
   return (
