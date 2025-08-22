@@ -81,13 +81,13 @@ export default function LedgerRegistrationModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl p-6 w-4/5 max-w-md max-h-[80%]'>
+        <View className='bg-white rounded-2xl p-6 w-4/5 max-w-md h-[65%] flex flex-col'>
           <Text className='text-xl font-bold text-center mb-4'>장부 등록</Text>
           <Text className='text-gray-600 text-center mb-6'>
             새로운 고객 장부를 등록합니다.
           </Text>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
             {/* 이름 입력 */}
             <View className='mb-4'>
               <Text className='text-gray-700 font-semibold mb-2'>이름</Text>
@@ -105,11 +105,13 @@ export default function LedgerRegistrationModal({
                   />
                 )}
               />
-              {errors.name && (
-                <Text className='text-red-500 text-sm mt-1'>
-                  {errors.name.message}
-                </Text>
-              )}
+              <View className='min-h-[24px] mt-1'>
+                {errors.name && (
+                  <Text className='text-red-500 text-sm'>
+                    {errors.name.message}
+                  </Text>
+                )}
+              </View>
             </View>
 
             {/* 전화번호 입력 */}
@@ -130,11 +132,13 @@ export default function LedgerRegistrationModal({
                   />
                 )}
               />
-              {errors.phoneNumber && (
-                <Text className='text-red-500 text-sm mt-1'>
-                  {errors.phoneNumber.message}
-                </Text>
-              )}
+              <View className='min-h-[20px] mt-1'>
+                {errors.phoneNumber && (
+                  <Text className='text-red-500 text-sm'>
+                    {errors.phoneNumber.message}
+                  </Text>
+                )}
+              </View>
             </View>
 
             {/* 초기 충전 금액 입력 */}
@@ -162,11 +166,13 @@ export default function LedgerRegistrationModal({
                   />
                 )}
               />
-              {errors.initialAmount && (
-                <Text className='text-red-500 text-sm mt-1'>
-                  {errors.initialAmount.message}
-                </Text>
-              )}
+              <View className='min-h-[20px] mt-1'>
+                {errors.initialAmount && (
+                  <Text className='text-red-500 text-sm'>
+                    {errors.initialAmount.message}
+                  </Text>
+                )}
+              </View>
             </View>
 
             {/* 접수자 선택 */}
@@ -177,7 +183,7 @@ export default function LedgerRegistrationModal({
                 name='receptionist'
                 render={({ field: { onChange, value } }) => (
                   <View
-                    className={`border rounded-lg ${
+                    className={`border rounded-lg relative ${
                       errors.receptionist ? 'border-red-500' : 'border-gray-300'
                     }`}
                   >
@@ -202,39 +208,46 @@ export default function LedgerRegistrationModal({
 
                     {/* 옵션 목록 - 항상 표시 */}
                     {showReceptionistDropdown && (
-                      <View className='border-t border-gray-100'>
-                        {receptionistOptions.map((option, index) => (
-                          <Pressable
-                            key={index}
-                            className='px-4 py-3 border-b border-gray-100 last:border-b-0'
-                            onPress={() => {
-                              onChange(option);
-                              setValue('receptionist', option);
-                              setShowReceptionistDropdown(false);
-                            }}
-                          >
-                            <View className='flex-row items-center justify-between'>
-                              <Text className='text-gray-800'>{option}</Text>
-                              {value === option && (
-                                <Ionicons
-                                  name='checkmark'
-                                  size={20}
-                                  color='#10B981'
-                                />
-                              )}
-                            </View>
-                          </Pressable>
-                        ))}
+                      <View className='absolute top-full left-0 right-0 z-10 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48'>
+                        <ScrollView
+                          showsVerticalScrollIndicator={false}
+                          className='max-h-48'
+                        >
+                          {receptionistOptions.map((option, index) => (
+                            <Pressable
+                              key={index}
+                              className='px-4 py-3 border-b border-gray-100 last:border-b-0'
+                              onPress={() => {
+                                onChange(option);
+                                setValue('receptionist', option);
+                                setShowReceptionistDropdown(false);
+                              }}
+                            >
+                              <View className='flex-row items-center justify-between'>
+                                <Text className='text-gray-800'>{option}</Text>
+                                {value === option && (
+                                  <Ionicons
+                                    name='checkmark'
+                                    size={20}
+                                    color='#10B981'
+                                  />
+                                )}
+                              </View>
+                            </Pressable>
+                          ))}
+                        </ScrollView>
                       </View>
                     )}
                   </View>
                 )}
               />
-              {errors.receptionist && (
-                <Text className='text-red-500 text-sm mt-1'>
-                  {errors.receptionist.message}
-                </Text>
-              )}
+              <View className='min-h-[20px] mt-1'>
+                {errors.receptionist && (
+                  <Text className='text-red-500 text-sm'>
+                    {errors.receptionist.message}
+                  </Text>
+                )}
+              </View>
             </View>
 
             {/* 결제수단 선택 */}
@@ -245,7 +258,7 @@ export default function LedgerRegistrationModal({
                 name='paymentMethod'
                 render={({ field: { onChange, value } }) => (
                   <View
-                    className={`border rounded-lg ${
+                    className={`border rounded-lg relative ${
                       errors.paymentMethod
                         ? 'border-red-500'
                         : 'border-gray-300'
@@ -274,39 +287,46 @@ export default function LedgerRegistrationModal({
 
                     {/* 옵션 목록 - 항상 표시 */}
                     {showPaymentMethodDropdown && (
-                      <View className='border-t border-gray-100'>
-                        {paymentMethodOptions.map((option, index) => (
-                          <Pressable
-                            key={index}
-                            className='px-4 py-3 border-b border-gray-100 last:border-b-0'
-                            onPress={() => {
-                              onChange(option);
-                              setValue('paymentMethod', option);
-                              setShowPaymentMethodDropdown(false);
-                            }}
-                          >
-                            <View className='flex-row items-center justify-between'>
-                              <Text className='text-gray-800'>{option}</Text>
-                              {value === option && (
-                                <Ionicons
-                                  name='checkmark'
-                                  size={20}
-                                  color='#10B981'
-                                />
-                              )}
-                            </View>
-                          </Pressable>
-                        ))}
+                      <View className='absolute top-full left-0 right-0 z-10 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48'>
+                        <ScrollView
+                          showsVerticalScrollIndicator={false}
+                          className='max-h-48'
+                        >
+                          {paymentMethodOptions.map((option, index) => (
+                            <Pressable
+                              key={index}
+                              className='px-4 py-3 border-b border-gray-100 last:border-b-0'
+                              onPress={() => {
+                                onChange(option);
+                                setValue('paymentMethod', option);
+                                setShowPaymentMethodDropdown(false);
+                              }}
+                            >
+                              <View className='flex-row items-center justify-between'>
+                                <Text className='text-gray-800'>{option}</Text>
+                                {value === option && (
+                                  <Ionicons
+                                    name='checkmark'
+                                    size={20}
+                                    color='#10B981'
+                                  />
+                                )}
+                              </View>
+                            </Pressable>
+                          ))}
+                        </ScrollView>
                       </View>
                     )}
                   </View>
                 )}
               />
-              {errors.paymentMethod && (
-                <Text className='text-red-500 text-sm mt-1'>
-                  {errors.paymentMethod.message}
-                </Text>
-              )}
+              <View className='min-h-[20px] mt-1'>
+                {errors.paymentMethod && (
+                  <Text className='text-red-500 text-sm'>
+                    {errors.paymentMethod.message}
+                  </Text>
+                )}
+              </View>
             </View>
           </ScrollView>
 

@@ -80,8 +80,8 @@ export default function ChargeModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl p-6 w-[90%] max-w-lg'>
-          <ScrollView showsVerticalScrollIndicator={false}>
+        <View className='bg-white rounded-2xl p-6 w-[90%] max-w-lg h-[60%] flex flex-col'>
+          <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
             <View className='flex-row items-center justify-between mb-6'>
               <Text className='text-xl font-bold'>장부 충전</Text>
               <Pressable onPress={handleClose} className='p-2'>
@@ -115,7 +115,7 @@ export default function ChargeModal({
             </View>
 
             {/* 충전 금액 입력 */}
-            <View className='mb-4'>
+            <View className='mb-8'>
               <Text className='text-base font-medium mb-2 text-gray-700'>
                 충전 금액 *
               </Text>
@@ -129,7 +129,7 @@ export default function ChargeModal({
             </View>
 
             {/* 접수자 선택 */}
-            <View className='mb-4'>
+            <View className='mb-8'>
               <Text className='text-base font-medium mb-2 text-gray-700'>
                 접수자 *
               </Text>
@@ -158,29 +158,33 @@ export default function ChargeModal({
                 </Pressable>
 
                 {showReceptionistDropdown && (
-                  <View
-                    className='border border-gray-300 rounded-lg mt-1 bg-white shadow-lg'
-                    style={{ zIndex: 1000 }}
-                  >
-                    {receptionists.map(item => (
-                      <Pressable
-                        key={item}
-                        className='px-4 py-3 border-b border-gray-100 last:border-b-0'
-                        onPress={() => {
-                          setReceptionist(item);
-                          setShowReceptionistDropdown(false);
-                        }}
-                      >
-                        <Text className='text-base text-gray-800'>{item}</Text>
-                      </Pressable>
-                    ))}
+                  <View className='absolute top-full left-0 right-0 z-10 bg-white border border-gray-300 rounded-lg shadow-lg max-h-56'>
+                    <ScrollView
+                      showsVerticalScrollIndicator={false}
+                      className='max-h-56'
+                    >
+                      {receptionists.map(item => (
+                        <Pressable
+                          key={item}
+                          className='px-4 py-3 border-b border-gray-100 last:border-b-0'
+                          onPress={() => {
+                            setReceptionist(item);
+                            setShowReceptionistDropdown(false);
+                          }}
+                        >
+                          <Text className='text-base text-gray-800'>
+                            {item}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
                   </View>
                 )}
               </View>
             </View>
 
             {/* 결제수단 선택 */}
-            <View className='mb-6'>
+            <View className='mb-10'>
               <Text className='text-base font-medium mb-2 text-gray-700'>
                 결제수단 *
               </Text>
@@ -207,47 +211,49 @@ export default function ChargeModal({
                 </Pressable>
 
                 {showPaymentDropdown && (
-                  <View
-                    className='border border-gray-300 rounded-lg mt-1 bg-white shadow-lg'
-                    style={{ zIndex: 1000 }}
-                  >
-                    {paymentMethods.map(item => (
-                      <Pressable
-                        key={item}
-                        className='px-4 py-3 border-b border-gray-100 last:border-b-0'
-                        onPress={() => {
-                          setPaymentMethod(item);
-                          setShowPaymentDropdown(false);
-                        }}
-                      >
-                        <Text className='text-base text-gray-800'>{item}</Text>
-                      </Pressable>
-                    ))}
+                  <View className='absolute top-full left-0 right-0 z-10 bg-white border border-gray-300 rounded-lg shadow-lg max-h-56'>
+                    <ScrollView
+                      showsVerticalScrollIndicator={false}
+                      className='max-h-56'
+                    >
+                      {paymentMethods.map(item => (
+                        <Pressable
+                          key={item}
+                          className='px-4 py-3 border-b border-gray-100 last:border-b-0'
+                          onPress={() => {
+                            setPaymentMethod(item);
+                            setShowPaymentDropdown(false);
+                          }}
+                        >
+                          <Text className='text-base text-gray-800'>
+                            {item}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
                   </View>
                 )}
               </View>
             </View>
-
-            {/* 버튼들 */}
-            <View className='flex-row gap-3'>
-              <Pressable
-                className='flex-1 p-3 bg-gray-300 rounded-lg'
-                onPress={handleClose}
-              >
-                <Text className='text-gray-700 text-center font-semibold'>
-                  취소
-                </Text>
-              </Pressable>
-              <Pressable
-                className='flex-1 p-3 bg-green-500 rounded-lg'
-                onPress={handleConfirm}
-              >
-                <Text className='text-white text-center font-semibold'>
-                  충전
-                </Text>
-              </Pressable>
-            </View>
           </ScrollView>
+
+          {/* 버튼들 */}
+          <View className='flex-row gap-3 mt-6'>
+            <Pressable
+              className='flex-1 p-3 bg-gray-300 rounded-lg'
+              onPress={handleClose}
+            >
+              <Text className='text-gray-700 text-center font-semibold'>
+                취소
+              </Text>
+            </Pressable>
+            <Pressable
+              className='flex-1 p-3 bg-green-500 rounded-lg'
+              onPress={handleConfirm}
+            >
+              <Text className='text-white text-center font-semibold'>충전</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </Modal>
