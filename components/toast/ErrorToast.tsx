@@ -13,7 +13,7 @@ interface ErrorToastProps {
  */
 export default function ErrorToast({ text1, text2 }: ErrorToastProps) {
   return (
-    <View className='bg-red-500 mx-4 p-4 rounded-lg flex-row items-center shadow-lg z-50'>
+    <View className='bg-red-500 mx-4 p-4 rounded-lg flex-row items-center shadow-lg'>
       <View className='bg-white rounded-full p-1 mr-3'>
         <Text className='text-red-500 text-lg font-bold'>❌</Text>
       </View>

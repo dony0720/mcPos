@@ -5,7 +5,13 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { useModal } from '../../hooks';
 import { useMenuStore } from '../../stores';
-import type { MenuCategory, MenuFormData, MenuItem } from '../../types';
+import {
+  MenuCategory,
+  MenuFormData,
+  MenuItem,
+  MenuToastType,
+  PendingSuccessToast,
+} from '../../types';
 import { MENU_CATEGORIES } from '../../types';
 import { MenuToast } from '../../utils';
 import {
@@ -19,27 +25,43 @@ import {
  * 메뉴 관리 메인 화면 컴포넌트
  * - 메뉴 목록 테이블과 액션 버튼들을 포함하는 메인 화면
  */
+
 export default function MenuManagementMain() {
+  const [pendingSuccessToast, setPendingSuccessToast] =
+    useState<PendingSuccessToast | null>(null);
+
   const [selectedCategory, setSelectedCategory] = useState<
     MenuCategory | 'ALL'
   >('ALL');
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(
     null
   );
-  const [pendingSuccessToast, setPendingSuccessToast] = useState<string | null>(
-    null
-  );
   const { openModal, closeModal, isModalOpen } = useModal();
-  const { menus, addMenu } = useMenuStore();
-
+  const { menus, addMenu, updateMenu } = useMenuStore();
   // 모달이 닫힌 후 성공 Toast 표시
   useEffect(() => {
-    if (!isModalOpen('menuAdd') && pendingSuccessToast) {
-      MenuToast.addSuccess(pendingSuccessToast);
+    if (
+      !isModalOpen('menuAdd') &&
+      !isModalOpen('menuEdit') &&
+      !isModalOpen('menuDelete') &&
+      pendingSuccessToast
+    ) {
+      if (pendingSuccessToast.type === 'add') {
+        MenuToast.addSuccess(
+          `${pendingSuccessToast.name} 메뉴가 추가되었습니다`
+        );
+      } else if (pendingSuccessToast.type === 'edit') {
+        MenuToast.editSuccess(
+          `${pendingSuccessToast.name} 메뉴가 수정되었습니다`
+        );
+      } else if (pendingSuccessToast.type === 'delete') {
+        MenuToast.deleteSuccess(
+          `${pendingSuccessToast.name} 메뉴가 삭제되었습니다`
+        );
+      }
       setPendingSuccessToast(null);
     }
   }, [isModalOpen, pendingSuccessToast]);
-
   // 카테고리별 메뉴 필터링
   const filteredMenus =
     selectedCategory === 'ALL'
@@ -60,8 +82,9 @@ export default function MenuManagementMain() {
       image: menuData.image,
     });
 
-    // Toast 표시를 위해 메뉴명 저장
-    setPendingSuccessToast(menuData.name);
+    // 메뉴 추가 성공 Toast 표시
+
+    setPendingSuccessToast({ type: MenuToastType.ADD, name: menuData.name });
 
     closeModal();
   };
@@ -71,9 +94,21 @@ export default function MenuManagementMain() {
     openModal('menuEdit');
   };
 
-  const handleEditMenuConfirm = (_menuData: MenuFormData) => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+  const handleEditMenuConfirm = (menuData: MenuFormData) => {
+    if (!selectedMenuItem) return;
+
+    // 선택된 메뉴를 Store에서 업데이트
+    updateMenu(selectedMenuItem.id, {
+      name: menuData.name,
+      price: menuData.price,
+      category: menuData.category,
+      image: menuData.image,
+    });
+
+    setPendingSuccessToast({ type: MenuToastType.EDIT, name: menuData.name });
+
     closeModal();
+    // 메뉴 편집 성공 Toast 표시
     setSelectedMenuItem(null);
   };
 
