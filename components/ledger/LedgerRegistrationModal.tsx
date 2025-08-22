@@ -16,7 +16,7 @@ import {
   ledgerRegistrationSchema,
   PAYMENT_METHOD_OPTIONS,
   RECEPTIONIST_OPTIONS,
-} from '../../schemas/ledgerSchema';
+} from '../../schemas';
 import { LedgerRegistrationModalProps } from '../../types/ledger';
 
 export default function LedgerRegistrationModal({
