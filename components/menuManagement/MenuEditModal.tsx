@@ -13,20 +13,10 @@ import {
   View,
 } from 'react-native';
 
-import {
-  CATEGORY_OPTIONS,
-  type MenuFormData,
-  menuFormSchema,
-} from '../../schemas';
-import type { MenuItem } from '../../types';
+import { menuFormSchema } from '../../schemas';
+import type { MenuEditModalProps, MenuFormData } from '../../types';
+import { CATEGORY_OPTIONS } from '../../types';
 import { formatPrice, handlePriceInput } from '../../utils';
-
-interface MenuEditModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: (menuData: MenuFormData) => void;
-  menuItem: MenuItem | null;
-}
 
 /**
  * 메뉴 편집 모달 컴포넌트

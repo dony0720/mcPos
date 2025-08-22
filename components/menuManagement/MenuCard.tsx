@@ -1,15 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-import type { MenuItem } from '../../types';
-import { MENU_CATEGORIES } from '../../types/menu';
-
-interface MenuCardProps {
-  menu: MenuItem;
-  onEdit: (menu: MenuItem) => void;
-  onDelete: (menu: MenuItem) => void;
-}
+import type { MenuCardProps } from '../../types';
+import { MENU_CATEGORIES } from '../../types';
 
 /**
  * 메뉴 카드 컴포넌트
@@ -41,11 +35,13 @@ export default function MenuCard({ menu, onEdit, onDelete }: MenuCardProps) {
         </View>
 
         {menu.image ? (
-          <View className='items-center justify-center'>
-            <Ionicons name='image' size={24} color='#10B981' />
-          </View>
+          <Image
+            source={{ uri: menu.image }}
+            className='flex-1 w-full rounded-lg'
+            resizeMode='cover'
+          />
         ) : (
-          <View className='items-center justify-center'>
+          <View className='flex-1 items-center justify-center'>
             <Ionicons name='image-outline' size={24} color='#9CA3AF' />
           </View>
         )}

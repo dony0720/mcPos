@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
-import { MENU_ITEMS } from '../../data/menuItems';
 import { useModal } from '../../hooks';
-import type { MenuFormData } from '../../schemas';
-import type { MenuCategory, MenuItem } from '../../types';
-import { MENU_CATEGORIES } from '../../types/menu';
+import { useMenuStore } from '../../stores';
+import type { MenuCategory, MenuFormData, MenuItem } from '../../types';
+import { MENU_CATEGORIES } from '../../types';
+import { MenuToast } from '../../utils';
 import {
   MenuAddModal,
   MenuCard,
@@ -26,21 +26,43 @@ export default function MenuManagementMain() {
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(
     null
   );
+  const [pendingSuccessToast, setPendingSuccessToast] = useState<string | null>(
+    null
+  );
   const { openModal, closeModal, isModalOpen } = useModal();
+  const { menus, addMenu } = useMenuStore();
+
+  // 모달이 닫힌 후 성공 Toast 표시
+  useEffect(() => {
+    if (!isModalOpen('menuAdd') && pendingSuccessToast) {
+      MenuToast.addSuccess(pendingSuccessToast);
+      setPendingSuccessToast(null);
+    }
+  }, [isModalOpen, pendingSuccessToast]);
 
   // 카테고리별 메뉴 필터링
   const filteredMenus =
     selectedCategory === 'ALL'
-      ? MENU_ITEMS
-      : MENU_ITEMS.filter(menu => menu.category === selectedCategory);
+      ? menus
+      : menus.filter(menu => menu.category === selectedCategory);
 
   // 이벤트 핸들러
   const handleAddMenu = () => {
     openModal('menuAdd');
   };
 
-  const handleAddMenuConfirm = (_menuData: MenuFormData) => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+  const handleAddMenuConfirm = (menuData: MenuFormData) => {
+    // 새 메뉴를 Store에 추가
+    addMenu({
+      name: menuData.name,
+      price: menuData.price,
+      category: menuData.category,
+      image: menuData.image,
+    });
+
+    // Toast 표시를 위해 메뉴명 저장
+    setPendingSuccessToast(menuData.name);
+
     closeModal();
   };
 
@@ -102,13 +124,13 @@ export default function MenuManagementMain() {
                     selectedCategory === 'ALL' ? 'text-white' : 'text-gray-600'
                   )}
                 >
-                  전체 ({MENU_ITEMS.length})
+                  전체 ({menus.length})
                 </Text>
               </TouchableOpacity>
 
               {/* 카테고리별 필터 */}
               {MENU_CATEGORIES.map(category => {
-                const categoryCount = MENU_ITEMS.filter(
+                const categoryCount = menus.filter(
                   item => item.category === category.id
                 ).length;
 

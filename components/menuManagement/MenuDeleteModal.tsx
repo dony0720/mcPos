@@ -2,14 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 
-import type { MenuItem } from '../../types';
-
-interface MenuDeleteModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  menuItem: MenuItem | null;
-}
+import type { MenuDeleteModalProps } from '../../types';
 
 /**
  * 메뉴 삭제 확인 모달 컴포넌트
