@@ -12,14 +12,8 @@ export interface Category {
   name: string;
   /** 카테고리 표시 순서 (낮을수록 앞에 표시) */
   displayOrder: number;
-  /** 기본 카테고리 여부 (삭제 불가) */
-  isDefault: boolean;
   /** 해당 카테고리의 메뉴 개수 (선택적) */
   menuCount?: number;
-  /** 생성일시 */
-  createdAt: string;
-  /** 수정일시 */
-  updatedAt: string;
 }
 
 /**
