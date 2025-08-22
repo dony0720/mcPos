@@ -37,7 +37,7 @@ export default function MenuManagementMain() {
     null
   );
   const { openModal, closeModal, isModalOpen } = useModal();
-  const { menus, addMenu, updateMenu } = useMenuStore();
+  const { menus, addMenu, updateMenu, deleteMenu } = useMenuStore();
   // 모달이 닫힌 후 성공 Toast 표시
   useEffect(() => {
     if (
@@ -118,7 +118,14 @@ export default function MenuManagementMain() {
   };
 
   const handleDeleteMenuConfirm = () => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+    // 메뉴 삭제
+    if (selectedMenuItem) {
+      deleteMenu(selectedMenuItem.id);
+      setPendingSuccessToast({
+        type: MenuToastType.DELETE,
+        name: selectedMenuItem.name,
+      });
+    }
     closeModal();
     setSelectedMenuItem(null);
   };
