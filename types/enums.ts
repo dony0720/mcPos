@@ -67,3 +67,12 @@ export enum TransactionType {
   CASH_DEPOSIT = 'cash_deposit', // 현금 입금
   CASH_WITHDRAWAL = 'cash_withdrawal', // 현금 출금
 }
+
+/**
+ * 메뉴 토스트 타입 enum
+ */
+export enum MenuToastType {
+  ADD = 'add',
+  EDIT = 'edit',
+  DELETE = 'delete',
+}
