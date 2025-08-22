@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
+import { zodResolver } from '@hookform/resolvers/zod';
 import clsx from 'clsx';
 import React, { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
   Modal,
   Pressable,
@@ -9,8 +11,24 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { z } from 'zod';
 
 import { ChargeModalProps } from '../../types';
+
+// 유효성 검사 스키마
+const chargeSchema = z.object({
+  chargeAmount: z
+    .string()
+    .min(1, '충전 금액을 입력해주세요')
+    .refine(val => {
+      const num = parseInt(val.replace(/,/g, ''));
+      return !isNaN(num) && num >= 1000;
+    }, '최소 1,000원 이상 입력해주세요'),
+  receptionist: z.string().min(1, '접수자를 선택해주세요'),
+  paymentMethod: z.string().min(1, '결제수단을 선택해주세요'),
+});
+
+type ChargeFormData = z.infer<typeof chargeSchema>;
 
 export default function ChargeModal({
   visible,
@@ -18,9 +36,22 @@ export default function ChargeModal({
   onConfirm,
   customerInfo,
 }: ChargeModalProps) {
-  const [chargeAmount, setChargeAmount] = useState('');
-  const [receptionist, setReceptionist] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('');
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+    setValue,
+  } = useForm<ChargeFormData>({
+    resolver: zodResolver(chargeSchema),
+    mode: 'onChange',
+    defaultValues: {
+      chargeAmount: '',
+      receptionist: '',
+      paymentMethod: '',
+    },
+  });
+
   const [showReceptionistDropdown, setShowReceptionistDropdown] =
     useState(false);
   const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
@@ -46,32 +77,17 @@ export default function ChargeModal({
     return number.toLocaleString('ko-KR');
   };
 
-  const handleAmountChange = (value: string) => {
-    const formatted = formatAmount(value);
-    setChargeAmount(formatted);
-  };
-
-  const handleConfirm = () => {
-    if (!chargeAmount || !receptionist || !paymentMethod) {
-      return;
-    }
-
+  const handleConfirm = (data: ChargeFormData) => {
     onConfirm({
-      chargeAmount,
-      receptionist,
-      paymentMethod,
+      chargeAmount: data.chargeAmount,
+      receptionist: data.receptionist,
+      paymentMethod: data.paymentMethod,
     });
-
-    // 초기화
-    setChargeAmount('');
-    setReceptionist('');
-    setPaymentMethod('');
+    handleClose();
   };
 
   const handleClose = () => {
-    setChargeAmount('');
-    setReceptionist('');
-    setPaymentMethod('');
+    reset();
     setShowReceptionistDropdown(false);
     setShowPaymentDropdown(false);
     onClose();
@@ -81,7 +97,11 @@ export default function ChargeModal({
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
         <View className='bg-white rounded-2xl p-6 w-[90%] max-w-lg h-[60%] flex flex-col'>
-          <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            className='flex-1'
+            nestedScrollEnabled={true}
+          >
             <View className='flex-row items-center justify-between mb-6'>
               <Text className='text-xl font-bold'>장부 충전</Text>
               <Pressable onPress={handleClose} className='p-2'>
@@ -115,123 +135,185 @@ export default function ChargeModal({
             </View>
 
             {/* 충전 금액 입력 */}
-            <View className='mb-8'>
+            <View className='mb-2'>
               <Text className='text-base font-medium mb-2 text-gray-700'>
                 충전 금액 *
               </Text>
-              <TextInput
-                className='border border-gray-300 rounded-lg px-4 py-3 text-base'
-                placeholder='충전할 금액을 입력하세요'
-                value={chargeAmount}
-                onChangeText={handleAmountChange}
-                keyboardType='numeric'
+              <Controller
+                control={control}
+                name='chargeAmount'
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    className={`border rounded-lg px-4 py-3 text-base ${
+                      errors.chargeAmount ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder='충전할 금액을 입력하세요'
+                    value={value}
+                    onChangeText={text => {
+                      const formatted = formatAmount(text);
+                      onChange(formatted);
+                    }}
+                    keyboardType='numeric'
+                  />
+                )}
               />
+              <View className='min-h-[20px] mt-1'>
+                {errors.chargeAmount && (
+                  <Text className='text-red-500 text-sm'>
+                    {errors.chargeAmount.message}
+                  </Text>
+                )}
+              </View>
             </View>
 
             {/* 접수자 선택 */}
-            <View className='mb-8'>
+            <View className='mb-2'>
               <Text className='text-base font-medium mb-2 text-gray-700'>
                 접수자 *
               </Text>
-              <View className='relative'>
-                <Pressable
-                  className='border border-gray-300 rounded-lg px-4 py-3 flex-row justify-between items-center'
-                  onPress={() => {
-                    setShowReceptionistDropdown(!showReceptionistDropdown);
-                  }}
-                >
-                  <Text
-                    className={clsx('text-base', {
-                      'text-gray-800': receptionist,
-                      'text-gray-400': !receptionist,
-                    })}
-                  >
-                    {receptionist || '접수자를 선택하세요'}
-                  </Text>
-                  <Ionicons
-                    name={
-                      showReceptionistDropdown ? 'chevron-up' : 'chevron-down'
-                    }
-                    size={20}
-                    color='#666'
-                  />
-                </Pressable>
-
-                {showReceptionistDropdown && (
-                  <View className='absolute top-full left-0 right-0 z-10 bg-white border border-gray-300 rounded-lg shadow-lg max-h-56'>
-                    <ScrollView
-                      showsVerticalScrollIndicator={false}
-                      className='max-h-56'
+              <Controller
+                control={control}
+                name='receptionist'
+                render={({ field: { onChange, value } }) => (
+                  <View className='relative'>
+                    <Pressable
+                      className={`border rounded-lg px-4 py-3 flex-row justify-between items-center ${
+                        errors.receptionist
+                          ? 'border-red-500'
+                          : 'border-gray-300'
+                      }`}
+                      onPress={() => {
+                        setShowPaymentDropdown(false); // 다른 드롭다운 닫기
+                        setShowReceptionistDropdown(!showReceptionistDropdown);
+                      }}
                     >
-                      {receptionists.map(item => (
-                        <Pressable
-                          key={item}
-                          className='px-4 py-3 border-b border-gray-100 last:border-b-0'
-                          onPress={() => {
-                            setReceptionist(item);
-                            setShowReceptionistDropdown(false);
-                          }}
+                      <Text
+                        className={clsx('text-base', {
+                          'text-gray-800': value,
+                          'text-gray-400': !value,
+                        })}
+                      >
+                        {value || '접수자를 선택하세요'}
+                      </Text>
+                      <Ionicons
+                        name={
+                          showReceptionistDropdown
+                            ? 'chevron-up'
+                            : 'chevron-down'
+                        }
+                        size={20}
+                        color='#666'
+                      />
+                    </Pressable>
+
+                    {showReceptionistDropdown && (
+                      <View className='absolute top-full left-0 right-0 z-50 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48'>
+                        <ScrollView
+                          showsVerticalScrollIndicator={true}
+                          nestedScrollEnabled={true}
+                          className='max-h-48'
                         >
-                          <Text className='text-base text-gray-800'>
-                            {item}
-                          </Text>
-                        </Pressable>
-                      ))}
-                    </ScrollView>
+                          {receptionists.map(item => (
+                            <Pressable
+                              key={item}
+                              className='px-4 py-3 border-b border-gray-100 last:border-b-0 active:bg-gray-50'
+                              onPress={() => {
+                                onChange(item);
+                                setValue('receptionist', item);
+                                setShowReceptionistDropdown(false);
+                              }}
+                            >
+                              <Text className='text-base text-gray-800'>
+                                {item}
+                              </Text>
+                            </Pressable>
+                          ))}
+                        </ScrollView>
+                      </View>
+                    )}
                   </View>
+                )}
+              />
+              <View className='min-h-[20px] mt-1'>
+                {errors.receptionist && (
+                  <Text className='text-red-500 text-sm'>
+                    {errors.receptionist.message}
+                  </Text>
                 )}
               </View>
             </View>
 
             {/* 결제수단 선택 */}
-            <View className='mb-10'>
+            <View className='mb-2'>
               <Text className='text-base font-medium mb-2 text-gray-700'>
                 결제수단 *
               </Text>
-              <View className='relative'>
-                <Pressable
-                  className='border border-gray-300 rounded-lg px-4 py-3 flex-row justify-between items-center'
-                  onPress={() => {
-                    setShowPaymentDropdown(!showPaymentDropdown);
-                  }}
-                >
-                  <Text
-                    className={clsx('text-base', {
-                      'text-gray-800': paymentMethod,
-                      'text-gray-400': !paymentMethod,
-                    })}
-                  >
-                    {paymentMethod || '결제수단을 선택하세요'}
-                  </Text>
-                  <Ionicons
-                    name={showPaymentDropdown ? 'chevron-up' : 'chevron-down'}
-                    size={20}
-                    color='#666'
-                  />
-                </Pressable>
-
-                {showPaymentDropdown && (
-                  <View className='absolute top-full left-0 right-0 z-10 bg-white border border-gray-300 rounded-lg shadow-lg max-h-56'>
-                    <ScrollView
-                      showsVerticalScrollIndicator={false}
-                      className='max-h-56'
+              <Controller
+                control={control}
+                name='paymentMethod'
+                render={({ field: { onChange, value } }) => (
+                  <View className='relative'>
+                    <Pressable
+                      className={`border rounded-lg px-4 py-3 flex-row justify-between items-center ${
+                        errors.paymentMethod
+                          ? 'border-red-500'
+                          : 'border-gray-300'
+                      }`}
+                      onPress={() => {
+                        setShowReceptionistDropdown(false); // 다른 드롭다운 닫기
+                        setShowPaymentDropdown(!showPaymentDropdown);
+                      }}
                     >
-                      {paymentMethods.map(item => (
-                        <Pressable
-                          key={item}
-                          className='px-4 py-3 border-b border-gray-100 last:border-b-0'
-                          onPress={() => {
-                            setPaymentMethod(item);
-                            setShowPaymentDropdown(false);
-                          }}
+                      <Text
+                        className={clsx('text-base', {
+                          'text-gray-800': value,
+                          'text-gray-400': !value,
+                        })}
+                      >
+                        {value || '결제수단을 선택하세요'}
+                      </Text>
+                      <Ionicons
+                        name={
+                          showPaymentDropdown ? 'chevron-up' : 'chevron-down'
+                        }
+                        size={20}
+                        color='#666'
+                      />
+                    </Pressable>
+
+                    {showPaymentDropdown && (
+                      <View className='absolute top-full left-0 right-0 z-50 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48'>
+                        <ScrollView
+                          showsVerticalScrollIndicator={true}
+                          nestedScrollEnabled={true}
+                          className='max-h-48'
                         >
-                          <Text className='text-base text-gray-800'>
-                            {item}
-                          </Text>
-                        </Pressable>
-                      ))}
-                    </ScrollView>
+                          {paymentMethods.map(item => (
+                            <Pressable
+                              key={item}
+                              className='px-4 py-3 border-b border-gray-100 last:border-b-0 active:bg-gray-50'
+                              onPress={() => {
+                                onChange(item);
+                                setValue('paymentMethod', item);
+                                setShowPaymentDropdown(false);
+                              }}
+                            >
+                              <Text className='text-base text-gray-800'>
+                                {item}
+                              </Text>
+                            </Pressable>
+                          ))}
+                        </ScrollView>
+                      </View>
+                    )}
                   </View>
+                )}
+              />
+              <View className='min-h-[20px] mt-1'>
+                {errors.paymentMethod && (
+                  <Text className='text-red-500 text-sm'>
+                    {errors.paymentMethod.message}
+                  </Text>
                 )}
               </View>
             </View>
@@ -240,18 +322,27 @@ export default function ChargeModal({
           {/* 버튼들 */}
           <View className='flex-row gap-3 mt-6'>
             <Pressable
-              className='flex-1 p-3 bg-gray-300 rounded-lg'
+              className='flex-1 p-3 border border-gray-300 rounded-lg'
               onPress={handleClose}
             >
-              <Text className='text-gray-700 text-center font-semibold'>
+              <Text className='text-gray-600 text-center font-semibold'>
                 취소
               </Text>
             </Pressable>
             <Pressable
-              className='flex-1 p-3 bg-green-500 rounded-lg'
-              onPress={handleConfirm}
+              className={`flex-1 p-3 rounded-lg ${
+                isValid ? 'bg-primaryGreen' : 'bg-gray-300'
+              }`}
+              onPress={handleSubmit(handleConfirm)}
+              disabled={!isValid}
             >
-              <Text className='text-white text-center font-semibold'>충전</Text>
+              <Text
+                className={`text-center font-semibold ${
+                  isValid ? 'text-white' : 'text-gray-500'
+                }`}
+              >
+                충전
+              </Text>
             </Pressable>
           </View>
         </View>

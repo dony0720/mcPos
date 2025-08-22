@@ -190,7 +190,7 @@ export default function LedgerRegistrationModal({
                     <Pressable
                       className='px-4 py-3 flex-row items-center justify-between'
                       onPress={() => {
-                        // 드롭다운 토글 로직이 필요한 경우 여기에 추가
+                        setShowPaymentMethodDropdown(false); // 다른 드롭다운 닫기
                         setShowReceptionistDropdown(!showReceptionistDropdown);
                       }}
                     >
@@ -267,7 +267,7 @@ export default function LedgerRegistrationModal({
                     <Pressable
                       className='px-4 py-3 flex-row items-center justify-between'
                       onPress={() => {
-                        // 드롭다운 토글 로직이 필요한 경우 여기에 추가
+                        setShowReceptionistDropdown(false); // 다른 드롭다운 닫기
                         setShowPaymentMethodDropdown(
                           !showPaymentMethodDropdown
                         );
