@@ -464,7 +464,7 @@ export default function MenuAddModal({
               )}
               {/* 옵션 목록 */}
               {availableOptions.length > 0 && (
-                <View className=''>
+                <View className='flex-1 gap-2'>
                   {availableOptions.map((option, index) => (
                     <View
                       key={index}
