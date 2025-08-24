@@ -1,5 +1,14 @@
 import { z } from 'zod';
 
+// 메뉴 옵션 스키마
+export const menuOptionSchema = z.object({
+  name: z
+    .string()
+    .min(1, '옵션명을 입력해주세요')
+    .max(30, '옵션명은 30자 이하로 입력해주세요'),
+  price: z.number().min(0, '옵션 가격은 0원 이상이어야 합니다'),
+});
+
 // 메뉴 추가/편집 폼 스키마
 export const menuFormSchema = z.object({
   name: z
@@ -9,4 +18,5 @@ export const menuFormSchema = z.object({
   price: z.number().min(0, '가격은 0원 이상이어야 합니다'),
   category: z.string(),
   image: z.string().optional(),
+  availableOptions: z.array(menuOptionSchema).optional().default([]),
 });

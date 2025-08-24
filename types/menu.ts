@@ -14,6 +14,7 @@ export interface MenuItem extends BaseItem {
   temperature?: Temperature;
   description?: string;
   image?: any;
+  availableOptions?: MenuOption[]; // 이 메뉴에서 선택 가능한 옵션들
 }
 
 export interface OrderItem extends Quantifiable, Optionable {
@@ -60,18 +61,13 @@ export interface CategoryTabsProps {
   onSelectCategory: (category: string) => void;
 }
 
-export const MENU_OPTIONS: MenuOption[] = [
-  { name: '샷추가', price: 500 },
-  { name: '시럽추가', price: 300 },
-  { name: '휘핑크림', price: 700 },
-];
-
 // 메뉴 관리 관련 타입들
 export interface MenuFormData {
   name: string;
   price: number;
   category: string;
   image?: string;
+  availableOptions?: MenuOption[];
 }
 
 // 메뉴 관리 모달 Props

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-import { MENU_OPTIONS } from '../../types';
+import { MenuItem } from '../../types';
 
 /**
  * 옵션 선택자 컴포넌트
@@ -13,14 +13,21 @@ import { MENU_OPTIONS } from '../../types';
 interface OptionsSelectorProps {
   selectedOptions: string[];
   setSelectedOptions: (options: string[]) => void;
+  menuItem: MenuItem;
 }
 
 export default function OptionsSelector({
   selectedOptions,
   setSelectedOptions,
+  menuItem,
 }: OptionsSelectorProps) {
-  // 중앙화된 옵션 데이터 사용
-  const options = MENU_OPTIONS;
+  // 해당 메뉴의 사용 가능한 옵션들 사용 (안전한 처리)
+  const options = menuItem.availableOptions || [];
+
+  // 옵션이 없는 경우 아무것도 렌더링하지 않음
+  if (!options || options.length === 0) {
+    return null;
+  }
 
   return (
     <View>

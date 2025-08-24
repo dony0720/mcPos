@@ -54,6 +54,7 @@ export default function MenuEditModal({
       price: 0,
       category: 'COFFEE',
       image: undefined,
+      availableOptions: [],
     },
   });
 
@@ -66,6 +67,7 @@ export default function MenuEditModal({
       setValue('price', menuItem.price);
       setValue('category', menuItem.category);
       setValue('image', menuItem.image);
+      setValue('availableOptions', menuItem.availableOptions || []);
       setShowCategoryDropdown(false);
     } else if (visible) {
       reset();
