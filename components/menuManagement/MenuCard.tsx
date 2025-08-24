@@ -2,16 +2,18 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
+import { useCategoryStore } from '@/stores';
+
 import type { MenuCardProps } from '../../types';
-import { MENU_CATEGORIES } from '../../types';
 
 /**
  * 메뉴 카드 컴포넌트
  * - 개별 메뉴 정보를 카드 형태로 표시
  */
 export default function MenuCard({ menu, onEdit, onDelete }: MenuCardProps) {
+  const { categories } = useCategoryStore();
   const categoryName =
-    MENU_CATEGORIES.find(cat => cat.id === menu.category)?.name || '기타';
+    categories.find(cat => cat.id === menu.category)?.name || '기타';
 
   return (
     <View className='bg-white rounded-lg border border-gray-100 p-4 flex-1 relative'>

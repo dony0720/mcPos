@@ -129,13 +129,6 @@ export default function DiscountManagementMain() {
     setSelectedDiscount(null);
   };
 
-  const handleToggleActive = (discount: Discount) => {
-    // 할인 활성화 상태 토글
-    updateDiscount(discount.id, {
-      isActive: !discount.isActive,
-    });
-  };
-
   return (
     <View className='h-full w-full bg-white flex flex-col'>
       <View className='flex-1 max-w-7xl mx-auto w-full'>
@@ -171,7 +164,6 @@ export default function DiscountManagementMain() {
                             discount={discount}
                             onEdit={handleEditDiscount}
                             onDelete={handleDeleteDiscount}
-                            onToggleActive={handleToggleActive}
                           />
                         ))}
                       {/* 빈 공간 채우기 (3개 미만인 경우) */}

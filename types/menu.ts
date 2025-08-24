@@ -1,7 +1,7 @@
 import { BaseItem, ModalProps, Optionable, Quantifiable } from './common';
 import { DiscountType } from './enums';
 
-export type MenuCategory = 'COFFEE' | 'NON_COFFEE' | 'TEA' | 'ADE' | 'DESSERT';
+export type MenuCategory = string;
 export type Temperature = 'HOT' | 'ICE';
 
 export interface MenuOption {
@@ -35,7 +35,7 @@ export interface MenuItemProps {
 }
 
 export interface MenuGridProps {
-  selectedCategory: MenuCategory;
+  selectedCategory: string;
   onAddItem: (menuItem: MenuItem, options: string[]) => void;
 }
 
@@ -56,18 +56,9 @@ export interface TemperatureSelectorProps {
 }
 
 export interface CategoryTabsProps {
-  selectedCategory: MenuCategory;
-  onSelectCategory: (category: MenuCategory) => void;
+  selectedCategory: string;
+  onSelectCategory: (category: string) => void;
 }
-
-// 상수 데이터
-export const MENU_CATEGORIES: { id: MenuCategory; name: string }[] = [
-  { id: 'COFFEE', name: '커피' },
-  { id: 'NON_COFFEE', name: '논커피' },
-  { id: 'TEA', name: '차' },
-  { id: 'ADE', name: '에이드' },
-  { id: 'DESSERT', name: '디저트' },
-];
 
 export const MENU_OPTIONS: MenuOption[] = [
   { name: '샷추가', price: 500 },
@@ -79,7 +70,7 @@ export const MENU_OPTIONS: MenuOption[] = [
 export interface MenuFormData {
   name: string;
   price: number;
-  category: MenuCategory;
+  category: string;
   image?: string;
 }
 
@@ -110,12 +101,3 @@ export interface MenuCardProps {
   onEdit: (menu: MenuItem) => void;
   onDelete: (menu: MenuItem) => void;
 }
-
-// 카테고리 옵션 (관리용)
-export const CATEGORY_OPTIONS: { value: MenuCategory; label: string }[] = [
-  { value: 'COFFEE', label: '커피' },
-  { value: 'NON_COFFEE', label: '논커피' },
-  { value: 'TEA', label: '차' },
-  { value: 'ADE', label: '에이드' },
-  { value: 'DESSERT', label: '디저트' },
-];

@@ -14,9 +14,10 @@ export default function MenuGrid({
   const { menus } = useMenuStore();
 
   // 현재 카테고리의 메뉴 아이템들 필터링
-  const filteredMenuItems = menus.filter(
-    item => item.category === selectedCategory
-  );
+  const filteredMenuItems =
+    selectedCategory === 'ALL'
+      ? menus
+      : menus.filter(menu => menu.category === selectedCategory);
 
   // 페이지네이션 상태 관리
   const [currentPage, setCurrentPage] = useState(0);

@@ -14,6 +14,10 @@ interface CategoryStore {
   getCategoryById: (id: string) => Category | undefined;
 }
 
+const initialCategories: Category[] = [
+  { id: 'All', name: '전체', displayOrder: 1, menuCount: 0 },
+];
+
 /**
  * 카테고리 상태 관리 Store
  * - 카테고리 CRUD 기능 제공
@@ -22,7 +26,7 @@ interface CategoryStore {
 export const useCategoryStore = create<CategoryStore>()(
   persist(
     (set, get) => ({
-      categories: [],
+      categories: initialCategories,
 
       // 카테고리 추가
       addCategory: category => {
