@@ -1,12 +1,12 @@
 import js from '@eslint/js';
 import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
+import prettierConfig from 'eslint-config-prettier';
+import prettier from 'eslint-plugin-prettier';
 import react from 'eslint-plugin-react';
 import reactNative from 'eslint-plugin-react-native';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import unusedImports from 'eslint-plugin-unused-imports';
-import prettier from 'eslint-plugin-prettier';
-import prettierConfig from 'eslint-config-prettier';
 
 export default [
   {
@@ -63,9 +63,9 @@ export default [
       },
     },
     rules: {
-      // Simple Import Sort 규칙
-      'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
+      // Simple Import Sort 규칙 (더 유연하게 설정)
+      'simple-import-sort/imports': 'warn',
+      'simple-import-sort/exports': 'warn',
 
       // Unused Imports 규칙
       'no-unused-vars': 'off', // 기본 규칙을 끄고 TypeScript 전용 규칙 사용

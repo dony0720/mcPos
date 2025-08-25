@@ -10,8 +10,12 @@ const RECEPTIONIST_OPTIONS = [
   '최대리',
 ] as const;
 
+type ReceptionistOption = (typeof RECEPTIONIST_OPTIONS)[number];
+
 // 결제수단 옵션 enum
 const PAYMENT_METHOD_OPTIONS = ['현금', '계좌이체'] as const;
+
+type PaymentMethodOption = (typeof PAYMENT_METHOD_OPTIONS)[number];
 
 export const ledgerRegistrationSchema = z.object({
   name: z
@@ -48,7 +52,7 @@ export const ledgerRegistrationSchema = z.object({
     .string()
     .min(1, '접수자를 선택해주세요')
     .refine(
-      val => RECEPTIONIST_OPTIONS.includes(val as any),
+      val => RECEPTIONIST_OPTIONS.includes(val as ReceptionistOption),
       '유효한 접수자를 선택해주세요'
     ),
 
@@ -56,7 +60,7 @@ export const ledgerRegistrationSchema = z.object({
     .string()
     .min(1, '결제수단을 선택해주세요')
     .refine(
-      val => PAYMENT_METHOD_OPTIONS.includes(val as any),
+      val => PAYMENT_METHOD_OPTIONS.includes(val as PaymentMethodOption),
       '유효한 결제수단을 선택해주세요'
     ),
 });
