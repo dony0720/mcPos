@@ -1,35 +1,99 @@
 import Toast from 'react-native-toast-message';
 
+import { ToastActionType, ToastCategoryType } from '../types';
+
 /**
- * 메뉴 관리 관련 Toast 메시지들
+ * 통합 관리 Toast 시스템
+ * - 메뉴, 카테고리 등 다양한 관리 기능에 대한 통합 토스트 처리
+ */
+export const ManagementToast = {
+  showSuccess: (
+    action: ToastActionType,
+    category: ToastCategoryType,
+    name: string
+  ) => {
+    const categoryText =
+      category === ToastCategoryType.MENU ? '메뉴' : '카테고리';
+
+    let actionText = '';
+    let message = '';
+
+    switch (action) {
+      case ToastActionType.ADD:
+        actionText = '추가';
+        message =
+          category === ToastCategoryType.MENU
+            ? `${name}이(가) 성공적으로 추가되었습니다.`
+            : `${name} 카테고리가 성공적으로 추가되었습니다.`;
+        break;
+      case ToastActionType.EDIT:
+        actionText = '수정';
+        message =
+          category === ToastCategoryType.MENU
+            ? `${name}이(가) 성공적으로 수정되었습니다.`
+            : `${name} 카테고리가 성공적으로 수정되었습니다.`;
+        break;
+      case ToastActionType.DELETE:
+        actionText = '삭제';
+        message =
+          category === ToastCategoryType.MENU
+            ? `${name}이(가) 성공적으로 삭제되었습니다.`
+            : `${name} 카테고리가 성공적으로 삭제되었습니다.`;
+        break;
+    }
+
+    Toast.show({
+      type: 'success',
+      text1: `${categoryText} ${actionText} 완료`,
+      text2: message,
+    });
+  },
+};
+
+/**
+ * 하위 호환성을 위한 기존 Toast 함수들
+ * @deprecated ManagementToast.showSuccess를 사용하세요
  */
 export const MenuToast = {
-  // 메뉴 추가 성공
-  addSuccess: (menuName: string) => {
-    Toast.show({
-      type: 'success',
-      text1: '메뉴 추가 완료',
-      text2: `${menuName}이(가) 성공적으로 추가되었습니다.`,
-    });
-  },
+  addSuccess: (menuName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.ADD,
+      ToastCategoryType.MENU,
+      menuName
+    ),
+  editSuccess: (menuName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.EDIT,
+      ToastCategoryType.MENU,
+      menuName
+    ),
+  deleteSuccess: (menuName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.DELETE,
+      ToastCategoryType.MENU,
+      menuName
+    ),
+};
 
-  // 메뉴 편집 성공
-  editSuccess: (menuName: string) => {
-    Toast.show({
-      type: 'success',
-      text1: '메뉴 수정 완료',
-      text2: `${menuName}이(가) 성공적으로 수정되었습니다.`,
-    });
-  },
-
-  // 메뉴 삭제 성공
-  deleteSuccess: (menuName: string) => {
-    Toast.show({
-      type: 'success',
-      text1: '메뉴 삭제 완료',
-      text2: `${menuName}이(가) 성공적으로 삭제되었습니다.`,
-    });
-  },
+export const CategoryToast = {
+  addSuccess: (categoryName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.ADD,
+      ToastCategoryType.CATEGORY,
+      categoryName
+    ),
+  editSuccess: (categoryName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.EDIT,
+      ToastCategoryType.CATEGORY,
+      categoryName
+    ),
+  deleteSuccess: (categoryName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.DELETE,
+      ToastCategoryType.CATEGORY,
+      categoryName
+    ),
 };
 
 /**
