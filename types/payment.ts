@@ -1,9 +1,8 @@
 import { BaseItem, ModalProps, Optionable } from './common';
+import { Discount as DiscountFromDiscount } from './discount';
 import {
-  PaymentMethod,
-  PaymentDetailsType,
-  DiscountType,
   OrderReceiptMethod as OrderReceiptMethodEnum,
+  PaymentMethod
 } from './enums';
 
 // ===== 기본 엔티티 타입들 =====
@@ -21,11 +20,8 @@ export interface PaymentOrderItem extends Optionable {
   price: number;
 }
 
-export interface Discount extends Pick<BaseItem, 'id' | 'name'> {
-  value: number;
-  type: DiscountType; // fixed: 고정가격으로 변경, deduction: 차감
-  description?: string;
-}
+// payment.ts의 Discount 타입을 discount.ts의 타입으로 통합
+export type Discount = DiscountFromDiscount;
 
 // ===== 컴포넌트 Props 타입들 =====
 
@@ -144,15 +140,21 @@ export const DISCOUNT_OPTIONS: Discount[] = [
     id: 'fixed-1500',
     name: '1500원 고정가',
     value: 1500,
-    type: DiscountType.FIXED,
+    type: 'FIXED_AMOUNT',
     description: '선택된 메뉴를 1,500원으로 변경',
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
     id: 'deduction-1000',
     name: '1000원 차감',
     value: 1000,
-    type: DiscountType.DEDUCTION,
+    type: 'FIXED_AMOUNT',
     description: '선택된 메뉴에서 1,000원 차감',
+    isActive: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
 ] as const;
 

@@ -68,6 +68,7 @@ interface LedgerState {
 
   // 유틸리티
   getLedgerByMemberNumber: (memberNumber: string) => LedgerData | undefined;
+  getLedgersByPhoneLastDigits: (lastDigits: string) => LedgerData[];
   getTransactionsByMemberNumber: (memberNumber: string) => Transaction[];
   generateMemberNumber: () => string;
   formatAmount: (amount: number) => string;
@@ -369,6 +370,16 @@ export const useLedgerStore = create<LedgerState>()(
           ledger => ledger.memberNumber === memberNumber
         );
         return ledger;
+      },
+
+      // 핸드폰 뒷자리로 장부 검색
+      getLedgersByPhoneLastDigits: (lastDigits: string) => {
+        const ledgers = get().ledgerData.filter(ledger => {
+          const phoneNumber = ledger.phoneNumber.replace(/[^\d]/g, '');
+          const lastFourDigits = phoneNumber.slice(-4);
+          return lastFourDigits === lastDigits;
+        });
+        return ledgers;
       },
 
       getTransactionsByMemberNumber: (memberNumber: string) => {
