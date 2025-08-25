@@ -10,7 +10,6 @@ import {
 } from '../../components';
 import { useButtonAnimation, useModal } from '../../hooks';
 import { useAuthStore, useOrderStore } from '../../stores';
-import type { MenuCategory } from '../../types';
 
 /**
  * 메뉴 선택 메인 화면 컴포넌트
@@ -27,8 +26,7 @@ export default function MenuSelection() {
   const { isAdminAuthenticated, login, logout } = useAuthStore();
 
   // 카테고리 상태 관리 (로컬 상태)
-  const [selectedCategory, setSelectedCategory] =
-    useState<MenuCategory>('COFFEE');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
 
   // 이벤트 핸들러
   /**

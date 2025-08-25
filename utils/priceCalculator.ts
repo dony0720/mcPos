@@ -1,4 +1,4 @@
-import type { OrderItem } from '../types';
+import { DiscountType, OrderItem } from '../types';
 import { MENU_OPTIONS } from '../types';
 
 /**
@@ -24,12 +24,15 @@ export const calculateItemPrice = (item: OrderItem): number => {
 
   // 할인이 적용된 경우
   if (item.discount) {
-    if (item.discount.type === 'fixed') {
+    if (item.discount.type === DiscountType.FIXED_AMOUNT) {
       // 고정가격으로 변경
       return item.discount.value * item.quantity;
-    } else if (item.discount.type === 'deduction') {
+    } else if (item.discount.type === DiscountType.PERCENTAGE) {
       // 차감 적용 (최소 0원)
-      const discountedPrice = Math.max(0, basePrice - item.discount.value);
+      const discountedPrice = Math.max(
+        0,
+        basePrice * (1 - item.discount.value / 100)
+      );
       return discountedPrice * item.quantity;
     }
   }
@@ -64,12 +67,12 @@ export const calculateDiscountedUnitPrice = (item: OrderItem): number => {
 
   // 할인이 적용된 경우
   if (item.discount) {
-    if (item.discount.type === 'fixed') {
+    if (item.discount.type === DiscountType.FIXED_AMOUNT) {
       // 고정가격으로 변경
       return item.discount.value;
-    } else if (item.discount.type === 'deduction') {
+    } else if (item.discount.type === DiscountType.PERCENTAGE) {
       // 차감 적용 (최소 0원)
-      return Math.max(0, basePrice - item.discount.value);
+      return Math.max(0, basePrice * (1 - item.discount.value / 100));
     }
   }
 

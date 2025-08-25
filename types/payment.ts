@@ -21,10 +21,12 @@ export interface PaymentOrderItem extends Optionable {
   price: number;
 }
 
-export interface Discount extends Pick<BaseItem, 'id' | 'name'> {
+export interface Discount {
+  id: string;
+  name: string;
   value: number;
   type: DiscountType; // fixed: 고정가격으로 변경, deduction: 차감
-  description?: string;
+  isActive?: boolean | undefined;
 }
 
 // ===== 컴포넌트 Props 타입들 =====
@@ -136,23 +138,6 @@ export const ORDER_RECEIPT_METHODS: Array<{
     id: OrderReceiptMethodEnum.DINE_IN,
     name: '매장',
     icon: 'restaurant-outline',
-  },
-] as const;
-
-export const DISCOUNT_OPTIONS: Discount[] = [
-  {
-    id: 'fixed-1500',
-    name: '1500원 고정가',
-    value: 1500,
-    type: DiscountType.FIXED,
-    description: '선택된 메뉴를 1,500원으로 변경',
-  },
-  {
-    id: 'deduction-1000',
-    name: '1000원 차감',
-    value: 1000,
-    type: DiscountType.DEDUCTION,
-    description: '선택된 메뉴에서 1,000원 차감',
   },
 ] as const;
 

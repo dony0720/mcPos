@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { MenuItem, OrderItem, OrderState } from '../types';
+import { DiscountType, MenuItem, OrderItem, OrderState } from '../types';
 import { calculateTotalPrice } from '../utils';
 
 export const useOrderStore = create<OrderState>(set => ({
@@ -65,7 +65,7 @@ export const useOrderStore = create<OrderState>(set => ({
       id: string;
       name: string;
       value: number;
-      type: 'fixed' | 'deduction';
+      type: DiscountType;
     }
   ) => {
     set(state => {

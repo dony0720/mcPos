@@ -1,3 +1,4 @@
+import { DiscountType } from './enums';
 import { MenuItem, OrderItem } from './menu';
 
 // 주문 섹션 Props 타입
@@ -30,7 +31,7 @@ export interface OrderStoreActions {
       id: string;
       name: string;
       value: number;
-      type: 'fixed' | 'deduction';
+      type: DiscountType;
     }
   ) => void;
   removeDiscount: (itemIds: string[]) => void;

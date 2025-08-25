@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 
-import type { Discount } from '../../types';
+import { Discount, DiscountType } from '../../types';
 
 interface DiscountDeleteModalProps {
   visible: boolean;
@@ -33,7 +33,7 @@ export default function DiscountDeleteModal({
 
   // 할인 유형별 표시 텍스트
   const getDiscountTypeText = (discount: Discount) => {
-    if (discount.type === 'PERCENTAGE') {
+    if (discount.type === DiscountType.PERCENTAGE) {
       return `${discount.value}%`;
     }
     return `${discount.value.toLocaleString()}원`;
@@ -71,7 +71,7 @@ export default function DiscountDeleteModal({
                 </Text>
                 <Text className='text-blue-600 font-medium text-sm'>
                   유형:{' '}
-                  {discount.type === 'PERCENTAGE'
+                  {discount.type === DiscountType.PERCENTAGE
                     ? '퍼센트 할인'
                     : '고정금액 할인'}
                 </Text>

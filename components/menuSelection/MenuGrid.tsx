@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
-import { MENU_ITEMS } from '../../data/menuItems';
 import { useModal } from '../../hooks';
+import { useMenuStore } from '../../stores';
 import type { MenuGridProps, MenuItem } from '../../types';
 import { MenuDetailModal, MenuItem as MenuItemComponent } from './index';
 import PaginationButtons from './PaginationButtons';
@@ -11,10 +11,13 @@ export default function MenuGrid({
   selectedCategory,
   onAddItem,
 }: MenuGridProps) {
+  const { menus } = useMenuStore();
+
   // 현재 카테고리의 메뉴 아이템들 필터링
-  const filteredMenuItems = MENU_ITEMS.filter(
-    item => item.category === selectedCategory
-  );
+  const filteredMenuItems =
+    selectedCategory === 'ALL'
+      ? menus
+      : menus.filter(menu => menu.category === selectedCategory);
 
   // 페이지네이션 상태 관리
   const [currentPage, setCurrentPage] = useState(0);

@@ -1,35 +1,119 @@
 import Toast from 'react-native-toast-message';
 
+import { ToastActionType, ToastCategoryType } from '../types';
 /**
- * 메뉴 관리 관련 Toast 메시지들
+ * 통합 관리 Toast 시스템
+ * - 메뉴, 카테고리 등 다양한 관리 기능에 대한 통합 토스트 처리
+ */
+export const ManagementToast = {
+  showSuccess: (
+    action: ToastActionType,
+    category: ToastCategoryType,
+    name: string
+  ) => {
+    let categoryText = '';
+    let actionText = '';
+    let message = '';
+
+    // 카테고리별 텍스트 설정
+    switch (category) {
+      case ToastCategoryType.MENU:
+        categoryText = '메뉴';
+        break;
+      case ToastCategoryType.CATEGORY:
+        categoryText = '카테고리';
+        break;
+      case ToastCategoryType.DISCOUNT:
+        categoryText = '할인';
+        break;
+    }
+
+    // 액션별 텍스트와 메시지 설정
+    switch (action) {
+      case ToastActionType.ADD:
+        actionText = '추가';
+        if (category === ToastCategoryType.MENU) {
+          message = `${name}이(가) 성공적으로 추가되었습니다.`;
+        } else if (category === ToastCategoryType.CATEGORY) {
+          message = `${name} 카테고리가 성공적으로 추가되었습니다.`;
+        } else if (category === ToastCategoryType.DISCOUNT) {
+          message = `${name} 할인이 성공적으로 추가되었습니다.`;
+        }
+        break;
+      case ToastActionType.EDIT:
+        actionText = '수정';
+        if (category === ToastCategoryType.MENU) {
+          message = `${name}이(가) 성공적으로 수정되었습니다.`;
+        } else if (category === ToastCategoryType.CATEGORY) {
+          message = `${name} 카테고리가 성공적으로 수정되었습니다.`;
+        } else if (category === ToastCategoryType.DISCOUNT) {
+          message = `${name} 할인이 성공적으로 수정되었습니다.`;
+        }
+        break;
+      case ToastActionType.DELETE:
+        actionText = '삭제';
+        if (category === ToastCategoryType.MENU) {
+          message = `${name}이(가) 성공적으로 삭제되었습니다.`;
+        } else if (category === ToastCategoryType.CATEGORY) {
+          message = `${name} 카테고리가 성공적으로 삭제되었습니다.`;
+        } else if (category === ToastCategoryType.DISCOUNT) {
+          message = `${name} 할인이 성공적으로 삭제되었습니다.`;
+        }
+        break;
+    }
+
+    Toast.show({
+      type: 'success',
+      text1: `${categoryText} ${actionText} 완료`,
+      text2: message,
+    });
+  },
+};
+
+/**
+ * 하위 호환성을 위한 기존 Toast 함수들
+ * @deprecated ManagementToast.showSuccess를 사용하세요
  */
 export const MenuToast = {
-  // 메뉴 추가 성공
-  addSuccess: (menuName: string) => {
-    Toast.show({
-      type: 'success',
-      text1: '메뉴 추가 완료',
-      text2: `${menuName}이(가) 성공적으로 추가되었습니다.`,
-    });
-  },
+  addSuccess: (menuName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.ADD,
+      ToastCategoryType.MENU,
+      menuName
+    ),
+  editSuccess: (menuName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.EDIT,
+      ToastCategoryType.MENU,
+      menuName
+    ),
+  deleteSuccess: (menuName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.DELETE,
+      ToastCategoryType.MENU,
+      menuName
+    ),
+};
 
-  // 메뉴 편집 성공
-  editSuccess: (menuName: string) => {
-    Toast.show({
-      type: 'success',
-      text1: '메뉴 수정 완료',
-      text2: `${menuName}이(가) 성공적으로 수정되었습니다.`,
-    });
-  },
-
-  // 메뉴 삭제 성공
-  deleteSuccess: (menuName: string) => {
-    Toast.show({
-      type: 'success',
-      text1: '메뉴 삭제 완료',
-      text2: `${menuName}이(가) 성공적으로 삭제되었습니다.`,
-    });
-  },
+export const CategoryToast = {
+  addSuccess: (categoryName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.ADD,
+      ToastCategoryType.CATEGORY,
+      categoryName
+    ),
+  editSuccess: (categoryName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.EDIT,
+      ToastCategoryType.CATEGORY,
+      categoryName
+    ),
+  deleteSuccess: (categoryName: string) =>
+    ManagementToast.showSuccess(
+      ToastActionType.DELETE,
+      ToastCategoryType.CATEGORY,
+      categoryName
+    ),
 };
 
 /**
