@@ -4,16 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { useModal } from '../../hooks';
-import { useMenuStore } from '../../stores';
+import { useCategoryStore, useMenuStore } from '../../stores';
 import {
   MenuCategory,
   MenuFormData,
   MenuItem,
-  MenuToastType,
   PendingSuccessToast,
+  ToastActionType,
+  ToastCategoryType,
 } from '../../types';
-import { MENU_CATEGORIES } from '../../types';
-import { MenuToast } from '../../utils';
+import { ManagementToast } from '../../utils';
 import {
   MenuAddModal,
   MenuCard,
@@ -38,6 +38,7 @@ export default function MenuManagementMain() {
   );
   const { openModal, closeModal, isModalOpen } = useModal();
   const { menus, addMenu, updateMenu, deleteMenu } = useMenuStore();
+  const { categories } = useCategoryStore();
   // 모달이 닫힌 후 성공 Toast 표시
   useEffect(() => {
     if (
@@ -46,19 +47,11 @@ export default function MenuManagementMain() {
       !isModalOpen('menuDelete') &&
       pendingSuccessToast
     ) {
-      if (pendingSuccessToast.type === 'add') {
-        MenuToast.addSuccess(
-          `${pendingSuccessToast.name} 메뉴가 추가되었습니다`
-        );
-      } else if (pendingSuccessToast.type === 'edit') {
-        MenuToast.editSuccess(
-          `${pendingSuccessToast.name} 메뉴가 수정되었습니다`
-        );
-      } else if (pendingSuccessToast.type === 'delete') {
-        MenuToast.deleteSuccess(
-          `${pendingSuccessToast.name} 메뉴가 삭제되었습니다`
-        );
-      }
+      ManagementToast.showSuccess(
+        pendingSuccessToast.action,
+        pendingSuccessToast.category,
+        pendingSuccessToast.name
+      );
       setPendingSuccessToast(null);
     }
   }, [isModalOpen, pendingSuccessToast]);
@@ -67,6 +60,12 @@ export default function MenuManagementMain() {
     selectedCategory === 'ALL'
       ? menus
       : menus.filter(menu => menu.category === selectedCategory);
+
+  // 카테고리 목록을 동적으로 생성 (메뉴 ID와 카테고리 ID 매핑)
+  const menuCategories = categories.map(category => ({
+    id: category.id as MenuCategory,
+    name: category.name,
+  }));
 
   // 이벤트 핸들러
   const handleAddMenu = () => {
@@ -83,8 +82,11 @@ export default function MenuManagementMain() {
     });
 
     // 메뉴 추가 성공 Toast 표시
-
-    setPendingSuccessToast({ type: MenuToastType.ADD, name: menuData.name });
+    setPendingSuccessToast({
+      action: ToastActionType.ADD,
+      category: ToastCategoryType.MENU,
+      name: menuData.name,
+    });
 
     closeModal();
   };
@@ -105,7 +107,11 @@ export default function MenuManagementMain() {
       image: menuData.image,
     });
 
-    setPendingSuccessToast({ type: MenuToastType.EDIT, name: menuData.name });
+    setPendingSuccessToast({
+      action: ToastActionType.EDIT,
+      category: ToastCategoryType.MENU,
+      name: menuData.name,
+    });
 
     closeModal();
     // 메뉴 편집 성공 Toast 표시
@@ -122,7 +128,8 @@ export default function MenuManagementMain() {
     if (selectedMenuItem) {
       deleteMenu(selectedMenuItem.id);
       setPendingSuccessToast({
-        type: MenuToastType.DELETE,
+        action: ToastActionType.DELETE,
+        category: ToastCategoryType.MENU,
         name: selectedMenuItem.name,
       });
     }
@@ -171,7 +178,7 @@ export default function MenuManagementMain() {
               </TouchableOpacity>
 
               {/* 카테고리별 필터 */}
-              {MENU_CATEGORIES.map(category => {
+              {menuCategories.map(category => {
                 const categoryCount = menus.filter(
                   item => item.category === category.id
                 ).length;
