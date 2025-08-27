@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { CATEGORIES } from '../data/categories';
 import type { Category } from '../types';
 
 interface CategoryStore {
@@ -13,9 +12,13 @@ interface CategoryStore {
   updateCategory: (id: string, category: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
   getCategoryById: (id: string) => Category | undefined;
-  clearAllCategories: () => void;
-  resetToDefaults: () => void;
+
 }
+
+const initialCategories: Category[] = [
+  { id: 'All', name: '전체', displayOrder: 1, menuCount: 0 },
+];
+
 
 /**
  * 카테고리 상태 관리 Store
@@ -25,7 +28,9 @@ interface CategoryStore {
 export const useCategoryStore = create<CategoryStore>()(
   persist(
     (set, get) => ({
-      categories: CATEGORIES,
+
+      categories: initialCategories,
+
 
       // 카테고리 추가
       addCategory: category => {
@@ -71,15 +76,6 @@ export const useCategoryStore = create<CategoryStore>()(
         return get().categories.find(category => category.id === id);
       },
 
-      // 모든 카테고리 삭제 (기본 카테고리 제외)
-      clearAllCategories: () => {
-        set({ categories: [] });
-      },
-
-      // 기본 카테고리로 리셋
-      resetToDefaults: () => {
-        set({ categories: CATEGORIES });
-      },
     }),
     {
       name: 'category-store', // 로컬 스토리지 키

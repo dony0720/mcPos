@@ -15,9 +15,10 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { useCategoryStore } from '@/stores';
+
 import { menuFormSchema } from '../../schemas';
 import type { MenuAddModalProps, MenuFormData } from '../../types';
-import { CATEGORY_OPTIONS } from '../../types';
 import {
   formatPrice,
   handleImageSelection,
@@ -35,7 +36,7 @@ export default function MenuAddModal({
   onConfirm,
 }: MenuAddModalProps) {
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-
+  const { categories } = useCategoryStore();
   const {
     control,
     handleSubmit,
@@ -49,7 +50,7 @@ export default function MenuAddModal({
     defaultValues: {
       name: '',
       price: 0,
-      category: 'COFFEE',
+      category: '',
       image: undefined,
     },
   });
@@ -83,9 +84,9 @@ export default function MenuAddModal({
     setShowCategoryDropdown(false);
   };
 
-  const selectedCategoryLabel = CATEGORY_OPTIONS.find(
-    option => option.value === selectedCategory
-  )?.label;
+  const selectedCategoryLabel = categories.find(
+    category => category.id === selectedCategory
+  )?.name;
 
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
@@ -194,18 +195,18 @@ export default function MenuAddModal({
               {/* 드롭다운 목록 */}
               {showCategoryDropdown && (
                 <View className='border border-t-0 border-gray-300 rounded-b-lg bg-white'>
-                  {CATEGORY_OPTIONS.map((option, index) => (
+                  {categories.map((category, index) => (
                     <TouchableOpacity
-                      key={option.value}
+                      key={category.id}
                       className={clsx(
                         'px-4 py-4',
-                        index !== CATEGORY_OPTIONS.length - 1 &&
+                        index !== categories.length - 1 &&
                           'border-b border-gray-100'
                       )}
-                      onPress={() => handleCategorySelect(option.value)}
+                      onPress={() => handleCategorySelect(category.id)}
                     >
                       <Text className='text-gray-800 text-base'>
-                        {option.label}
+                        {category.name}
                       </Text>
                     </TouchableOpacity>
                   ))}

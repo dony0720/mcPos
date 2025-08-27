@@ -30,6 +30,25 @@ export default function CategoryManagementMain() {
     null
   );
   const { openModal, closeModal, isModalOpen } = useModal();
+  const { categories, addCategory, updateCategory, deleteCategory } =
+    useCategoryStore();
+
+  // 모달이 닫힌 후 성공 Toast 표시
+  useEffect(() => {
+    if (
+      !isModalOpen('categoryAdd') &&
+      !isModalOpen('categoryEdit') &&
+      !isModalOpen('categoryDelete') &&
+      pendingSuccessToast
+    ) {
+      ManagementToast.showSuccess(
+        pendingSuccessToast.action,
+        pendingSuccessToast.category,
+        pendingSuccessToast.name
+      );
+      setPendingSuccessToast(null);
+    }
+  }, [isModalOpen, pendingSuccessToast]);
 
   const { categories, addCategory, updateCategory, deleteCategory } =
     useCategoryStore();

@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 
 import { discountFormSchema, type DiscountFormSchemaType } from '../../schemas';
-import type { Discount, DiscountType } from '../../types';
+import { Discount, DiscountType } from '../../types';
 import { formatPrice, handlePriceInput } from '../../utils';
 
 interface DiscountEditModalProps {
@@ -48,7 +48,7 @@ export default function DiscountEditModal({
     mode: 'onChange',
     defaultValues: {
       name: '',
-      type: 'PERCENTAGE',
+      type: DiscountType.PERCENTAGE,
       value: 0,
     },
   });
@@ -57,8 +57,8 @@ export default function DiscountEditModal({
 
   // 할인 유형 옵션
   const TYPE_OPTIONS = [
-    { value: 'PERCENTAGE' as DiscountType, label: '퍼센트 할인 (%)' },
-    { value: 'FIXED_AMOUNT' as DiscountType, label: '고정금액 할인 (원)' },
+    { value: DiscountType.PERCENTAGE, label: '퍼센트 할인 (%)' },
+    { value: DiscountType.FIXED_AMOUNT, label: '고정금액 할인 (원)' },
   ];
 
   // 모달이 열릴 때 기존 할인 정보로 폼 초기화
@@ -216,17 +216,17 @@ export default function DiscountEditModal({
                         errors.value ? 'border-red-500' : 'border-gray-300'
                       )}
                       placeholder={
-                        selectedType === 'PERCENTAGE'
+                        selectedType === DiscountType.PERCENTAGE
                           ? '할인 퍼센트 (1-100)'
                           : '할인 금액 (원)'
                       }
                       value={
-                        selectedType === 'PERCENTAGE'
+                        selectedType === DiscountType.PERCENTAGE
                           ? value?.toString() || ''
                           : formatPrice(value) || ''
                       }
                       onChangeText={text => {
-                        if (selectedType === 'PERCENTAGE') {
+                        if (selectedType === DiscountType.PERCENTAGE) {
                           const numValue = parseInt(text) || 0;
                           onChange(numValue);
                         } else {
@@ -236,7 +236,7 @@ export default function DiscountEditModal({
                       keyboardType='numeric'
                     />
                     <Text className='ml-2 text-gray-500 text-base'>
-                      {selectedType === 'PERCENTAGE' ? '%' : '원'}
+                      {selectedType === DiscountType.PERCENTAGE ? '%' : '원'}
                     </Text>
                   </View>
                 )}
@@ -247,7 +247,7 @@ export default function DiscountEditModal({
                 </Text>
               )}
               <Text className='text-gray-400 text-xs mt-1 px-1'>
-                {selectedType === 'PERCENTAGE'
+                {selectedType === DiscountType.PERCENTAGE
                   ? '1-100 사이의 퍼센트를 입력하세요'
                   : '할인할 금액을 원 단위로 입력하세요'}
               </Text>

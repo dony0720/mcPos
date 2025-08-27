@@ -12,33 +12,55 @@ export const ManagementToast = {
     category: ToastCategoryType,
     name: string
   ) => {
-    const categoryText =
-      category === ToastCategoryType.MENU ? '메뉴' : '카테고리';
 
+    let categoryText = '';
     let actionText = '';
     let message = '';
 
+    // 카테고리별 텍스트 설정
+    switch (category) {
+      case ToastCategoryType.MENU:
+        categoryText = '메뉴';
+        break;
+      case ToastCategoryType.CATEGORY:
+        categoryText = '카테고리';
+        break;
+      case ToastCategoryType.DISCOUNT:
+        categoryText = '할인';
+        break;
+    }
+
+    // 액션별 텍스트와 메시지 설정
     switch (action) {
       case ToastActionType.ADD:
         actionText = '추가';
-        message =
-          category === ToastCategoryType.MENU
-            ? `${name}이(가) 성공적으로 추가되었습니다.`
-            : `${name} 카테고리가 성공적으로 추가되었습니다.`;
+        if (category === ToastCategoryType.MENU) {
+          message = `${name}이(가) 성공적으로 추가되었습니다.`;
+        } else if (category === ToastCategoryType.CATEGORY) {
+          message = `${name} 카테고리가 성공적으로 추가되었습니다.`;
+        } else if (category === ToastCategoryType.DISCOUNT) {
+          message = `${name} 할인이 성공적으로 추가되었습니다.`;
+        }
         break;
       case ToastActionType.EDIT:
         actionText = '수정';
-        message =
-          category === ToastCategoryType.MENU
-            ? `${name}이(가) 성공적으로 수정되었습니다.`
-            : `${name} 카테고리가 성공적으로 수정되었습니다.`;
+        if (category === ToastCategoryType.MENU) {
+          message = `${name}이(가) 성공적으로 수정되었습니다.`;
+        } else if (category === ToastCategoryType.CATEGORY) {
+          message = `${name} 카테고리가 성공적으로 수정되었습니다.`;
+        } else if (category === ToastCategoryType.DISCOUNT) {
+          message = `${name} 할인이 성공적으로 수정되었습니다.`;
+        }
         break;
       case ToastActionType.DELETE:
         actionText = '삭제';
-        message =
-          category === ToastCategoryType.MENU
-            ? `${name}이(가) 성공적으로 삭제되었습니다.`
-            : `${name} 카테고리가 성공적으로 삭제되었습니다.`;
+        if (category === ToastCategoryType.MENU) {
+          message = `${name}이(가) 성공적으로 삭제되었습니다.`;
+        } else if (category === ToastCategoryType.CATEGORY) {
+          message = `${name} 카테고리가 성공적으로 삭제되었습니다.`;
+        } else if (category === ToastCategoryType.DISCOUNT) {
+          message = `${name} 할인이 성공적으로 삭제되었습니다.`;
+        }
         break;
     }
 

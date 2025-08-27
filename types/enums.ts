@@ -47,8 +47,8 @@ export enum PaymentDetailsType {
  * 할인 타입 enum
  */
 export enum DiscountType {
-  FIXED = 'fixed',
-  DEDUCTION = 'deduction',
+  PERCENTAGE = 'percentage',
+  FIXED_AMOUNT = 'fixed_amount',
 }
 
 /**
@@ -83,4 +83,5 @@ export enum ToastActionType {
 export enum ToastCategoryType {
   MENU = 'menu',
   CATEGORY = 'category',
+  DISCOUNT = 'discount',
 }
