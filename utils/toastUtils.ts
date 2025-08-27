@@ -1,6 +1,7 @@
 import Toast from 'react-native-toast-message';
 
 import { ToastActionType, ToastCategoryType } from '../types';
+
 /**
  * 통합 관리 Toast 시스템
  * - 메뉴, 카테고리 등 다양한 관리 기능에 대한 통합 토스트 처리
@@ -11,6 +12,7 @@ export const ManagementToast = {
     category: ToastCategoryType,
     name: string
   ) => {
+
     let categoryText = '';
     let actionText = '';
     let message = '';

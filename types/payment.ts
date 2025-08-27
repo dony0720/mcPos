@@ -1,9 +1,8 @@
 import { BaseItem, ModalProps, Optionable } from './common';
+import { Discount as DiscountFromDiscount } from './discount';
 import {
-  PaymentMethod,
-  PaymentDetailsType,
-  DiscountType,
   OrderReceiptMethod as OrderReceiptMethodEnum,
+  PaymentMethod
 } from './enums';
 
 // ===== 기본 엔티티 타입들 =====
@@ -20,6 +19,7 @@ export interface PaymentOrderItem extends Optionable {
   name: string;
   price: number;
 }
+
 
 export interface Discount {
   id: string;

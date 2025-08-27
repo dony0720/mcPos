@@ -3,6 +3,7 @@ export { default as CouponAmountModal } from './CouponAmountModal';
 export { default as DiscountModal } from './DiscountModal';
 export { default as DiscountSection } from './DiscountSection';
 export { default as Keypad } from './Keypad';
+export { default as LedgerSelectionModal } from './LedgerSelectionModal';
 export { default as NumberInputModal } from './NumberInputModal';
 export { default as OrderMethodSelector } from './OrderMethodSelector';
 export { default as PaymentHeader } from './PaymentHeader';

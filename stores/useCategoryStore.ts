@@ -12,11 +12,13 @@ interface CategoryStore {
   updateCategory: (id: string, category: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
   getCategoryById: (id: string) => Category | undefined;
+
 }
 
 const initialCategories: Category[] = [
   { id: 'All', name: '전체', displayOrder: 1, menuCount: 0 },
 ];
+
 
 /**
  * 카테고리 상태 관리 Store
@@ -26,7 +28,9 @@ const initialCategories: Category[] = [
 export const useCategoryStore = create<CategoryStore>()(
   persist(
     (set, get) => ({
+
       categories: initialCategories,
+
 
       // 카테고리 추가
       addCategory: category => {
@@ -51,7 +55,9 @@ export const useCategoryStore = create<CategoryStore>()(
           categories: state.categories
             .map(category =>
               category.id === id
+
                 ? { ...category, ...updatedCategory }
+
                 : category
             )
             .sort((a, b) => a.displayOrder - b.displayOrder),
@@ -69,6 +75,7 @@ export const useCategoryStore = create<CategoryStore>()(
       getCategoryById: id => {
         return get().categories.find(category => category.id === id);
       },
+
     }),
     {
       name: 'category-store', // 로컬 스토리지 키
