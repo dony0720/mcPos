@@ -4,7 +4,7 @@ import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useButtonAnimation } from '../../hooks';
 import type { OrderSectionProps } from '../../types';
-import { calculateUnitPrice } from '../../utils';
+import { calculateItemPrice } from '../../utils';
 import OrderItem from './OrderItem';
 
 export default function OrderSection({
@@ -31,10 +31,7 @@ export default function OrderSection({
           >
             {items.map(item => {
               // 유틸리티 함수로 단위 가격 계산
-              const itemUnitPrice = calculateUnitPrice(
-                item.menuItem.price,
-                item.options
-              );
+              const itemUnitPrice = calculateItemPrice(item);
 
               return (
                 <OrderItem
