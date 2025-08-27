@@ -238,7 +238,7 @@ export default function Payment() {
         id: discount.id,
         name: discount.name,
         value: discount.value,
-        type: discount.type === 'FIXED_AMOUNT' ? 'fixed' : 'deduction',
+        type: discount.type,
       });
 
       // 할인 적용 후 선택 해제
