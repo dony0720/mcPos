@@ -28,6 +28,7 @@ export const useMenuStore = create<MenuStore>()(
         const newMenu: MenuItem = {
           ...menu,
           id: Date.now().toString(), // 임시 ID 생성
+          availableOptions: menu.availableOptions || [], // 안전한 기본값 설정
         };
 
         set(state => ({
@@ -39,7 +40,14 @@ export const useMenuStore = create<MenuStore>()(
       updateMenu: (id, updatedMenu) => {
         set(state => ({
           menus: state.menus.map(menu =>
-            menu.id === id ? { ...menu, ...updatedMenu } : menu
+            menu.id === id
+              ? {
+                  ...menu,
+                  ...updatedMenu,
+                  availableOptions:
+                    updatedMenu.availableOptions || menu.availableOptions || [],
+                }
+              : menu
           ),
         }));
       },

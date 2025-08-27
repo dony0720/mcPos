@@ -73,12 +73,13 @@ export default function MenuManagementMain() {
   };
 
   const handleAddMenuConfirm = (menuData: MenuFormData) => {
-    // 새 메뉴를 Store에 추가
+    // 새 메뉴를 Store에 추가 (옵션 포함)
     addMenu({
       name: menuData.name,
       price: menuData.price,
       category: menuData.category,
       image: menuData.image,
+      availableOptions: menuData.availableOptions,
     });
 
     // 메뉴 추가 성공 Toast 표시
@@ -99,12 +100,13 @@ export default function MenuManagementMain() {
   const handleEditMenuConfirm = (menuData: MenuFormData) => {
     if (!selectedMenuItem) return;
 
-    // 선택된 메뉴를 Store에서 업데이트
+    // 선택된 메뉴를 Store에서 업데이트 (옵션 포함)
     updateMenu(selectedMenuItem.id, {
       name: menuData.name,
       price: menuData.price,
       category: menuData.category,
       image: menuData.image,
+      availableOptions: menuData.availableOptions,
     });
 
     setPendingSuccessToast({

@@ -1,16 +1,19 @@
-import { DiscountType, OrderItem } from '../types';
-import { MENU_OPTIONS } from '../types';
+import { DiscountType, MenuItem, OrderItem } from '../types';
 
 /**
  * 가격 계산 유틸리티 함수들
  */
 
 /**
- * 선택된 옵션들의 총 가격 계산
+ * 특정 메뉴의 선택된 옵션들의 총 가격 계산
  */
-export const calculateOptionPrice = (options: string[]): number => {
+export const calculateMenuOptionPrice = (
+  options: string[],
+  menuItem: MenuItem
+): number => {
+  const availableOptions = menuItem.availableOptions || [];
   return options.reduce((sum, optionName) => {
-    const option = MENU_OPTIONS.find(opt => opt.name === optionName);
+    const option = availableOptions.find(opt => opt.name === optionName);
     return sum + (option?.price || 0);
   }, 0);
 };
@@ -19,7 +22,7 @@ export const calculateOptionPrice = (options: string[]): number => {
  * 개별 주문 아이템의 총 가격 계산 (옵션 및 할인 포함)
  */
 export const calculateItemPrice = (item: OrderItem): number => {
-  const optionPrice = calculateOptionPrice(item.options);
+  const optionPrice = calculateMenuOptionPrice(item.options, item.menuItem);
   const basePrice = item.menuItem.price + optionPrice;
 
   // 할인이 적용된 경우
@@ -48,21 +51,21 @@ export const calculateTotalPrice = (orderItems: OrderItem[]): number => {
 };
 
 /**
- * 개별 아이템의 단위 가격 계산 (수량 제외)
+ * 특정 메뉴 아이템의 단위 가격 계산 (수량 제외)
  */
-export const calculateUnitPrice = (
-  menuPrice: number,
+export const calculateMenuUnitPrice = (
+  menuItem: MenuItem,
   options: string[]
 ): number => {
-  const optionPrice = calculateOptionPrice(options);
-  return menuPrice + optionPrice;
+  const optionPrice = calculateMenuOptionPrice(options, menuItem);
+  return menuItem.price + optionPrice;
 };
 
 /**
  * 할인이 적용된 개별 아이템의 단위 가격 계산 (수량 제외)
  */
 export const calculateDiscountedUnitPrice = (item: OrderItem): number => {
-  const optionPrice = calculateOptionPrice(item.options);
+  const optionPrice = calculateMenuOptionPrice(item.options, item.menuItem);
   const basePrice = item.menuItem.price + optionPrice;
 
   // 할인이 적용된 경우

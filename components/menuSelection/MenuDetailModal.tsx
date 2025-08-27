@@ -6,7 +6,7 @@ import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
  * - 선택된 메뉴의 상세 정보와 옵션 선택 기능을 제공하는 모달
  */
 import type { MenuDetailModalProps, Temperature } from '../../types';
-import { calculateOptionPrice } from '../../utils';
+import { calculateMenuOptionPrice } from '../../utils';
 import {
   MenuActionButtons,
   MenuInfoCard,
@@ -27,7 +27,9 @@ export default function MenuDetailModal({
   const [quantity, setQuantity] = useState(1);
 
   // 선택된 옵션들의 총 가격 계산 (유틸리티 함수 사용)
-  const optionPrice = calculateOptionPrice(selectedOptions);
+  const optionPrice = menuItem
+    ? calculateMenuOptionPrice(selectedOptions, menuItem)
+    : 0;
 
   const totalPrice = menuItem ? (menuItem.price + optionPrice) * quantity : 0;
 
@@ -91,6 +93,7 @@ export default function MenuDetailModal({
             <OptionsSelector
               selectedOptions={selectedOptions}
               setSelectedOptions={setSelectedOptions}
+              menuItem={menuItem}
             />
           </ScrollView>
 
