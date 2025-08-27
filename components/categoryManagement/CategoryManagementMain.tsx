@@ -33,7 +33,9 @@ export default function CategoryManagementMain() {
   const {
     categories,
     addCategory,
-    updateCategory: _updateCategory,
+
+    updateCategory,
+
     deleteCategory: _deleteCategory,
   } = useCategoryStore();
 
@@ -86,7 +88,19 @@ export default function CategoryManagementMain() {
     openModal('categoryEdit');
   };
 
-  const handleEditCategoryConfirm = (_categoryData: CategoryFormSchemaType) => {
+  const handleEditCategoryConfirm = (categoryData: CategoryFormSchemaType) => {
+    if (!selectedCategory) return;
+
+    updateCategory(selectedCategory.id, {
+      name: categoryData.name,
+      displayOrder: categoryData.displayOrder,
+    });
+
+    setPendingSuccessToast({
+      action: ToastActionType.EDIT,
+      category: ToastCategoryType.CATEGORY,
+      name: categoryData.name,
+    });
     // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
     closeModal();
     setSelectedCategory(null);

@@ -46,12 +46,14 @@ export const useCategoryStore = create<CategoryStore>()(
 
       // 카테고리 수정
       updateCategory: (id, updatedCategory) => {
-        const now = new Date().toISOString();
+
         set(state => ({
           categories: state.categories
             .map(category =>
               category.id === id
-                ? { ...category, ...updatedCategory, updatedAt: now }
+
+                ? { ...category, ...updatedCategory }
+
                 : category
             )
             .sort((a, b) => a.displayOrder - b.displayOrder),
