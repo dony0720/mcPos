@@ -46,11 +46,14 @@ export const useCategoryStore = create<CategoryStore>()(
 
       // 카테고리 수정
       updateCategory: (id, updatedCategory) => {
+
         set(state => ({
           categories: state.categories
             .map(category =>
               category.id === id
+
                 ? { ...category, ...updatedCategory }
+
                 : category
             )
             .sort((a, b) => a.displayOrder - b.displayOrder),

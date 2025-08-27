@@ -9,6 +9,7 @@ import {
   CashAmountModal,
   CouponAmountModal,
   DiscountSection,
+  LedgerSelectionModal,
   NumberInputModal,
   OrderMethodSelector,
   PaymentHeader,
@@ -17,21 +18,25 @@ import {
   SelectAllCheckbox,
 } from '../components';
 import { useButtonAnimation, useModal } from '../hooks';
-import { useCashStore, useOrderStore, useTransactionStore } from '../stores';
 import {
+  useCashStore,
+  useLedgerStore,
+  useOrderStore,
+  useTransactionStore,
+} from '../stores';
+import {
+  CashRegisterPaymentId,
   CashTransactionType,
+  Discount,
+  LedgerData,
+  NumberInputType,
   OrderReceiptMethod as OrderReceiptMethodEnum,
+  OrderReceiptMethodId,
+  PaymentDetails,
   PaymentDetailsType,
   PaymentMethod,
   TransactionStatus,
   TransactionType,
-} from '../types';
-import {
-  CashRegisterPaymentId,
-  Discount,
-  NumberInputType,
-  OrderReceiptMethodId,
-  PaymentDetails,
 } from '../types';
 import { calculateDiscountedUnitPrice } from '../utils';
 
@@ -57,6 +62,9 @@ export default function Payment() {
     calculateOptimalChangeBreakdown,
   } = useCashStore();
 
+  // 장부 관리 스토어
+  const { getLedgersByPhoneLastDigits, useLedger } = useLedgerStore();
+
   // 간단한 상태 관리
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
@@ -79,6 +87,12 @@ export default function Payment() {
   const [couponAmount, setCouponAmount] = useState(0);
   const [remainingAmount, setRemainingAmount] = useState(0);
   const [shouldOpenCashModal, setShouldOpenCashModal] = useState(false);
+
+  // 장부 결제 관련 상태
+  const [phoneLastDigits, setPhoneLastDigits] = useState('');
+  const [selectedLedger, setSelectedLedger] = useState<LedgerData | null>(null);
+  const [isLedgerSelectionModalVisible, setIsLedgerSelectionModalVisible] =
+    useState(false);
 
   const paymentButtonAnimation = useButtonAnimation();
 
@@ -113,7 +127,7 @@ export default function Payment() {
       case PaymentMethod.LEDGER:
         return {
           type: PaymentDetailsType.LEDGER,
-          phoneNumber: '', // 실제로는 입력받은 전화번호를 사용
+          phoneNumber: selectedLedger?.phoneNumber || '',
         };
       default:
         return {
@@ -224,7 +238,7 @@ export default function Payment() {
         id: discount.id,
         name: discount.name,
         value: discount.value,
-        type: discount.type,
+        type: discount.type === 'FIXED_AMOUNT' ? 'fixed' : 'deduction',
       });
 
       // 할인 적용 후 선택 해제
@@ -253,6 +267,7 @@ export default function Payment() {
       // 쿠폰 결제: 쿠폰 금액 입력 모달 열기
       openModal('couponAmount');
     } else if (selectedPaymentMethod === PaymentMethod.LEDGER) {
+      // 장부 결제: 핸드폰 뒷자리 입력 모달 열기
       setModalType('phone');
       setIsLedgerFirstStep(true);
       openModal('numberInput');
@@ -308,10 +323,40 @@ export default function Payment() {
 
   const handleModalConfirm = (number: string) => {
     if (isLedgerFirstStep) {
-      // 장부 번호 입력 완료 → 픽업 번호 입력으로 이동
-      setIsLedgerFirstStep(false);
-      setModalType('pickup');
-      // 첫 번째 단계 완료 후 모달 상태 유지하여 바로 픽업 번호 입력으로 이동
+      // 핸드폰 뒷자리 입력 완료 → 장부 검색 및 선택
+      setPhoneLastDigits(number);
+      const matchingLedgers = getLedgersByPhoneLastDigits(number);
+
+      if (matchingLedgers.length === 0) {
+        // 일치하는 장부가 없는 경우
+        console.warn('해당 핸드폰 뒷자리와 일치하는 장부가 없습니다.');
+        closeModal();
+        return;
+      } else if (matchingLedgers.length === 1) {
+        // 일치하는 장부가 하나인 경우 자동 선택
+        const ledger = matchingLedgers[0];
+        const currentAmount = parseInt(
+          ledger.chargeAmount.replace(/[^\d]/g, ''),
+          10
+        );
+
+        if (currentAmount < totalAmount) {
+          console.warn(
+            `장부 잔액이 부족합니다. 잔액: ${ledger.chargeAmount}, 결제 금액: ${totalAmount.toLocaleString()}원`
+          );
+          closeModal();
+          return;
+        }
+
+        setSelectedLedger(ledger);
+        setIsLedgerFirstStep(false);
+        setModalType('pickup');
+      } else {
+        // 일치하는 장부가 여러 개인 경우 선택 모달 표시
+        setIsLedgerSelectionModalVisible(true);
+        closeModal();
+        return;
+      }
     } else {
       // 픽업 번호 입력 완료 또는 일반 결제 완료
 
@@ -356,10 +401,29 @@ export default function Payment() {
             transactionId
           );
         }
+      } else if (
+        selectedPaymentMethod === PaymentMethod.LEDGER &&
+        selectedLedger
+      ) {
+        // 장부 결제: 장부에서 금액 차감
+        try {
+          useLedger(selectedLedger.memberNumber, {
+            amount: totalAmount,
+            receptionist: 'POS 시스템',
+          });
+        } catch (error) {
+          console.warn('장부 잔액이 부족합니다.');
+          closeModal();
+          return;
+        }
       }
 
       // 결제 완료 후 주문 데이터 초기화
       clearOrder();
+
+      // 장부 결제 관련 상태 초기화
+      setSelectedLedger(null);
+      setPhoneLastDigits('');
 
       closeModal();
 
@@ -372,6 +436,27 @@ export default function Payment() {
     if (!isLedgerFirstStep) {
       closeModal();
     }
+  };
+
+  // 장부 선택 핸들러
+  const handleLedgerSelect = (ledger: LedgerData) => {
+    // 잔액 확인
+    const currentAmount = parseInt(
+      ledger.chargeAmount.replace(/[^\d]/g, ''),
+      10
+    );
+    if (currentAmount < totalAmount) {
+      console.warn(
+        `장부 잔액이 부족합니다. 잔액: ${ledger.chargeAmount}, 결제 금액: ${totalAmount.toLocaleString()}원`
+      );
+      return;
+    }
+
+    setSelectedLedger(ledger);
+    setIsLedgerSelectionModalVisible(false);
+    setIsLedgerFirstStep(false);
+    setModalType('pickup');
+    openModal('numberInput');
   };
 
   return (
@@ -481,6 +566,16 @@ export default function Payment() {
             onClose={handleModalClose}
             onConfirm={handleModalConfirm}
             type={modalType}
+          />
+
+          {/* 장부 선택 모달 */}
+          <LedgerSelectionModal
+            visible={isLedgerSelectionModalVisible}
+            onClose={() => setIsLedgerSelectionModalVisible(false)}
+            onSelect={handleLedgerSelect}
+            ledgers={getLedgersByPhoneLastDigits(phoneLastDigits)}
+            phoneLastDigits={phoneLastDigits}
+            totalAmount={totalAmount}
           />
         </View>
       </View>

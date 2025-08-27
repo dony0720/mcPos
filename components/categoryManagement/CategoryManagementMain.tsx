@@ -33,7 +33,9 @@ export default function CategoryManagementMain() {
   const {
     categories,
     addCategory,
+
     updateCategory,
+
     deleteCategory: _deleteCategory,
   } = useCategoryStore();
 
