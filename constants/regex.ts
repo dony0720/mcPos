@@ -10,3 +10,8 @@ export const REGEX_PATTERNS = {
   // 숫자만 추출 (콤마, 공백, 특수문자 제거) - 가격 입력에서 사용
   NUMBERS_ONLY: /[^0-9]/g,
 } as const;
+
+/**
+ * 전화번호 정규식 패턴 (010-1234-5678 형식)
+ */
+export const PHONE_REGEX = /^010-\d{4}-\d{4}$/;

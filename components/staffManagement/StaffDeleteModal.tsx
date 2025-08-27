@@ -47,26 +47,11 @@ export default function StaffDeleteModal({
 
           {/* 삭제할 직원 정보 */}
           <View className='bg-gray-50 rounded-lg p-4 mb-6'>
-            <View className='flex-row items-center justify-between'>
-              <View className='flex-1'>
-                <Text className='text-lg font-semibold text-gray-800'>
-                  {staff.name}
-                </Text>
-                <Text className='text-sm text-gray-500 mt-1'>
-                  {staff.role === 'ADMIN' && '관리자'}
-                  {staff.role === 'STAFF' && '직원'}
-                  {staff.role === 'PART_TIME' && '파트타임'}
-                </Text>
-              </View>
-              <View
-                className={`px-3 py-1 rounded-full ${staff.isActive ? 'bg-green-100' : 'bg-gray-100'}`}
-              >
-                <Text
-                  className={`text-xs font-medium ${staff.isActive ? 'text-green-700' : 'text-gray-700'}`}
-                >
-                  {staff.isActive ? '재직' : '퇴사'}
-                </Text>
-              </View>
+            <View className='items-center'>
+              <Text className='text-lg font-semibold text-gray-800'>
+                {staff.name}
+              </Text>
+              <Text className='text-sm text-gray-500 mt-1'>{staff.phone}</Text>
             </View>
           </View>
 

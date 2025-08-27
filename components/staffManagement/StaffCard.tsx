@@ -24,13 +24,18 @@ export default function StaffCard({ staff, onEdit, onDelete }: StaffCardProps) {
         </View>
 
         {/* 직원명 */}
-        <Text className='text-gray-800 text-base font-semibold text-center'>
+        <Text className='text-gray-800 text-base font-semibold text-center mb-1'>
           {staff.name}
         </Text>
       </View>
 
+      {/* 전화번호 */}
+      <View className='items-center mb-3'>
+        <Text className='text-sm text-gray-600'>{staff.phone}</Text>
+      </View>
+
       {/* 액션 버튼들 */}
-      <View className='flex-row items-center justify-center gap-3 mt-2'>
+      <View className='flex-row items-center justify-center gap-3'>
         {/* 편집 버튼 */}
         <TouchableOpacity
           className='w-8 h-8 rounded-full bg-blue-100 items-center justify-center'
