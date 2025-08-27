@@ -50,7 +50,9 @@ export const useCategoryStore = create<CategoryStore>()(
           categories: state.categories
             .map(category =>
               category.id === id
+
                 ? { ...category, ...updatedCategory }
+
                 : category
             )
             .sort((a, b) => a.displayOrder - b.displayOrder),

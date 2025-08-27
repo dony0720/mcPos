@@ -30,6 +30,7 @@ export default function CategoryManagementMain() {
     null
   );
   const { openModal, closeModal, isModalOpen } = useModal();
+
   const { categories, addCategory, updateCategory, deleteCategory } =
     useCategoryStore();
 
