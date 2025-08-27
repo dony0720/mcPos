@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-import type { Staff } from '../../types';
+import { Staff } from '../../types';
 
 interface StaffCardProps {
   staff: Staff;

@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 
-import { staffFormSchema, type StaffFormSchemaType } from '../../schemas';
+import { staffFormSchema, StaffFormSchemaType } from '../../schemas';
 
 interface StaffAddModalProps {
   visible: boolean;

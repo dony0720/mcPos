@@ -13,8 +13,8 @@ import {
   View,
 } from 'react-native';
 
-import { staffFormSchema, type StaffFormSchemaType } from '../../schemas';
-import type { Staff } from '../../types';
+import { staffFormSchema, StaffFormSchemaType } from '../../schemas';
+import { Staff } from '../../types';
 
 interface StaffEditModalProps {
   visible: boolean;
@@ -70,7 +70,7 @@ export default function StaffEditModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl w-4/5 max-w-md max-h-[80%]'>
+        <View className='bg-white rounded-2xl w-4/5 h-[40%] max-w-md max-h-[600px]'>
           {/* 헤더 */}
           <View className='flex-row justify-between items-center p-6 pb-4'>
             <Text className='text-xl font-bold text-gray-800'>
