@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Modal,
@@ -57,6 +57,14 @@ export default function LedgerRegistrationModal({
   // 결제수단 옵션 (스키마에서 가져옴)
   const paymentMethodOptions = [...PAYMENT_METHOD_OPTIONS];
 
+  // 모달이 열릴 때 드롭다운 상태 초기화
+  useEffect(() => {
+    if (visible) {
+      setShowReceptionistDropdown(false);
+      setShowPaymentMethodDropdown(false);
+    }
+  }, [visible]);
+
   // 폼 제출 핸들러 - 검증이 통과된 경우에만 호출됨
   const onSubmit = (data: LedgerRegistrationFormData) => {
     onConfirm(data);
@@ -65,6 +73,8 @@ export default function LedgerRegistrationModal({
 
   const handleClose = () => {
     reset(); // 폼 초기화
+    setShowReceptionistDropdown(false); // 접수자 드롭다운 닫기
+    setShowPaymentMethodDropdown(false); // 결제수단 드롭다운 닫기
     onClose();
   };
 
@@ -86,7 +96,7 @@ export default function LedgerRegistrationModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl p-6 w-4/5 max-w-md h-[75%] flex flex-col'>
+        <View className='bg-white rounded-2xl p-6 w-4/5 max-w-md h-[70%] flex flex-col'>
           {/* 헤더 영역 */}
           <Text className='text-xl font-bold text-center mb-4'>장부 등록</Text>
           <Text className='text-gray-600 text-center mb-6'>

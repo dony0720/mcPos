@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Modal,
@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { z } from 'zod';
 
+import { useStaffStore } from '../../stores';
 import { ChargeModalProps } from '../../types';
 
 // 유효성 검사 스키마
@@ -56,8 +57,23 @@ export default function ChargeModal({
     useState(false);
   const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
 
-  const receptionists = ['홍길동', '김직원', '이사장', '박매니저', '최대리'];
+  // 접수자 옵션 (스토어에서 중복 제거)
+  const allStaffs = useStaffStore(state => state.staffs);
+  const receptionistOptions = allStaffs.filter(
+    (staff, index, self) =>
+      index ===
+      self.findIndex(s => s.name === staff.name && s.phone === staff.phone)
+  );
+
   const paymentMethods = ['현금', '계좌이체'];
+
+  // 모달이 열릴 때 드롭다운 상태 초기화
+  useEffect(() => {
+    if (visible) {
+      setShowReceptionistDropdown(false);
+      setShowPaymentDropdown(false);
+    }
+  }, [visible]);
 
   const formatAmount = (text: string) => {
     // 숫자가 아닌 문자들을 모두 제거 (한 글자씩 확인)
@@ -96,11 +112,12 @@ export default function ChargeModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl p-6 w-[90%] max-w-lg h-[60%] flex flex-col'>
+        <View className='bg-white rounded-2xl p-6 w-[90%] max-w-lg h-[65%] flex flex-col'>
           <ScrollView
             showsVerticalScrollIndicator={false}
             className='flex-1'
             nestedScrollEnabled={true}
+            contentContainerStyle={{ paddingBottom: 150 }}
           >
             <View className='flex-row items-center justify-between mb-6'>
               <Text className='text-xl font-bold'>장부 충전</Text>
@@ -213,19 +230,35 @@ export default function ChargeModal({
                           nestedScrollEnabled={true}
                           className='max-h-48'
                         >
-                          {receptionists.map(item => (
+                          {receptionistOptions.map((option, index) => (
                             <Pressable
-                              key={item}
+                              key={index}
                               className='px-4 py-3 border-b border-gray-100 last:border-b-0 active:bg-gray-50'
                               onPress={() => {
-                                onChange(item);
-                                setValue('receptionist', item);
+                                const displayText = `${option.name} (${option.phone})`;
+                                onChange(displayText);
+                                setValue('receptionist', displayText);
                                 setShowReceptionistDropdown(false);
                               }}
                             >
-                              <Text className='text-base text-gray-800'>
-                                {item}
-                              </Text>
+                              <View className='flex-row items-center justify-between'>
+                                <View className='flex-1'>
+                                  <Text className='text-gray-800 font-medium'>
+                                    {option.name}
+                                  </Text>
+                                  <Text className='text-gray-500 text-sm'>
+                                    {option.phone}
+                                  </Text>
+                                </View>
+                                {value ===
+                                  `${option.name} (${option.phone})` && (
+                                  <Ionicons
+                                    name='checkmark'
+                                    size={20}
+                                    color='#10B981'
+                                  />
+                                )}
+                              </View>
                             </Pressable>
                           ))}
                         </ScrollView>
@@ -288,19 +321,33 @@ export default function ChargeModal({
                           nestedScrollEnabled={true}
                           className='max-h-48'
                         >
-                          {paymentMethods.map(item => (
+                          {paymentMethods.map((option, index) => (
                             <Pressable
-                              key={item}
-                              className='px-4 py-3 border-b border-gray-100 last:border-b-0 active:bg-gray-50'
+                              key={index}
+                              className='px-4 py-4 min-h-[56px] flex-row items-center justify-between border-b border-gray-100 last:border-b-0 active:bg-blue-100'
+                              hitSlop={{
+                                top: 10,
+                                bottom: 10,
+                                left: 10,
+                                right: 10,
+                              }}
                               onPress={() => {
-                                onChange(item);
-                                setValue('paymentMethod', item);
+                                console.log('결제수단 선택됨:', option);
+                                onChange(option);
+                                setValue('paymentMethod', option);
                                 setShowPaymentDropdown(false);
                               }}
                             >
-                              <Text className='text-base text-gray-800'>
-                                {item}
+                              <Text className='text-gray-800 flex-1'>
+                                {option}
                               </Text>
+                              {value === option && (
+                                <Ionicons
+                                  name='checkmark'
+                                  size={20}
+                                  color='#10B981'
+                                />
+                              )}
                             </Pressable>
                           ))}
                         </ScrollView>
