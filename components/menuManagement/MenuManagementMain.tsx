@@ -59,7 +59,7 @@ export default function MenuManagementMain() {
   const filteredMenus =
     selectedCategory === 'ALL'
       ? menus
-      : menus.filter(menu => menu.category === selectedCategory);
+      : menus.filter(menu => menu.categories?.includes(selectedCategory));
 
   // 카테고리 목록을 동적으로 생성 (메뉴 ID와 카테고리 ID 매핑)
   const menuCategories = categories.map(category => ({
@@ -77,7 +77,7 @@ export default function MenuManagementMain() {
     addMenu({
       name: menuData.name,
       price: menuData.price,
-      category: menuData.category,
+      categories: menuData.categories,
       image: menuData.image,
       availableOptions: menuData.availableOptions,
     });
@@ -104,7 +104,7 @@ export default function MenuManagementMain() {
     updateMenu(selectedMenuItem.id, {
       name: menuData.name,
       price: menuData.price,
-      category: menuData.category,
+      categories: menuData.categories,
       image: menuData.image,
       availableOptions: menuData.availableOptions,
     });
@@ -181,8 +181,8 @@ export default function MenuManagementMain() {
 
               {/* 카테고리별 필터 */}
               {menuCategories.map(category => {
-                const categoryCount = menus.filter(
-                  item => item.category === category.id
+                const categoryCount = menus.filter(item =>
+                  item.categories?.includes(category.id)
                 ).length;
 
                 return (

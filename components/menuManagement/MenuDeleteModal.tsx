@@ -55,7 +55,7 @@ export default function MenuDeleteModal({
                 </Text>
               </View>
               <Text className='text-gray-500 text-sm'>
-                카테고리: {menuItem.category}
+                카테고리: {menuItem.categories?.join(', ') || '없음'}
               </Text>
             </View>
 

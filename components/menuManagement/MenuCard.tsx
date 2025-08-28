@@ -13,7 +13,10 @@ import type { MenuCardProps } from '../../types';
 export default function MenuCard({ menu, onEdit, onDelete }: MenuCardProps) {
   const { categories } = useCategoryStore();
   const categoryName =
-    categories.find(cat => cat.id === menu.category)?.name || '기타';
+    menu.categories
+      ?.map(catId => categories.find(cat => cat.id === catId)?.name)
+      .filter(Boolean)
+      .join(', ') || '기타';
 
   return (
     <View className='bg-white rounded-lg border border-gray-100 p-4 flex-1 relative'>
