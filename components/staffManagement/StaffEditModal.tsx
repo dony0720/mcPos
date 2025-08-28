@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import clsx from 'clsx';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Modal,
@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import { staffFormSchema, StaffFormSchemaType } from '../../schemas';
+import { useStaffStore } from '../../stores';
 import { Staff } from '../../types';
 
 interface StaffEditModalProps {
@@ -33,11 +34,15 @@ export default function StaffEditModal({
   onConfirm,
   staff,
 }: StaffEditModalProps) {
+  const { staffs } = useStaffStore();
+  const [duplicateError, setDuplicateError] = useState<string | null>(null);
+
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors, isValid },
+    watch,
   } = useForm<StaffFormSchemaType>({
     resolver: zodResolver(staffFormSchema),
     mode: 'onChange',
@@ -47,6 +52,10 @@ export default function StaffEditModal({
     },
   });
 
+  // 폼 데이터 실시간 감시
+  const watchedName = watch('name');
+  const watchedPhone = watch('phone');
+
   // 모달이 열릴 때마다 폼 초기화 및 기존 데이터 설정
   useEffect(() => {
     if (visible && staff) {
@@ -54,11 +63,54 @@ export default function StaffEditModal({
         name: staff.name,
         phone: staff.phone,
       });
+      setDuplicateError(null);
     }
   }, [visible, staff, reset]);
 
+  // 실시간 중복 검증 (자기 자신 제외)
+  useEffect(() => {
+    if (watchedName && watchedPhone && staff) {
+      const isDuplicate = staffs.some(
+        existingStaff =>
+          existingStaff.id !== staff.id && // 자기 자신 제외
+          existingStaff.name.trim().toLowerCase() ===
+            watchedName.trim().toLowerCase() &&
+          existingStaff.phone === watchedPhone
+      );
+
+      if (isDuplicate) {
+        setDuplicateError(
+          '동일한 이름과 전화번호를 가진 직원이 이미 존재합니다.'
+        );
+      } else {
+        setDuplicateError(null);
+      }
+    } else {
+      setDuplicateError(null);
+    }
+  }, [watchedName, watchedPhone, staffs, staff]);
+
   const onSubmit = (data: StaffFormSchemaType) => {
+    if (!staff) return;
+
+    // 최종 중복 검증 (자기 자신 제외)
+    const isDuplicate = staffs.some(
+      existingStaff =>
+        existingStaff.id !== staff.id && // 자기 자신 제외
+        existingStaff.name.trim().toLowerCase() ===
+          data.name.trim().toLowerCase() &&
+        existingStaff.phone === data.phone
+    );
+
+    if (isDuplicate) {
+      setDuplicateError(
+        '동일한 이름과 전화번호를 가진 직원이 이미 존재합니다.'
+      );
+      return;
+    }
+
     onConfirm(data);
+    setDuplicateError(null);
     onClose();
   };
 
@@ -141,6 +193,18 @@ export default function StaffEditModal({
                 </Text>
               )}
             </View>
+
+            {/* 중복 검증 에러 표시 */}
+            {duplicateError && (
+              <View className='mb-4 p-3 bg-red-50 border border-red-200 rounded-lg'>
+                <View className='flex-row items-center'>
+                  <Ionicons name='warning' size={16} color='#EF4444' />
+                  <Text className='text-red-600 text-sm ml-2 flex-1'>
+                    {duplicateError}
+                  </Text>
+                </View>
+              </View>
+            )}
           </ScrollView>
 
           {/* 하단 버튼들 */}
@@ -157,15 +221,15 @@ export default function StaffEditModal({
               <Pressable
                 className={clsx(
                   'flex-1 p-3 rounded-lg',
-                  isValid ? 'bg-blue-500' : 'bg-gray-300'
+                  isValid && !duplicateError ? 'bg-blue-500' : 'bg-gray-300'
                 )}
                 onPress={handleSubmit(onSubmit)}
-                disabled={!isValid}
+                disabled={!isValid || !!duplicateError}
               >
                 <Text
                   className={clsx(
                     'text-center font-medium',
-                    isValid ? 'text-white' : 'text-gray-500'
+                    isValid && !duplicateError ? 'text-white' : 'text-gray-500'
                   )}
                 >
                   수정

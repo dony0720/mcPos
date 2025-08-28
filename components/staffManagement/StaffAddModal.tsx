@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import clsx from 'clsx';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Modal,
@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import { staffFormSchema, StaffFormSchemaType } from '../../schemas';
+import { useStaffStore } from '../../stores';
 
 interface StaffAddModalProps {
   visible: boolean;
@@ -30,11 +31,15 @@ export default function StaffAddModal({
   onClose,
   onConfirm,
 }: StaffAddModalProps) {
+  const { staffs } = useStaffStore();
+  const [duplicateError, setDuplicateError] = useState<string | null>(null);
+
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors, isValid },
+    watch,
   } = useForm<StaffFormSchemaType>({
     resolver: zodResolver(staffFormSchema),
     mode: 'onChange',
@@ -44,16 +49,57 @@ export default function StaffAddModal({
     },
   });
 
+  // 폼 데이터 실시간 감시
+  const watchedName = watch('name');
+  const watchedPhone = watch('phone');
+
   // 모달이 열릴 때마다 폼 초기화
   useEffect(() => {
     if (visible) {
       reset();
+      setDuplicateError(null);
     }
   }, [visible, reset]);
 
+  // 실시간 중복 검증
+  useEffect(() => {
+    if (watchedName && watchedPhone) {
+      const isDuplicate = staffs.some(
+        staff =>
+          staff.name.trim().toLowerCase() ===
+            watchedName.trim().toLowerCase() && staff.phone === watchedPhone
+      );
+
+      if (isDuplicate) {
+        setDuplicateError(
+          '동일한 이름과 전화번호를 가진 직원이 이미 존재합니다.'
+        );
+      } else {
+        setDuplicateError(null);
+      }
+    } else {
+      setDuplicateError(null);
+    }
+  }, [watchedName, watchedPhone, staffs]);
+
   const onSubmit = (data: StaffFormSchemaType) => {
+    // 최종 중복 검증
+    const isDuplicate = staffs.some(
+      staff =>
+        staff.name.trim().toLowerCase() === data.name.trim().toLowerCase() &&
+        staff.phone === data.phone
+    );
+
+    if (isDuplicate) {
+      setDuplicateError(
+        '동일한 이름과 전화번호를 가진 직원이 이미 존재합니다.'
+      );
+      return;
+    }
+
     onConfirm(data);
     reset();
+    setDuplicateError(null);
     onClose();
   };
 
@@ -136,6 +182,18 @@ export default function StaffAddModal({
                 </Text>
               )}
             </View>
+
+            {/* 중복 검증 에러 표시 */}
+            {duplicateError && (
+              <View className='mb-4 p-3 bg-red-50 border border-red-200 rounded-lg'>
+                <View className='flex-row items-center'>
+                  <Ionicons name='warning' size={16} color='#EF4444' />
+                  <Text className='text-red-600 text-sm ml-2 flex-1'>
+                    {duplicateError}
+                  </Text>
+                </View>
+              </View>
+            )}
           </ScrollView>
 
           {/* 하단 버튼들 */}
@@ -153,15 +211,15 @@ export default function StaffAddModal({
               <Pressable
                 className={clsx(
                   'flex-1 p-3 rounded-lg',
-                  isValid ? 'bg-primaryGreen' : 'bg-gray-300'
+                  isValid && !duplicateError ? 'bg-primaryGreen' : 'bg-gray-300'
                 )}
                 onPress={handleSubmit(onSubmit)}
-                disabled={!isValid}
+                disabled={!isValid || !!duplicateError}
               >
                 <Text
                   className={clsx(
                     'text-center font-semibold',
-                    isValid ? 'text-white' : 'text-gray-500'
+                    isValid && !duplicateError ? 'text-white' : 'text-gray-500'
                   )}
                 >
                   추가
