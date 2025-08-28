@@ -2,10 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
-import { STAFF } from '../../data/staff';
 import { useModal } from '../../hooks';
-import type { StaffFormSchemaType } from '../../schemas';
-import type { Staff } from '../../types';
+import { StaffFormSchemaType } from '../../schemas';
+import { useStaffStore } from '../../stores';
+import { Staff } from '../../types';
 import {
   StaffAddModal,
   StaffCard,
@@ -21,20 +21,16 @@ export default function StaffManagementMain() {
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const { openModal, closeModal, isModalOpen } = useModal();
 
-  // 재직 상태별로 정렬 (재직자 먼저)
-  const sortedStaff = [...STAFF].sort((a, b) => {
-    if (a.isActive && !b.isActive) return -1;
-    if (!a.isActive && b.isActive) return 1;
-    return a.name.localeCompare(b.name);
-  });
+  // 스토어에서 직원 데이터와 액션들 가져오기
+  const { staffs, addStaff, updateStaff, deleteStaff } = useStaffStore();
 
   // 이벤트 핸들러
   const handleAddStaff = () => {
     openModal('staffAdd');
   };
 
-  const handleAddStaffConfirm = (_staffData: StaffFormSchemaType) => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+  const handleAddStaffConfirm = (staffData: StaffFormSchemaType) => {
+    addStaff(staffData);
     closeModal();
   };
 
@@ -43,8 +39,10 @@ export default function StaffManagementMain() {
     openModal('staffEdit');
   };
 
-  const handleEditStaffConfirm = (_staffData: StaffFormSchemaType) => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+  const handleEditStaffConfirm = (staffData: StaffFormSchemaType) => {
+    if (selectedStaff) {
+      updateStaff(selectedStaff.id, staffData);
+    }
     closeModal();
     setSelectedStaff(null);
   };
@@ -55,7 +53,9 @@ export default function StaffManagementMain() {
   };
 
   const handleDeleteStaffConfirm = () => {
-    // 퍼블리싱 단계 - 기능 구현 없이 모달만 닫기
+    if (selectedStaff) {
+      deleteStaff(selectedStaff.id);
+    }
     closeModal();
     setSelectedStaff(null);
   };
@@ -81,13 +81,13 @@ export default function StaffManagementMain() {
         {/* 직원 카드 그리드 섹션 */}
         <View className='flex-1 box-border px-[5%]'>
           <ScrollView showsVerticalScrollIndicator={false}>
-            {sortedStaff.length > 0 ? (
+            {staffs.length > 0 ? (
               <View className='pb-4'>
                 {Array.from(
-                  { length: Math.ceil(sortedStaff.length / 3) },
+                  { length: Math.ceil(staffs.length / 3) },
                   (_, rowIndex) => (
                     <View key={rowIndex} className='flex-row gap-4 mb-4'>
-                      {sortedStaff
+                      {staffs
                         .slice(rowIndex * 3, (rowIndex + 1) * 3)
                         .map(staff => (
                           <StaffCard
@@ -102,7 +102,7 @@ export default function StaffManagementMain() {
                         {
                           length:
                             3 -
-                            sortedStaff.slice(rowIndex * 3, (rowIndex + 1) * 3)
+                            staffs.slice(rowIndex * 3, (rowIndex + 1) * 3)
                               .length,
                         },
                         (_, emptyIndex) => (
