@@ -15,8 +15,8 @@ import {
   LedgerRegistrationFormData,
   ledgerRegistrationSchema,
   PAYMENT_METHOD_OPTIONS,
-  RECEPTIONIST_OPTIONS,
 } from '../../schemas';
+import { useStaffStore } from '../../stores';
 import { LedgerRegistrationModalProps } from '../../types/ledger';
 
 export default function LedgerRegistrationModal({
@@ -47,7 +47,7 @@ export default function LedgerRegistrationModal({
     useState(false);
 
   // 접수자 옵션 (스키마에서 가져옴)
-  const receptionistOptions = [...RECEPTIONIST_OPTIONS];
+  const receptionistOptions = useStaffStore(state => state.staffs);
 
   // 결제수단 옵션 (스키마에서 가져옴)
   const paymentMethodOptions = [...PAYMENT_METHOD_OPTIONS];
@@ -218,14 +218,16 @@ export default function LedgerRegistrationModal({
                               key={index}
                               className='px-4 py-3 border-b border-gray-100 last:border-b-0'
                               onPress={() => {
-                                onChange(option);
-                                setValue('receptionist', option);
+                                onChange(option.name);
+                                setValue('receptionist', option.name);
                                 setShowReceptionistDropdown(false);
                               }}
                             >
                               <View className='flex-row items-center justify-between'>
-                                <Text className='text-gray-800'>{option}</Text>
-                                {value === option && (
+                                <Text className='text-gray-800'>
+                                  {option.name}
+                                </Text>
+                                {value === option.name && (
                                   <Ionicons
                                     name='checkmark'
                                     size={20}

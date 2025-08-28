@@ -2,9 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { STAFF } from '../data/staff';
-import type { StaffFormSchemaType } from '../schemas';
-import type { Staff } from '../types';
+import { StaffFormSchemaType } from '../schemas';
+import { Staff } from '../types';
 
 interface StaffStore {
   staffs: Staff[];
@@ -22,7 +21,7 @@ interface StaffStore {
 export const useStaffStore = create<StaffStore>()(
   persist(
     (set, get) => ({
-      staffs: STAFF,
+      staffs: [],
 
       // 직원 추가
       addStaff: staff => {
