@@ -1,6 +1,6 @@
 import { BaseItem, ModalProps, Optionable } from './common';
-import { Discount as DiscountFromDiscount } from './discount';
 import {
+  DiscountType,
   OrderReceiptMethod as OrderReceiptMethodEnum,
   PaymentMethod
 } from './enums';
@@ -56,6 +56,8 @@ export interface DiscountModalProps extends ModalProps {
 export interface NumberInputModalProps extends ModalProps {
   onConfirm: (number: string) => void;
   type?: NumberInputType;
+  errorMessage?: string;
+  onInputChange?: () => void;
 }
 
 export interface SelectAllCheckboxProps {
