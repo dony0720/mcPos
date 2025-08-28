@@ -256,7 +256,7 @@ export default function MenuAddModal({
             {/* 카테고리 선택 (다중 선택) */}
             <View className='mb-4'>
               <Text className='text-sm font-medium text-gray-700 mb-2'>
-                카테고리 * (최대 5개)
+                카테고리
               </Text>
               <TouchableOpacity
                 className={clsx(

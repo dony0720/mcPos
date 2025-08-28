@@ -292,7 +292,7 @@ export default function MenuEditModal({
             {/* 카테고리 선택 */}
             <View className='mb-4'>
               <Text className='text-sm font-medium text-gray-700 mb-2'>
-                카테고리 * (다중 선택 가능)
+                카테고리
               </Text>
               <TouchableOpacity
                 className={clsx(
