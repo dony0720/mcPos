@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   Modal,
@@ -46,11 +46,24 @@ export default function LedgerRegistrationModal({
   const [showPaymentMethodDropdown, setShowPaymentMethodDropdown] =
     useState(false);
 
-  // 접수자 옵션 (스키마에서 가져옴)
-  const receptionistOptions = useStaffStore(state => state.staffs);
+  // 접수자 옵션 (중복 제거)
+  const allStaffs = useStaffStore(state => state.staffs);
+  const receptionistOptions = allStaffs.filter(
+    (staff, index, self) =>
+      index ===
+      self.findIndex(s => s.name === staff.name && s.phone === staff.phone)
+  );
 
   // 결제수단 옵션 (스키마에서 가져옴)
   const paymentMethodOptions = [...PAYMENT_METHOD_OPTIONS];
+
+  // 모달이 열릴 때 드롭다운 상태 초기화
+  useEffect(() => {
+    if (visible) {
+      setShowReceptionistDropdown(false);
+      setShowPaymentMethodDropdown(false);
+    }
+  }, [visible]);
 
   // 폼 제출 핸들러 - 검증이 통과된 경우에만 호출됨
   const onSubmit = (data: LedgerRegistrationFormData) => {
@@ -60,6 +73,8 @@ export default function LedgerRegistrationModal({
 
   const handleClose = () => {
     reset(); // 폼 초기화
+    setShowReceptionistDropdown(false); // 접수자 드롭다운 닫기
+    setShowPaymentMethodDropdown(false); // 결제수단 드롭다운 닫기
     onClose();
   };
 
@@ -81,13 +96,19 @@ export default function LedgerRegistrationModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl p-6 w-4/5 max-w-md h-[65%] flex flex-col'>
+        <View className='bg-white rounded-2xl p-6 w-4/5 max-w-md h-[70%] flex flex-col'>
+          {/* 헤더 영역 */}
           <Text className='text-xl font-bold text-center mb-4'>장부 등록</Text>
           <Text className='text-gray-600 text-center mb-6'>
             새로운 고객 장부를 등록합니다.
           </Text>
 
-          <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
+          {/* 콘텐츠 영역 (스크롤) */}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            className='flex-1'
+            contentContainerStyle={{ paddingBottom: 150 }}
+          >
             {/* 이름 입력 */}
             <View className='mb-4'>
               <Text className='text-gray-700 font-semibold mb-2'>이름</Text>
@@ -218,16 +239,23 @@ export default function LedgerRegistrationModal({
                               key={index}
                               className='px-4 py-3 border-b border-gray-100 last:border-b-0'
                               onPress={() => {
-                                onChange(option.name);
-                                setValue('receptionist', option.name);
+                                const displayText = `${option.name} (${option.phone})`;
+                                onChange(displayText);
+                                setValue('receptionist', displayText);
                                 setShowReceptionistDropdown(false);
                               }}
                             >
                               <View className='flex-row items-center justify-between'>
-                                <Text className='text-gray-800'>
-                                  {option.name}
-                                </Text>
-                                {value === option.name && (
+                                <View className='flex-1'>
+                                  <Text className='text-gray-800 font-medium'>
+                                    {option.name}
+                                  </Text>
+                                  <Text className='text-gray-500 text-sm'>
+                                    {option.phone}
+                                  </Text>
+                                </View>
+                                {value ===
+                                  `${option.name} (${option.phone})` && (
                                   <Ionicons
                                     name='checkmark'
                                     size={20}
@@ -287,9 +315,9 @@ export default function LedgerRegistrationModal({
                       />
                     </Pressable>
 
-                    {/* 옵션 목록 - 항상 표시 */}
+                    {/* 옵션 목록 - 아래쪽으로 열림 */}
                     {showPaymentMethodDropdown && (
-                      <View className='absolute top-full left-0 right-0 z-10 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48'>
+                      <View className='absolute top-full left-0 right-0 z-50 bg-white border border-gray-300 rounded-lg shadow-lg mt-1'>
                         <ScrollView
                           showsVerticalScrollIndicator={false}
                           className='max-h-48'
@@ -297,23 +325,29 @@ export default function LedgerRegistrationModal({
                           {paymentMethodOptions.map((option, index) => (
                             <Pressable
                               key={index}
-                              className='px-4 py-3 border-b border-gray-100 last:border-b-0'
+                              className='px-4 py-4 min-h-[56px] flex-row items-center justify-between border-b border-gray-100 last:border-b-0 active:bg-blue-100'
+                              hitSlop={{
+                                top: 10,
+                                bottom: 10,
+                                left: 10,
+                                right: 10,
+                              }}
                               onPress={() => {
                                 onChange(option);
                                 setValue('paymentMethod', option);
                                 setShowPaymentMethodDropdown(false);
                               }}
                             >
-                              <View className='flex-row items-center justify-between'>
-                                <Text className='text-gray-800'>{option}</Text>
-                                {value === option && (
-                                  <Ionicons
-                                    name='checkmark'
-                                    size={20}
-                                    color='#10B981'
-                                  />
-                                )}
-                              </View>
+                              <Text className='text-gray-800 flex-1'>
+                                {option}
+                              </Text>
+                              {value === option && (
+                                <Ionicons
+                                  name='checkmark'
+                                  size={20}
+                                  color='#10B981'
+                                />
+                              )}
                             </Pressable>
                           ))}
                         </ScrollView>
@@ -332,32 +366,34 @@ export default function LedgerRegistrationModal({
             </View>
           </ScrollView>
 
-          {/* 버튼들 */}
-          <View className='flex-row gap-3'>
-            <Pressable
-              className='flex-1 p-3 border border-gray-300 rounded-lg'
-              onPress={handleClose}
-            >
-              <Text className='text-gray-600 text-center font-semibold'>
-                취소
-              </Text>
-            </Pressable>
-
-            <Pressable
-              className={`flex-1 p-3 rounded-lg ${
-                isValid ? 'bg-primaryGreen' : 'bg-gray-300'
-              }`}
-              onPress={handleSubmit(onSubmit)}
-              disabled={!isValid}
-            >
-              <Text
-                className={`text-center font-semibold ${
-                  isValid ? 'text-white' : 'text-gray-500'
-                }`}
+          {/* 버튼 영역 */}
+          <View className='p-6 pt-4 '>
+            <View className='flex-row gap-3'>
+              <Pressable
+                className='flex-1 p-3 border border-gray-300 rounded-lg'
+                onPress={handleClose}
               >
-                등록
-              </Text>
-            </Pressable>
+                <Text className='text-gray-600 text-center font-semibold'>
+                  취소
+                </Text>
+              </Pressable>
+
+              <Pressable
+                className={`flex-1 p-3 rounded-lg ${
+                  isValid ? 'bg-primaryGreen' : 'bg-gray-300'
+                }`}
+                onPress={handleSubmit(onSubmit)}
+                disabled={!isValid}
+              >
+                <Text
+                  className={`text-center font-semibold ${
+                    isValid ? 'text-white' : 'text-gray-500'
+                  }`}
+                >
+                  등록
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </View>
