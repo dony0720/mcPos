@@ -57,8 +57,8 @@ export default function DiscountEditModal({
 
   // 할인 유형 옵션
   const TYPE_OPTIONS = [
-    { value: DiscountType.PERCENTAGE, label: '퍼센트 할인 (%)' },
     { value: DiscountType.FIXED_AMOUNT, label: '고정금액 할인 (원)' },
+    { value: DiscountType.PERCENTAGE, label: '퍼센트 할인 (%)' },
   ];
 
   // 모달이 열릴 때 기존 할인 정보로 폼 초기화
