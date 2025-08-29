@@ -48,7 +48,6 @@ export default function Payment() {
     removeItem,
     applyDiscount,
     removeDiscount,
-    clearAllDiscounts,
     clearOrder,
   } = useOrderStore();
 
@@ -173,14 +172,13 @@ export default function Payment() {
     return breakdown;
   };
 
-  // 페이지 포커스 시 모든 할인 제거
+  // 페이지 포커스 시 선택 상태만 초기화 (할인은 유지)
   useFocusEffect(
     useCallback(() => {
-      clearAllDiscounts();
-      // 선택 상태도 초기화
+      // 선택 상태만 초기화
       setCheckedItems(new Set());
       setIsAllChecked(false);
-    }, [clearAllDiscounts])
+    }, [])
   );
 
   // 간단한 핸들러들

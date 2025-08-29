@@ -15,6 +15,13 @@ export interface OrderItemProps {
   options: string[];
   quantity: number;
   price: string;
+  discount?: {
+    id: string;
+    name: string;
+    value: number;
+    type: DiscountType;
+  };
+  originalPrice?: string; // 할인 전 원가격
   onIncrease: () => void;
   onDecrease: () => void;
   onRemove: () => void;

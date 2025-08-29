@@ -4,7 +4,7 @@ import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useButtonAnimation } from '../../hooks';
 import type { OrderSectionProps } from '../../types';
-import { calculateItemPrice } from '../../utils';
+import { calculateItemPrice, calculateMenuUnitPrice } from '../../utils';
 import OrderItem from './OrderItem';
 
 export default function OrderSection({
@@ -30,8 +30,18 @@ export default function OrderSection({
             contentContainerClassName='gap-4'
           >
             {items.map(item => {
-              // 유틸리티 함수로 단위 가격 계산
-              const itemUnitPrice = calculateItemPrice(item);
+              // 할인이 적용된 총 가격 계산
+              const itemTotalPrice = calculateItemPrice(item);
+
+              // 할인 정보가 있는 경우 원가격 계산
+              let originalTotalPrice = null;
+              if (item.discount) {
+                const originalUnitPrice = calculateMenuUnitPrice(
+                  item.menuItem,
+                  item.options
+                );
+                originalTotalPrice = originalUnitPrice * item.quantity;
+              }
 
               return (
                 <OrderItem
@@ -39,7 +49,13 @@ export default function OrderSection({
                   menuName={`${item.menuItem.name} (${item.menuItem.temperature})`}
                   options={item.options}
                   quantity={item.quantity}
-                  price={`${itemUnitPrice.toLocaleString()}원`}
+                  price={`${itemTotalPrice.toLocaleString()}원`}
+                  discount={item.discount}
+                  originalPrice={
+                    originalTotalPrice
+                      ? `${originalTotalPrice.toLocaleString()}원`
+                      : undefined
+                  }
                   onIncrease={() => onUpdateQuantity(item.id, 1)}
                   onDecrease={() => onUpdateQuantity(item.id, -1)}
                   onRemove={() => onRemoveItem(item.id)}
