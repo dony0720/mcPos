@@ -16,12 +16,16 @@ export default function MenuInfoCard({
   return (
     <View className='flex-row mb-6'>
       {/* 메뉴 이미지 섹션 */}
-      <View className='w-36 h-36 rounded-lg overflow-hidden mr-4'>
-        <Image
-          source={require('../../assets/images/coffeeTest.png')}
-          className='w-full h-full'
-          resizeMode='cover'
-        />
+      <View className='flex items-center justify-center w-36 h-36 rounded-lg overflow-hidden mr-4'>
+        {menuItem.image ? (
+          <Image
+            source={{ uri: menuItem.image }}
+            className='w-full h-full'
+            resizeMode='cover'
+          />
+        ) : (
+          <Text className='text-4xl'>☕</Text>
+        )}
       </View>
 
       {/* 메뉴 정보 및 수량 선택 섹션 */}

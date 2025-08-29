@@ -13,7 +13,7 @@ export interface MenuItem extends BaseItem {
   category: MenuCategory;
   temperature?: Temperature;
   description?: string;
-  image?: any;
+  image?: string;
   availableOptions?: MenuOption[]; // 이 메뉴에서 선택 가능한 옵션들
 }
 
@@ -32,6 +32,7 @@ export interface MenuItemProps {
   id: string;
   name: string;
   price: string;
+  image?: string;
   onPress: () => void;
 }
 
