@@ -10,7 +10,7 @@ export interface MenuOption {
 }
 
 export interface MenuItem extends BaseItem {
-  category: MenuCategory;
+  categories: MenuCategory[]; // 다중 카테고리 지원
   temperature?: Temperature;
   description?: string;
   image?: any;
@@ -65,7 +65,7 @@ export interface CategoryTabsProps {
 export interface MenuFormData {
   name: string;
   price: number;
-  category: string;
+  categories: string[]; // 다중 카테고리 지원
   image?: string;
   availableOptions?: MenuOption[];
 }

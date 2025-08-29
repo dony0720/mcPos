@@ -16,7 +16,7 @@ export const menuFormSchema = z.object({
     .min(1, '메뉴명을 입력해주세요')
     .max(50, '메뉴명은 50자 이하로 입력해주세요'),
   price: z.number().min(0, '가격은 0원 이상이어야 합니다'),
-  category: z.string(),
+  categories: z.array(z.string()).min(1, '최소 하나의 카테고리를 선택해주세요'),
   image: z.string().optional(),
   availableOptions: z.array(menuOptionSchema).optional().default([]),
 });

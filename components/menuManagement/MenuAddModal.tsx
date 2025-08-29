@@ -19,18 +19,18 @@ import { useCategoryStore } from '@/stores';
 
 import { menuFormSchema, menuOptionSchema } from '../../schemas';
 import type { MenuAddModalProps, MenuFormData, MenuOption } from '../../types';
-
-// 옵션 폼용 타입
-type OptionFormData = {
-  name: string;
-  price: number;
-};
 import {
   formatPrice,
   handleImageSelection,
   handlePriceInput,
   ImageToast,
 } from '../../utils';
+
+// 옵션 폼용 타입
+type OptionFormData = {
+  name: string;
+  price: number;
+};
 
 /**
  * 메뉴 추가 모달 컴포넌트
@@ -59,7 +59,7 @@ export default function MenuAddModal({
     defaultValues: {
       name: '',
       price: 0,
-      category: '',
+      categories: [],
       image: undefined,
       availableOptions: [],
     },
@@ -80,7 +80,7 @@ export default function MenuAddModal({
     },
   });
 
-  const selectedCategory = watch('category');
+  const selectedCategories = watch('categories');
 
   // 모달이 열릴 때마다 폼 초기화
   useEffect(() => {
@@ -113,16 +113,41 @@ export default function MenuAddModal({
     onClose();
   };
 
-  const handleCategorySelect = (category: string) => {
-    setValue('category', category as MenuFormData['category'], {
+  const handleCategoryToggle = (categoryId: string) => {
+    const currentCategories = selectedCategories || [];
+    const isSelected = currentCategories.includes(categoryId);
+
+    let newCategories: string[];
+    if (isSelected) {
+      // 이미 선택된 경우 제거
+      newCategories = currentCategories.filter(id => id !== categoryId);
+    } else {
+      // 선택되지 않은 경우 추가
+      newCategories = [...currentCategories, categoryId];
+    }
+
+    setValue('categories', newCategories, {
       shouldValidate: true,
     });
-    setShowCategoryDropdown(false);
   };
 
-  const selectedCategoryLabel = categories.find(
-    category => category.id === selectedCategory
-  )?.name;
+  const getSelectedCategoriesLabel = () => {
+    if (!selectedCategories || selectedCategories.length === 0) {
+      return '카테고리를 선택하세요';
+    }
+
+    const selectedNames = selectedCategories
+      .map(id => categories.find(cat => cat.id === id)?.name)
+      .filter(Boolean);
+
+    if (selectedNames.length === 1) {
+      return selectedNames[0];
+    } else if (selectedNames.length <= 3) {
+      return selectedNames.join(', ');
+    } else {
+      return `${selectedNames[0]} 외 ${selectedNames.length - 1}개`;
+    }
+  };
 
   // 옵션 추가 함수 (Controller 사용)
   const handleAddOption = (data: OptionFormData) => {
@@ -228,25 +253,27 @@ export default function MenuAddModal({
               )}
             </View>
 
-            {/* 카테고리 선택 */}
+            {/* 카테고리 선택 (다중 선택) */}
             <View className='mb-4'>
               <Text className='text-sm font-medium text-gray-700 mb-2'>
-                카테고리 *
+                카테고리
               </Text>
               <TouchableOpacity
                 className={clsx(
                   'border rounded-lg px-4 py-3 flex-row justify-between items-center',
-                  errors.category ? 'border-red-500' : 'border-gray-300',
+                  errors.categories ? 'border-red-500' : 'border-gray-300',
                   showCategoryDropdown && 'rounded-b-none border-b-0'
                 )}
                 onPress={() => setShowCategoryDropdown(!showCategoryDropdown)}
               >
                 <Text
                   className={clsx(
-                    selectedCategory ? 'text-gray-800' : 'text-gray-400'
+                    selectedCategories && selectedCategories.length > 0
+                      ? 'text-gray-800'
+                      : 'text-gray-400'
                   )}
                 >
-                  {selectedCategoryLabel || '카테고리를 선택하세요'}
+                  {getSelectedCategoriesLabel()}
                 </Text>
                 <Ionicons
                   name={showCategoryDropdown ? 'chevron-up' : 'chevron-down'}
@@ -255,30 +282,51 @@ export default function MenuAddModal({
                 />
               </TouchableOpacity>
 
-              {/* 드롭다운 목록 */}
+              {/* 드롭다운 목록 (체크박스 형태) */}
               {showCategoryDropdown && (
-                <View className='border border-t-0 border-gray-300 rounded-b-lg bg-white'>
-                  {categories.map((category, index) => (
-                    <TouchableOpacity
-                      key={category.id}
-                      className={clsx(
-                        'px-4 py-4',
-                        index !== categories.length - 1 &&
-                          'border-b border-gray-100'
-                      )}
-                      onPress={() => handleCategorySelect(category.id)}
-                    >
-                      <Text className='text-gray-800 text-base'>
-                        {category.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                <View className='border border-t-0 border-gray-300 rounded-b-lg bg-white max-h-48'>
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    {categories.map((category, index) => {
+                      const isSelected =
+                        selectedCategories?.includes(category.id) || false;
+                      return (
+                        <TouchableOpacity
+                          key={category.id}
+                          className={clsx(
+                            'px-4 py-4 flex-row items-center justify-between',
+                            index !== categories.length - 1 &&
+                              'border-b border-gray-100',
+                            isSelected && 'bg-green-50'
+                          )}
+                          onPress={() => handleCategoryToggle(category.id)}
+                        >
+                          <Text
+                            className={clsx(
+                              'text-base',
+                              isSelected
+                                ? 'text-primaryGreen font-medium'
+                                : 'text-gray-800'
+                            )}
+                          >
+                            {category.name}
+                          </Text>
+                          {isSelected && (
+                            <Ionicons
+                              name='checkmark-circle'
+                              size={20}
+                              color='#10B981'
+                            />
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
                 </View>
               )}
 
-              {errors.category && (
+              {errors.categories && (
                 <Text className='text-red-500 text-sm mt-1 px-1'>
-                  {errors.category.message}
+                  {errors.categories.message}
                 </Text>
               )}
             </View>
