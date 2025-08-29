@@ -77,6 +77,7 @@ export default function MenuGrid({
                   id={item.id}
                   name={item.name}
                   price={`${item.price.toLocaleString()}원`}
+                  image={item.image}
                   onPress={() => handleMenuItemPress(item)}
                 />
               </View>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 /**
  * 메뉴 아이템 컴포넌트
@@ -7,7 +7,13 @@ import { Text, TouchableOpacity, View } from 'react-native';
  */
 import type { MenuItemProps } from '../../types';
 
-export default function MenuItem({ id, name, price, onPress }: MenuItemProps) {
+export default function MenuItem({
+  id,
+  name,
+  price,
+  image,
+  onPress,
+}: MenuItemProps) {
   return (
     <View key={id} className='w-full h-full box-border'>
       <TouchableOpacity onPress={onPress} className='w-full h-full'>
@@ -19,8 +25,16 @@ export default function MenuItem({ id, name, price, onPress }: MenuItemProps) {
               className='w-full h-full'
               resizeMode='cover'
             /> */}
-          <View className='bg-gray-100 rounded-lg aspect-square flex items-center justify-center'>
-            <Text className='text-4xl'>☕</Text>
+          <View className='bg-gray-100 rounded-lg aspect-square flex items-center justify-center overflow-hidden'>
+            {image ? (
+              <Image
+                source={{ uri: image }}
+                className='w-full h-full'
+                resizeMode='cover'
+              />
+            ) : (
+              <Text className='text-4xl'>☕</Text>
+            )}
           </View>
 
           {/* 메뉴 정보 섹션 */}
