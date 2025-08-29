@@ -8,6 +8,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { AdminProtectedRoute } from '../../components';
 import PageHeader from '../../components/common/PageHeader';
 import {
+  CashTransactionModal,
   EmptyState,
   FilterTabs,
   ReceiptModal,
@@ -30,11 +31,22 @@ export default function History() {
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
   const [receiptModalVisible, setReceiptModalVisible] = useState(false);
+  const [cashTransactionModalVisible, setCashTransactionModalVisible] =
+    useState(false);
 
   // 거래내역 클릭 핸들러
   const handleTransactionPress = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
-    setReceiptModalVisible(true);
+
+    // 입출금 거래인지 확인하여 적절한 모달 열기
+    if (
+      transaction.type === TransactionType.CASH_DEPOSIT ||
+      transaction.type === TransactionType.CASH_WITHDRAWAL
+    ) {
+      setCashTransactionModalVisible(true);
+    } else {
+      setReceiptModalVisible(true);
+    }
   };
 
   // 영수증 모달 닫기
@@ -43,10 +55,22 @@ export default function History() {
     setSelectedTransaction(null);
   };
 
-  // 출력 버튼 핸들러
-  const handlePrint = () => {
+  // 입출금 모달 닫기
+  const closeCashTransactionModal = () => {
+    setCashTransactionModalVisible(false);
+    setSelectedTransaction(null);
+  };
+
+  // 출력 버튼 핸들러 (영수증용)
+  const handleReceiptPrint = () => {
     // 실제 출력 로직 구현
     closeReceiptModal();
+  };
+
+  // 출력 버튼 핸들러 (입출금용)
+  const handleCashTransactionPrint = () => {
+    // 실제 출력 로직 구현
+    closeCashTransactionModal();
   };
 
   // 결제 방법 ID를 한글로 변환
@@ -132,12 +156,20 @@ export default function History() {
             )}
           </ScrollView>
 
-          {/* 영수증 모달 */}
+          {/* 영수증 모달 (주문 거래용) */}
           <ReceiptModal
             visible={receiptModalVisible}
             transaction={selectedTransaction}
             onClose={closeReceiptModal}
-            onPrint={handlePrint}
+            onPrint={handleReceiptPrint}
+          />
+
+          {/* 입출금 거래 모달 */}
+          <CashTransactionModal
+            visible={cashTransactionModalVisible}
+            transaction={selectedTransaction}
+            onClose={closeCashTransactionModal}
+            onPrint={handleCashTransactionPrint}
           />
         </View>
       </View>
