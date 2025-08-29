@@ -169,13 +169,6 @@ export default function TransactionItem({
                 </Text>
               </View>
             </View>
-            {(transaction.type === TransactionType.CASH_DEPOSIT ||
-              transaction.type === TransactionType.CASH_WITHDRAWAL) &&
-              transaction.description && (
-                <Text className='text-sm text-gray-600 mb-1'>
-                  {transaction.description}
-                </Text>
-              )}
 
             <View className='flex flex-row items-center gap-2'>
               <Text className='text-gray-600 text-sm font-medium'>
