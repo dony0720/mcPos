@@ -22,7 +22,7 @@ export interface OrderItemProps {
 
 // 주문 관련 액션들
 export interface OrderStoreActions {
-  addItem: (menuItem: MenuItem, options: string[]) => void;
+  addItem: (menuItem: MenuItem, options: string[], quantity?: number) => void;
   updateQuantity: (itemId: string, change: number) => void;
   removeItem: (itemId: string) => void;
   applyDiscount: (
