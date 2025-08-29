@@ -1,7 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import { useCashStore, useTransactionStore } from '../../stores';
+import {
+  useCashStore,
+  useLedgerStore,
+  useTransactionStore,
+} from '../../stores';
 import { SalesTheme, TransactionType } from '../../types';
 import SalesInfoCard from './SalesInfoCard';
 
@@ -9,6 +13,7 @@ export default function SalesInfoCards() {
   // 실제 데이터 가져오기
   const { getTodayDeposits, getTodayWithdrawals } = useCashStore();
   const { getTransactionStats, getTodayTransactions } = useTransactionStore();
+  const { ledgerData, parseAmount } = useLedgerStore();
 
   // 오늘의 통계 계산
   const todayStats = getTransactionStats({
@@ -52,11 +57,17 @@ export default function SalesInfoCards() {
     return sum + (t.paymentMethod === 'coupon' ? t.totalAmount : 0);
   }, 0);
 
-  const ledgerSales = completedOrderTransactions.reduce((sum, t) => {
-    if (t.paymentBreakdown?.ledger) {
-      return sum + t.paymentBreakdown.ledger;
-    }
-    return sum + (t.paymentMethod === 'ledger' ? t.totalAmount : 0);
+  // 장부 결제 매출 (현재는 사용하지 않지만 나중에 필요할 수 있음)
+  // const ledgerSales = completedOrderTransactions.reduce((sum, t) => {
+  //   if (t.paymentBreakdown?.ledger) {
+  //     return sum + t.paymentBreakdown.ledger;
+  //   }
+  //   return sum + (t.paymentMethod === 'ledger' ? t.totalAmount : 0);
+  // }, 0);
+
+  // 장부관리의 모든 장부 총 충전 금액 계산
+  const totalLedgerAmount = ledgerData.reduce((sum, ledger) => {
+    return sum + parseAmount(ledger.chargeAmount);
   }, 0);
 
   // 실제 데이터로 카드 구성
@@ -111,7 +122,7 @@ export default function SalesInfoCards() {
       {
         icon: 'book' as const,
         title: '장부',
-        amount: `${ledgerSales.toLocaleString()}원`,
+        amount: `${totalLedgerAmount.toLocaleString()}원`,
         theme: SalesTheme.INDIGO,
       },
     ],
