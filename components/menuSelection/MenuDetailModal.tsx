@@ -45,7 +45,7 @@ export default function MenuDetailModal({
   // 이벤트 핸들러
   /**
    * 장바구니 추가 핸들러
-   * 선택된 옵션들과 함께 장바구니에 메뉴를 추가
+   * 선택된 옵션들과 수량과 함께 장바구니에 메뉴를 추가
    */
   const handleAddToCart = () => {
     if (menuItem && onAddItem) {
@@ -54,7 +54,8 @@ export default function MenuDetailModal({
           ...menuItem,
           temperature: selectedTemperature,
         },
-        selectedOptions
+        selectedOptions,
+        quantity
       );
     }
     onClose();

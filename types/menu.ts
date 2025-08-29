@@ -38,12 +38,12 @@ export interface MenuItemProps {
 
 export interface MenuGridProps {
   selectedCategory: string;
-  onAddItem: (menuItem: MenuItem, options: string[]) => void;
+  onAddItem: (menuItem: MenuItem, options: string[], quantity?: number) => void;
 }
 
 export interface MenuDetailModalProps extends ModalProps {
   menuItem: MenuItem | null;
-  onAddItem?: (menuItem: MenuItem, options: string[]) => void;
+  onAddItem?: (menuItem: MenuItem, options: string[], quantity?: number) => void;
 }
 
 export interface MenuInfoCardProps {

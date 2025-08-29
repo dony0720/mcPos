@@ -10,11 +10,11 @@ export const useOrderStore = create<OrderState>(set => ({
   itemCount: 0,
 
   // 메뉴 아이템 추가
-  addItem: (menuItem: MenuItem, options: string[]) => {
+  addItem: (menuItem: MenuItem, options: string[], quantity: number = 1) => {
     const newItem: OrderItem = {
       id: Date.now().toString(),
       menuItem,
-      quantity: 1,
+      quantity,
       options,
     };
 
