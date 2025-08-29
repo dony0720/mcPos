@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
-import { Transaction } from '../../types';
+import { DiscountType, Transaction } from '../../types';
 
 interface ReceiptModalProps {
   visible: boolean;
@@ -93,7 +93,7 @@ export default function ReceiptModal({
             {transaction.orderItems?.map((item, index) => {
               // 할인이 적용된 경우 실제 가격 계산
               const actualPrice = item.discount
-                ? item.discount.type === 'fixed'
+                ? item.discount.type === DiscountType.FIXED_AMOUNT
                   ? item.discount.value
                   : item.menuItem.price - item.discount.value
                 : item.menuItem.price;
@@ -166,16 +166,18 @@ export default function ReceiptModal({
               );
             })}
           </ScrollView>
+
           {/* 구분선 */}
           <View className='w-full h-px bg-gray-300 mb-4' />
+
           {/* 하단 정보 */}
           <View className='items-center mb-6'>
             <Text className='text-xl font-bold mb-3'>
               총 결제금액: {transaction.totalAmount.toLocaleString()}원
             </Text>
           </View>
-          {/* 출력 버튼 */}
 
+          {/* 출력 버튼 */}
           <Pressable
             onPress={onPrint}
             className='bg-blue-500 rounded-lg py-3 px-6 items-center'
