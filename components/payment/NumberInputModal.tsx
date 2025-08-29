@@ -11,6 +11,8 @@ export default function NumberInputModal({
   onClose,
   onConfirm,
   type = 'pickup',
+  errorMessage,
+  onInputChange,
 }: NumberInputModalProps) {
   // 타입별 설정
   const config =
@@ -32,11 +34,13 @@ export default function NumberInputModal({
   const handleNumberPress = (number: string) => {
     if (inputNumber.length < maxLength) {
       setInputNumber(prev => prev + number);
+      onInputChange?.(); // 입력이 변경될 때 에러 메시지 초기화
     }
   };
 
   const handleBackspace = () => {
     setInputNumber(prev => prev.slice(0, -1));
+    onInputChange?.(); // 입력이 변경될 때 에러 메시지 초기화
   };
 
   const handleConfirm = () => {
@@ -100,6 +104,12 @@ export default function NumberInputModal({
             <Text className='text-center text-6xl font-normal text-gray-800 mb-2'>
               {inputNumber || ''}
             </Text>
+            {/* 에러 메시지 표시 */}
+            {errorMessage && (
+              <Text className='text-center text-red-500 text-base mt-2'>
+                {errorMessage}
+              </Text>
+            )}
           </View>
 
           {/* 번호 입력 키패드 섹션 */}

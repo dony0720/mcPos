@@ -77,6 +77,7 @@ export default function Payment() {
   const { openModal, closeModal, isModalOpen } = useModal();
   const [modalType, setModalType] = useState<NumberInputType>('pickup');
   const [isLedgerFirstStep, setIsLedgerFirstStep] = useState(false);
+  const [modalErrorMessage, setModalErrorMessage] = useState<string>('');
 
   // 현금 결제 관련 상태
   const [receivedAmount, setReceivedAmount] = useState(0);
@@ -270,6 +271,7 @@ export default function Payment() {
       // 장부 결제: 핸드폰 뒷자리 입력 모달 열기
       setModalType('phone');
       setIsLedgerFirstStep(true);
+      setModalErrorMessage(''); // 에러 메시지 초기화
       openModal('numberInput');
     } else {
       setModalType('pickup');
@@ -329,8 +331,9 @@ export default function Payment() {
 
       if (matchingLedgers.length === 0) {
         // 일치하는 장부가 없는 경우
-        console.warn('해당 핸드폰 뒷자리와 일치하는 장부가 없습니다.');
-        closeModal();
+        setModalErrorMessage(
+          '해당 핸드폰 뒷자리와 일치하는 장부가 없습니다. 다시 확인해주세요.'
+        );
         return;
       } else if (matchingLedgers.length === 1) {
         // 일치하는 장부가 하나인 경우 자동 선택
@@ -341,10 +344,9 @@ export default function Payment() {
         );
 
         if (currentAmount < totalAmount) {
-          console.warn(
+          setModalErrorMessage(
             `장부 잔액이 부족합니다. 잔액: ${ledger.chargeAmount}, 결제 금액: ${totalAmount.toLocaleString()}원`
           );
-          closeModal();
           return;
         }
 
@@ -412,7 +414,6 @@ export default function Payment() {
             receptionist: 'POS 시스템',
           });
         } catch (error) {
-          console.warn('장부 잔액이 부족합니다.');
           closeModal();
           return;
         }
@@ -434,6 +435,7 @@ export default function Payment() {
 
   const handleModalClose = () => {
     if (!isLedgerFirstStep) {
+      setModalErrorMessage(''); // 에러 메시지 초기화
       closeModal();
     }
   };
@@ -446,9 +448,6 @@ export default function Payment() {
       10
     );
     if (currentAmount < totalAmount) {
-      console.warn(
-        `장부 잔액이 부족합니다. 잔액: ${ledger.chargeAmount}, 결제 금액: ${totalAmount.toLocaleString()}원`
-      );
       return;
     }
 
@@ -566,6 +565,8 @@ export default function Payment() {
             onClose={handleModalClose}
             onConfirm={handleModalConfirm}
             type={modalType}
+            errorMessage={modalErrorMessage}
+            onInputChange={() => setModalErrorMessage('')}
           />
 
           {/* 장부 선택 모달 */}
