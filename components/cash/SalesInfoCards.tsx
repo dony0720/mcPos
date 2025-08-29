@@ -11,7 +11,8 @@ import SalesInfoCard from './SalesInfoCard';
 
 export default function SalesInfoCards() {
   // 실제 데이터 가져오기
-  const { getTodayDeposits, getTodayWithdrawals } = useCashStore();
+  const { getTodayDeposits, getTodayWithdrawals, getTotalCashAmount } =
+    useCashStore();
   const { getTransactionStats, getTodayTransactions } = useTransactionStore();
   const { ledgerData, parseAmount } = useLedgerStore();
 
@@ -22,6 +23,7 @@ export default function SalesInfoCards() {
   });
 
   const todayTransactions = getTodayTransactions();
+  const totalCash = getTotalCashAmount();
 
   // 오늘 입출금 데이터
   const todayDeposits = getTodayDeposits();
@@ -77,7 +79,7 @@ export default function SalesInfoCards() {
       {
         icon: 'play-circle' as const,
         title: '시작금액',
-        amount: `${(1000000).toLocaleString()}원`, // 고정값 (나중에 설정 가능하게 할 수 있음)
+        amount: `${totalCash.toLocaleString()}원`, // 고정값 (나중에 설정 가능하게 할 수 있음)
         theme: SalesTheme.GRAY,
       },
       {
