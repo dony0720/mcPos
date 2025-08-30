@@ -4,12 +4,12 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import {
   ChargeData,
+  CustomerAccountPaymentMethod as PaymentMethod,
+  CustomerAccountTransactionType as TransactionType,
   CustomerInfo,
+  CustomerTransaction as Transaction,
   LedgerData,
   LedgerRegistrationData,
-  CustomerAccountPaymentMethod as PaymentMethod,
-  CustomerTransaction as Transaction,
-  CustomerAccountTransactionType as TransactionType,
 } from '../types';
 
 // ===== Store State Interface =====
