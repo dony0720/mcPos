@@ -6,7 +6,10 @@ import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
  * - 선택된 메뉴의 상세 정보와 옵션 선택 기능을 제공하는 모달
  */
 import type { MenuDetailModalProps, Temperature } from '../../types';
-import { calculateMenuOptionPrice } from '../../utils';
+import {
+  calculateMenuOptionPrice,
+  calculateTemperaturePrice,
+} from '../../utils';
 import {
   MenuActionButtons,
   MenuInfoCard,
@@ -31,7 +34,12 @@ export default function MenuDetailModal({
     ? calculateMenuOptionPrice(selectedOptions, menuItem)
     : 0;
 
-  const totalPrice = menuItem ? (menuItem.price + optionPrice) * quantity : 0;
+  // 온도별 추가 가격 계산
+  const temperaturePrice = calculateTemperaturePrice(selectedTemperature);
+
+  const totalPrice = menuItem
+    ? (menuItem.price + optionPrice + temperaturePrice) * quantity
+    : 0;
 
   // 모달이 열릴 때마다 상태 초기화
   useEffect(() => {
