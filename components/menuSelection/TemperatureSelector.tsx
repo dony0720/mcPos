@@ -13,9 +13,21 @@ export default function TemperatureSelector({
   setSelectedTemperature,
 }: TemperatureSelectorProps) {
   // 온도 옵션 데이터
-  const temperatures: { value: Temperature; label: string; emoji: string }[] = [
-    { value: 'HOT', label: 'HOT', emoji: '🔥' },
-    { value: 'ICE', label: 'ICE', emoji: '🧊' },
+  const temperatures: {
+    value: Temperature;
+    label: string;
+    emoji: string;
+    price: number;
+    priceLabel: string;
+  }[] = [
+    { value: 'HOT', label: 'HOT', emoji: '🔥', price: 0, priceLabel: '' },
+    {
+      value: 'ICE',
+      label: 'ICE',
+      emoji: '🧊',
+      price: 500,
+      priceLabel: '+500원',
+    },
   ];
 
   return (
@@ -39,16 +51,27 @@ export default function TemperatureSelector({
             )}
           >
             {/* 온도 옵션 정보 */}
-            <View className='flex items-center gap-2'>
+            <View className='flex items-center gap-1'>
               <Text className='text-2xl'>{temp.emoji}</Text>
               <Text
-                className={clsx({
+                className={clsx('font-medium', {
                   'text-white': selectedTemperature === temp.value,
                   'text-gray-700': selectedTemperature !== temp.value,
                 })}
               >
                 {temp.label}
               </Text>
+              {/* 가격 정보 표시 */}
+              {temp.priceLabel && (
+                <Text
+                  className={clsx('text-xs', {
+                    'text-white/80': selectedTemperature === temp.value,
+                    'text-gray-500': selectedTemperature !== temp.value,
+                  })}
+                >
+                  {temp.priceLabel}
+                </Text>
+              )}
             </View>
           </TouchableOpacity>
         ))}

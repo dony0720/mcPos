@@ -157,8 +157,8 @@ export default function Payment() {
           breakdown.coupon = couponAmount;
           breakdown.cash = remainingAmount;
         } else {
-          // 쿠폰 전액 결제
-          breakdown.coupon = totalAmount;
+          // 쿠폰 전액 결제 또는 초과 결제
+          breakdown.coupon = couponAmount;
         }
         break;
       case PaymentMethod.TRANSFER:
@@ -288,7 +288,7 @@ export default function Payment() {
       // 남은 금액이 있으면 현금 결제 모달 열기
       setShouldOpenCashModal(true);
     } else {
-      // 쿠폰으로 전액 결제 완료시 바로 수령번호 모달 열기
+      // 쿠폰으로 전액 결제 완료 또는 초과 결제시 바로 수령번호 모달 열기
       setShouldOpenPickupModal(true);
     }
   };

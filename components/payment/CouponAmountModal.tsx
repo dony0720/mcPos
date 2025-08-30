@@ -30,7 +30,7 @@ export default function CouponAmountModal({
 
   const handleConfirm = () => {
     const couponAmount = parseInt(inputAmount) || 0;
-    if (couponAmount > 0 && couponAmount <= totalAmount) {
+    if (couponAmount > 0) {
       const remainingAmount = totalAmount - couponAmount;
       setInputAmount('');
       onConfirm(couponAmount, remainingAmount);
@@ -50,7 +50,7 @@ export default function CouponAmountModal({
   // 입력된 쿠폰 금액
   const couponAmount = parseInt(inputAmount) || 0;
   const remainingAmount = totalAmount - couponAmount;
-  const isValidAmount = couponAmount > 0 && couponAmount <= totalAmount;
+  const isValidAmount = couponAmount > 0;
 
   return (
     <Modal
@@ -106,12 +106,16 @@ export default function CouponAmountModal({
           {couponAmount > 0 && (
             <View className='mb-6'>
               <Text className='text-center text-lg text-gray-600 mb-2'>
-                {remainingAmount > 0 ? '남은 금액 (현금 결제)' : '완료'}
+                {remainingAmount > 0
+                  ? '남은 금액 (현금 결제)'
+                  : remainingAmount === 0
+                    ? '완료'
+                    : '초과 결제'}
               </Text>
               <Text
                 className={clsx('text-center text-3xl font-bold', {
-                  'text-green-600': isValidAmount,
-                  'text-red-500': !isValidAmount,
+                  'text-green-600': remainingAmount <= 0,
+                  'text-blue-600': remainingAmount > 0,
                 })}
               >
                 {remainingAmount >= 0
@@ -120,14 +124,19 @@ export default function CouponAmountModal({
               </Text>
 
               {/* 안내 메시지 */}
-              {isValidAmount && remainingAmount > 0 && (
+              {remainingAmount > 0 && (
                 <Text className='text-center text-sm text-gray-500 mt-2'>
                   남은 금액은 현금으로 결제됩니다
                 </Text>
               )}
-              {isValidAmount && remainingAmount === 0 && (
+              {remainingAmount === 0 && (
                 <Text className='text-center text-sm text-green-600 mt-2'>
                   쿠폰으로 전액 결제 완료
+                </Text>
+              )}
+              {remainingAmount < 0 && (
+                <Text className='text-center text-sm text-green-600 mt-2'>
+                  쿠폰으로 초과 결제 (거스름돈 없음)
                 </Text>
               )}
             </View>

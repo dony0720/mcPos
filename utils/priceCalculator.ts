@@ -5,6 +5,16 @@ import { DiscountType, MenuItem, OrderItem } from '../types';
  */
 
 /**
+ * 온도별 추가 가격 계산
+ */
+export const calculateTemperaturePrice = (temperature?: string): number => {
+  if (temperature === 'ICE') {
+    return 500; // 아이스 500원 추가
+  }
+  return 0; // HOT은 추가 요금 없음
+};
+
+/**
  * 특정 메뉴의 선택된 옵션들의 총 가격 계산
  */
 export const calculateMenuOptionPrice = (
@@ -19,11 +29,12 @@ export const calculateMenuOptionPrice = (
 };
 
 /**
- * 개별 주문 아이템의 총 가격 계산 (옵션 및 할인 포함)
+ * 개별 주문 아이템의 총 가격 계산 (옵션, 온도 및 할인 포함)
  */
 export const calculateItemPrice = (item: OrderItem): number => {
   const optionPrice = calculateMenuOptionPrice(item.options, item.menuItem);
-  const basePrice = item.menuItem.price + optionPrice;
+  const temperaturePrice = calculateTemperaturePrice(item.menuItem.temperature);
+  const basePrice = item.menuItem.price + optionPrice + temperaturePrice;
 
   // 할인이 적용된 경우
   if (item.discount) {
@@ -51,22 +62,24 @@ export const calculateTotalPrice = (orderItems: OrderItem[]): number => {
 };
 
 /**
- * 특정 메뉴 아이템의 단위 가격 계산 (수량 제외)
+ * 특정 메뉴 아이템의 단위 가격 계산 (수량 제외, 온도 포함)
  */
 export const calculateMenuUnitPrice = (
   menuItem: MenuItem,
   options: string[]
 ): number => {
   const optionPrice = calculateMenuOptionPrice(options, menuItem);
-  return menuItem.price + optionPrice;
+  const temperaturePrice = calculateTemperaturePrice(menuItem.temperature);
+  return menuItem.price + optionPrice + temperaturePrice;
 };
 
 /**
- * 할인이 적용된 개별 아이템의 단위 가격 계산 (수량 제외)
+ * 할인이 적용된 개별 아이템의 단위 가격 계산 (수량 제외, 온도 포함)
  */
 export const calculateDiscountedUnitPrice = (item: OrderItem): number => {
   const optionPrice = calculateMenuOptionPrice(item.options, item.menuItem);
-  const basePrice = item.menuItem.price + optionPrice;
+  const temperaturePrice = calculateTemperaturePrice(item.menuItem.temperature);
+  const basePrice = item.menuItem.price + optionPrice + temperaturePrice;
 
   // 할인이 적용된 경우
   if (item.discount) {
