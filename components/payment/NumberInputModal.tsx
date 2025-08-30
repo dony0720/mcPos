@@ -25,7 +25,7 @@ export default function NumberInputModal({
       : {
           maxLength: 3,
           fixedLength: false,
-          title: '수령방을 변호를 입력해 주세요',
+          title: '수령방을 번호를 입력해 주세요',
         };
 
   const { maxLength, fixedLength, title } = config;
