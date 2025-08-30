@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Tailwind 색상을 변수로 정의
 const COLORS = {
@@ -27,15 +26,13 @@ const TAB_CONFIG = [
 ] as const;
 
 export default function TabLayout() {
-  const insets = useSafeAreaInsets();
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          height: 140,
-          paddingBottom: Math.max(insets.bottom + 20, 45),
+          height: 100,
+          paddingBottom: 15,
           paddingTop: 15,
           paddingHorizontal: 20,
           backgroundColor: COLORS.white,

@@ -12,7 +12,6 @@ export const ManagementToast = {
     category: ToastCategoryType,
     name: string
   ) => {
-
     let categoryText = '';
     let actionText = '';
     let message = '';
