@@ -5,8 +5,8 @@ import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { useLedgerStore } from '../../stores';
 import {
-  HistoryModalProps,
   CustomerAccountTransactionType as TransactionType,
+  HistoryModalProps,
 } from '../../types';
 
 export default function HistoryModal({
