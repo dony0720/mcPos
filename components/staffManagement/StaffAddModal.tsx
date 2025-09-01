@@ -40,7 +40,6 @@ export default function StaffAddModal({
     mode: 'onChange',
     defaultValues: {
       name: '',
-      phone: '',
     },
   });
 
@@ -65,7 +64,7 @@ export default function StaffAddModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl w-4/5 h-[40%] max-w-md max-h-[600px]'>
+        <View className='bg-white rounded-2xl w-4/5 h-[20%] max-w-md max-h-[600px]'>
           {/* 헤더 */}
           <View className='flex-row justify-between items-center p-6 pb-4'>
             <Text className='text-xl font-bold text-gray-800'>
@@ -105,34 +104,6 @@ export default function StaffAddModal({
               {errors.name && (
                 <Text className='text-red-500 text-sm mt-1 px-1'>
                   {errors.name.message}
-                </Text>
-              )}
-            </View>
-
-            {/* 전화번호 입력 */}
-            <View className='mb-6'>
-              <Text className='text-sm font-medium text-gray-700 mb-2'>
-                전화번호 *
-              </Text>
-              <Controller
-                control={control}
-                name='phone'
-                render={({ field: { onChange, value } }) => (
-                  <TextInput
-                    className={clsx(
-                      'border rounded-lg px-4 py-3 bg-white',
-                      errors.phone ? 'border-red-500' : 'border-gray-300'
-                    )}
-                    placeholder='010-1234-5678'
-                    value={value}
-                    onChangeText={onChange}
-                    keyboardType='phone-pad'
-                  />
-                )}
-              />
-              {errors.phone && (
-                <Text className='text-red-500 text-sm mt-1 px-1'>
-                  {errors.phone.message}
                 </Text>
               )}
             </View>

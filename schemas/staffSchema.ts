@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { PHONE_REGEX } from '../constants/regex';
-
 /**
  * 직원 폼 데이터 스키마
  */
@@ -10,10 +8,6 @@ export const staffFormSchema = z.object({
     .string()
     .min(1, '직원명을 입력해주세요')
     .max(20, '직원명은 20자 이하로 입력해주세요'),
-  phone: z
-    .string()
-    .min(1, '전화번호를 입력해주세요')
-    .regex(PHONE_REGEX, '올바른 전화번호 형식이 아닙니다 (예: 010-1234-5678)'),
 });
 
 /**

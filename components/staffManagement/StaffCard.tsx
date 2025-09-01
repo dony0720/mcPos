@@ -29,11 +29,6 @@ export default function StaffCard({ staff, onEdit, onDelete }: StaffCardProps) {
         </Text>
       </View>
 
-      {/* 전화번호 */}
-      <View className='items-center mb-3'>
-        <Text className='text-sm text-gray-600'>{staff.phone}</Text>
-      </View>
-
       {/* 액션 버튼들 */}
       <View className='flex-row items-center justify-center gap-3'>
         {/* 편집 버튼 */}
