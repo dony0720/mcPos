@@ -284,43 +284,41 @@ export default function MenuAddModal({
 
               {/* 드롭다운 목록 (체크박스 형태) */}
               {showCategoryDropdown && (
-                <View className='border border-t-0 border-gray-300 rounded-b-lg bg-white max-h-48'>
-                  <ScrollView showsVerticalScrollIndicator={false}>
-                    {categories.map((category, index) => {
-                      const isSelected =
-                        selectedCategories?.includes(category.id) || false;
-                      return (
-                        <TouchableOpacity
-                          key={category.id}
+                <View className='border border-t-0 border-gray-300 rounded-b-lg bg-white'>
+                  {categories.map((category, index) => {
+                    const isSelected =
+                      selectedCategories?.includes(category.id) || false;
+                    return (
+                      <TouchableOpacity
+                        key={category.id}
+                        className={clsx(
+                          'px-4 py-4 flex-row items-center justify-between',
+                          index !== categories.length - 1 &&
+                            'border-b border-gray-100',
+                          isSelected && 'bg-green-50'
+                        )}
+                        onPress={() => handleCategoryToggle(category.id)}
+                      >
+                        <Text
                           className={clsx(
-                            'px-4 py-4 flex-row items-center justify-between',
-                            index !== categories.length - 1 &&
-                              'border-b border-gray-100',
-                            isSelected && 'bg-green-50'
+                            'text-base',
+                            isSelected
+                              ? 'text-primaryGreen font-medium'
+                              : 'text-gray-800'
                           )}
-                          onPress={() => handleCategoryToggle(category.id)}
                         >
-                          <Text
-                            className={clsx(
-                              'text-base',
-                              isSelected
-                                ? 'text-primaryGreen font-medium'
-                                : 'text-gray-800'
-                            )}
-                          >
-                            {category.name}
-                          </Text>
-                          {isSelected && (
-                            <Ionicons
-                              name='checkmark-circle'
-                              size={20}
-                              color='#10B981'
-                            />
-                          )}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
+                          {category.name}
+                        </Text>
+                        {isSelected && (
+                          <Ionicons
+                            name='checkmark-circle'
+                            size={20}
+                            color='#10B981'
+                          />
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               )}
 
