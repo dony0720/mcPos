@@ -103,23 +103,21 @@ export default function CashAmountModal({
           </View>
 
           {/* 거스름돈 표시 */}
-          {receivedAmount > 0 && (
-            <View className='mb-6'>
-              <Text className='text-center text-lg text-gray-600 mb-2'>
-                거스름돈
-              </Text>
-              <Text
-                className={clsx('text-center text-3xl font-bold', {
-                  'text-green-600': isValidAmount,
-                  'text-red-500': !isValidAmount,
-                })}
-              >
-                {changeAmount >= 0
-                  ? `${changeAmount.toLocaleString()}원`
-                  : `${Math.abs(changeAmount).toLocaleString()}원 부족`}
-              </Text>
-            </View>
-          )}
+          <View className='mb-6'>
+            <Text className='text-center text-lg text-gray-600 mb-2'>
+              거스름돈
+            </Text>
+            <Text
+              className={clsx('text-center text-3xl font-bold', {
+                'text-green-600': changeAmount >= 0,
+                'text-red-500': changeAmount < 0,
+              })}
+            >
+              {changeAmount >= 0
+                ? `${changeAmount.toLocaleString()}원`
+                : `${Math.abs(changeAmount).toLocaleString()}원 부족`}
+            </Text>
+          </View>
 
           {/* 번호 입력 키패드 섹션 */}
           <Keypad

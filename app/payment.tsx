@@ -322,27 +322,13 @@ export default function Payment() {
   }, [shouldOpenPickupModal, openModal]);
 
   const handleModalConfirm = (number: string) => {
-    // eslint-disable-next-line no-console
-    console.log('=== handleModalConfirm 호출 ===');
-    // eslint-disable-next-line no-console
-    console.log('입력 번호:', number);
-    // eslint-disable-next-line no-console
-    console.log('isLedgerFirstStep:', isLedgerFirstStep);
-    // eslint-disable-next-line no-console
-    console.log('modalType:', modalType);
-
     if (isLedgerFirstStep) {
       // 핸드폰 뒷자리 입력 완료 → 장부 검색 및 선택
       setPhoneLastDigits(number);
       const matchingLedgers = getLedgersByPhoneLastDigits(number);
 
-      // eslint-disable-next-line no-console
-      console.log('매칭된 장부 수:', matchingLedgers.length);
-
       if (matchingLedgers.length === 0) {
         // 일치하는 장부가 없는 경우
-        // eslint-disable-next-line no-console
-        console.log('장부 없음 - 에러 메시지 설정');
         setModalErrorMessage(
           `입력하신 번호 "${number}"와 일치하는 장부를 찾을 수 없습니다.\n장부에 등록된 핸드폰 번호의 뒷자리 4자리를 정확히 입력해주세요.`
         );
@@ -373,17 +359,9 @@ export default function Payment() {
       }
     } else {
       // 픽업 번호 입력 완료 또는 일반 결제 완료
-      // eslint-disable-next-line no-console
-      console.log('=== 픽업 번호 입력 완료 또는 일반 결제 완료 ===');
-      // eslint-disable-next-line no-console
-      console.log('selectedLedger:', selectedLedger);
-      // eslint-disable-next-line no-console
-      console.log('selectedPaymentMethod:', selectedPaymentMethod);
 
       // 장부 결제인데 선택된 장부가 없는 경우 차단
       if (selectedPaymentMethod === PaymentMethod.LEDGER && !selectedLedger) {
-        // eslint-disable-next-line no-console
-        console.log('❌ 장부 결제인데 선택된 장부가 없음 - 주문 차단');
         setModalErrorMessage(
           '장부 결제 오류가 발생했습니다.\n장부를 다시 선택해주세요.'
         );
