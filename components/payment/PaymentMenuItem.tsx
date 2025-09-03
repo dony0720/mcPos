@@ -11,6 +11,7 @@ export default function PaymentMenuItem({
   menuName,
   options,
   price,
+  menuImage,
 }: PaymentMenuItemProps) {
   return (
     // 결제 메뉴 아이템 섹션 - 개별 메뉴 정보 표시 및 관리 (전체 클릭 가능)
@@ -40,12 +41,16 @@ export default function PaymentMenuItem({
       {/* 메뉴 정보 섹션 - 이미지, 이름, 옵션 */}
       <View className='w-[70%] flex flex-row items-center gap-7 '>
         {/* 메뉴 이미지 */}
-        <View className='w-[100px] h-[100px] rounded-lg overflow-hidden'>
-          <Image
-            source={require('../../assets/images/coffeeTest.png')}
-            className='w-full h-full'
-            resizeMode='cover'
-          />
+        <View className='w-[100px] h-[100px] rounded-lg overflow-hidden bg-gray-100 items-center justify-center'>
+          {menuImage ? (
+            <Image
+              source={{ uri: menuImage }}
+              className='w-full h-full'
+              resizeMode='cover'
+            />
+          ) : (
+            <Ionicons name='image-outline' size={32} color='#9CA3AF' />
+          )}
         </View>
 
         {/* 메뉴 이름 및 옵션 */}
