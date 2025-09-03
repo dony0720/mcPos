@@ -2,6 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 
+import { useAuthStore } from '../../stores/useAuthStore';
+
 // Tailwind 색상을 변수로 정의
 const COLORS = {
   white: '#ffffff',
@@ -26,19 +28,25 @@ const TAB_CONFIG = [
 ] as const;
 
 export default function TabLayout() {
+  const { isAdminAuthenticated } = useAuthStore();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          height: 100,
-          paddingBottom: 15,
-          paddingTop: 15,
-          paddingHorizontal: 20,
-          backgroundColor: COLORS.white,
-          borderTopWidth: 1,
-          borderTopColor: COLORS.gray[300],
-        },
+        tabBarStyle: isAdminAuthenticated
+          ? {
+              height: 100,
+              paddingBottom: 15,
+              paddingTop: 15,
+              paddingHorizontal: 20,
+              backgroundColor: COLORS.white,
+              borderTopWidth: 1,
+              borderTopColor: COLORS.gray[300],
+            }
+          : {
+              display: 'none', // 관리자 모드가 아닐 때 탭바 숨김
+            },
         tabBarLabelStyle: {
           fontSize: 14,
           fontWeight: '600',
