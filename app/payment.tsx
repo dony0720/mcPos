@@ -495,6 +495,7 @@ export default function Payment() {
                 menuName={menuName}
                 options={item.options.join(', ')}
                 price={`${itemTotalPrice.toLocaleString()}원`}
+                menuImage={item.menuItem.image || ''}
               />
             );
           })}
