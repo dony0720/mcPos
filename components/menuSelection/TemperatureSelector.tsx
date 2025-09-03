@@ -5,15 +5,17 @@ import { Text, TouchableOpacity, View } from 'react-native';
 /**
  * 온도 선택자 컴포넌트
  * - 음료의 온도(Hot/Iced)를 선택할 수 있는 컴포넌트
+ * - 메뉴의 온도 제한에 따라 선택 가능한 옵션 필터링
  */
 import { Temperature, TemperatureSelectorProps } from '../../types';
 
 export default function TemperatureSelector({
   selectedTemperature,
   setSelectedTemperature,
+  temperatureRestriction,
 }: TemperatureSelectorProps) {
   // 온도 옵션 데이터
-  const temperatures: {
+  const allTemperatures: {
     value: Temperature;
     label: string;
     emoji: string;
@@ -29,6 +31,16 @@ export default function TemperatureSelector({
       priceLabel: '+500원',
     },
   ];
+
+  // 온도 제한에 따른 필터링
+  const temperatures = allTemperatures.filter(temp => {
+    if (temperatureRestriction === 'HOT_ONLY') {
+      return temp.value === 'HOT';
+    } else if (temperatureRestriction === 'ICE_ONLY') {
+      return temp.value === 'ICE';
+    }
+    return true; // 제한이 없는 경우(undefined) 모든 옵션 표시
+  });
 
   return (
     <View className='mb-6'>
@@ -52,19 +64,22 @@ export default function TemperatureSelector({
           >
             {/* 온도 옵션 정보 */}
             <View className='flex items-center gap-1'>
-              <Text className='text-2xl'>{temp.emoji}</Text>
-              <Text
-                className={clsx('font-medium', {
-                  'text-white': selectedTemperature === temp.value,
-                  'text-gray-700': selectedTemperature !== temp.value,
-                })}
-              >
-                {temp.label}
-              </Text>
+              <View className='flex-row items-center gap-1'>
+                <Text className='text-2xl'>{temp.emoji}</Text>
+
+                <Text
+                  className={clsx('font-medium', {
+                    'text-white': selectedTemperature === temp.value,
+                    'text-gray-700': selectedTemperature !== temp.value,
+                  })}
+                >
+                  {temp.label}
+                </Text>
+              </View>
               {/* 가격 정보 표시 */}
               {temp.priceLabel && (
                 <Text
-                  className={clsx('text-xs', {
+                  className={clsx('text-base', {
                     'text-white/80': selectedTemperature === temp.value,
                     'text-gray-500': selectedTemperature !== temp.value,
                   })}

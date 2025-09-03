@@ -63,6 +63,7 @@ export default function MenuEditModal({
       name: '',
       price: 0,
       categories: [],
+      temperatureRestriction: undefined,
       image: undefined,
       availableOptions: [],
     },
@@ -92,6 +93,7 @@ export default function MenuEditModal({
       setValue('name', menuItem.name);
       setValue('price', menuItem.price);
       setValue('categories', menuItem.categories || []);
+      setValue('temperatureRestriction', menuItem.temperatureRestriction);
       setValue('image', menuItem.image);
       setValue('availableOptions', options);
       setAvailableOptions([...options]);
@@ -363,6 +365,105 @@ export default function MenuEditModal({
                   {errors.categories.message}
                 </Text>
               )}
+            </View>
+
+            {/* 온도 제한 옵션 */}
+            <View className='mb-4'>
+              <Text className='text-sm font-medium text-gray-700 mb-3'>
+                온도 제한 (선택사항)
+              </Text>
+              <Controller
+                control={control}
+                name='temperatureRestriction'
+                render={({ field: { onChange, value } }) => (
+                  <View className='flex-row gap-4'>
+                    {/* HOT ONLY */}
+                    <TouchableOpacity
+                      className={clsx(
+                        'flex-1 border rounded-lg px-4 py-3 flex-row items-center',
+                        value === 'HOT_ONLY'
+                          ? 'border-orange-500 bg-orange-50'
+                          : 'border-gray-300'
+                      )}
+                      onPress={() =>
+                        onChange(value === 'HOT_ONLY' ? undefined : 'HOT_ONLY')
+                      }
+                    >
+                      <View
+                        className={clsx(
+                          'w-5 h-5 rounded border-2 mr-3 items-center justify-center',
+                          value === 'HOT_ONLY'
+                            ? 'border-orange-500 bg-orange-500'
+                            : 'border-gray-300'
+                        )}
+                      >
+                        {value === 'HOT_ONLY' && (
+                          <Text className='text-white text-xs font-bold'>
+                            ✓
+                          </Text>
+                        )}
+                      </View>
+                      <View className='flex-row items-center'>
+                        <Text className='mr-1'>🔥</Text>
+                        <Text
+                          className={clsx(
+                            'text-sm font-medium',
+                            value === 'HOT_ONLY'
+                              ? 'text-orange-500'
+                              : 'text-gray-700'
+                          )}
+                        >
+                          HOT ONLY
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+
+                    {/* ICE ONLY */}
+                    <TouchableOpacity
+                      className={clsx(
+                        'flex-1 border rounded-lg px-4 py-3 flex-row items-center',
+                        value === 'ICE_ONLY'
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-300'
+                      )}
+                      onPress={() =>
+                        onChange(value === 'ICE_ONLY' ? undefined : 'ICE_ONLY')
+                      }
+                    >
+                      <View
+                        className={clsx(
+                          'w-5 h-5 rounded border-2 mr-3 items-center justify-center',
+                          value === 'ICE_ONLY'
+                            ? 'border-blue-500 bg-blue-500'
+                            : 'border-gray-300'
+                        )}
+                      >
+                        {value === 'ICE_ONLY' && (
+                          <Text className='text-white text-xs font-bold'>
+                            ✓
+                          </Text>
+                        )}
+                      </View>
+                      <View className='flex-row items-center'>
+                        <Text className='mr-1'>🧊</Text>
+                        <Text
+                          className={clsx(
+                            'text-sm font-medium',
+                            value === 'ICE_ONLY'
+                              ? 'text-blue-500'
+                              : 'text-gray-700'
+                          )}
+                        >
+                          ICE ONLY
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              />
+              <Text className='text-xs text-gray-500 mt-2'>
+                선택하지 않으면 HOT, ICE 모두 선택 가능합니다.
+              </Text>
             </View>
 
             {/* 이미지 선택 */}

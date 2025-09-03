@@ -55,9 +55,20 @@ export default function MenuCard({ menu, onEdit, onDelete }: MenuCardProps) {
       {/* 메뉴 정보 */}
       <View>
         {/* 메뉴명 */}
-        <Text className='text-gray-900 text-base font-semibold mb-1'>
-          {menu.name}
-        </Text>
+        <View className='flex-row items-center mb-1'>
+          <Text className='text-gray-900 text-base font-semibold'>
+            {menu.name}
+          </Text>
+          {menu.temperatureRestriction && (
+            <View className='ml-2 bg-gray-100 px-2 py-1 rounded'>
+              <Text className='text-gray-600 text-xs font-medium'>
+                {menu.temperatureRestriction === 'HOT_ONLY'
+                  ? '🔥 HOT ONLY'
+                  : '🧊 ICE ONLY'}
+              </Text>
+            </View>
+          )}
+        </View>
 
         {/* 카테고리 */}
         <Text className='text-gray-500 text-sm mb-3'>{categoryName}</Text>
