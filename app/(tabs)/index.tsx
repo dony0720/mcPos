@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Animated, Pressable, Text, View } from 'react-native';
 
-import McPosLogo from '../../assets/icon/mcPosLogo.svg';
+import McPos from '../../assets/icon/McPos.svg';
 import {
   AdminModal,
   CategoryTabs,
@@ -69,7 +69,7 @@ export default function MenuSelection() {
         {/* 헤더 섹션 - 로고와 관리자 모드 버튼이 포함된 상단 헤더 */}
         <View className='w-full h-[80px] box-border px-[5%] mt-[25px] flex flex-row justify-between items-center '>
           {/* 로고 */}
-          <McPosLogo width={150} height={150} />
+          <McPos width={100} height={100} />
 
           {/* 관리자 모드 버튼 */}
           <Pressable

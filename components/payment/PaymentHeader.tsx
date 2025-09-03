@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Animated, Pressable, View } from 'react-native';
 
-import McPosLogo from '../../assets/icon/mcPosLogo.svg';
+import McPos from '../../assets/icon/McPos.svg';
 import { useButtonAnimation } from '../../hooks';
 import { PaymentHeaderProps } from '../../types';
 
@@ -31,7 +31,7 @@ export default function PaymentHeader({ onBack }: PaymentHeaderProps) {
         </Pressable>
 
         {/* 로고 */}
-        <McPosLogo width={150} height={150} />
+        <McPos width={100} height={100} />
       </View>
     </View>
   );
