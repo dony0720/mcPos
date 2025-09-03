@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import McPosLogo from '../../assets/icon/mcPosLogo.svg';
+import McPos from '../../assets/icon/McPos.svg';
 
 interface PageHeaderProps {
   children?: React.ReactNode;
@@ -10,7 +10,7 @@ interface PageHeaderProps {
 export default function PageHeader({ children }: PageHeaderProps) {
   return (
     <View className='w-full h-[80px] box-border mt-[25px] flex flex-row justify-between items-center'>
-      <McPosLogo width={150} height={150} />
+      <McPos width={100} height={100} />
       {children && <View>{children}</View>}
     </View>
   );

@@ -4,7 +4,7 @@ import LottieView from 'lottie-react-native';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
-import McPosLogo from '../assets/icon/mcPosLogo.svg';
+import McPos from '../assets/icon/McPos.svg';
 import { CashInspectionModal } from '../components';
 import { useCashStore } from '../stores';
 import { CashDrawerMoneyItem } from '../types';
@@ -75,7 +75,7 @@ export default function HomeScreen() {
   return (
     <View className='h-full w-full box-border px-[20%] bg-white flex flex-col items-center justify-center'>
       <View className='flex justify-center items-center'>
-        <McPosLogo className='w-full h-full' />
+        <McPos className='w-full h-full' />
       </View>
       <LottieView
         source={require('../assets/animation/mcCoffee.json')}
