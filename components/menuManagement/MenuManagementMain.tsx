@@ -80,6 +80,7 @@ export default function MenuManagementMain() {
       categories: menuData.categories,
       image: menuData.image,
       availableOptions: menuData.availableOptions,
+      temperatureRestriction: menuData.temperatureRestriction,
     });
 
     // 메뉴 추가 성공 Toast 표시
@@ -107,6 +108,7 @@ export default function MenuManagementMain() {
       categories: menuData.categories,
       image: menuData.image,
       availableOptions: menuData.availableOptions,
+      temperatureRestriction: menuData.temperatureRestriction,
     });
 
     setPendingSuccessToast({

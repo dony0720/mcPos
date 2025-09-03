@@ -3,6 +3,7 @@ import { DiscountType } from './enums';
 
 export type MenuCategory = string;
 export type Temperature = 'HOT' | 'ICE';
+export type TemperatureRestriction = 'HOT_ONLY' | 'ICE_ONLY';
 
 export interface MenuOption {
   name: string;
@@ -12,6 +13,7 @@ export interface MenuOption {
 export interface MenuItem extends BaseItem {
   categories: MenuCategory[]; // 다중 카테고리 지원
   temperature?: Temperature;
+  temperatureRestriction?: TemperatureRestriction; // 온도 제한 옵션
   description?: string;
   image?: string;
   availableOptions?: MenuOption[]; // 이 메뉴에서 선택 가능한 옵션들
@@ -55,6 +57,7 @@ export interface MenuInfoCardProps {
 export interface TemperatureSelectorProps {
   selectedTemperature: Temperature;
   setSelectedTemperature: (temperature: Temperature) => void;
+  temperatureRestriction?: TemperatureRestriction;
 }
 
 export interface CategoryTabsProps {
@@ -67,6 +70,7 @@ export interface MenuFormData {
   name: string;
   price: number;
   categories: string[]; // 다중 카테고리 지원
+  temperatureRestriction?: TemperatureRestriction; // 온도 제한 옵션
   image?: string;
   availableOptions?: MenuOption[];
 }

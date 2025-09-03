@@ -43,10 +43,19 @@ export default function MenuDetailModal({
 
   // 모달이 열릴 때마다 상태 초기화
   useEffect(() => {
-    if (visible) {
+    if (visible && menuItem) {
       setSelectedOptions([]);
-      setSelectedTemperature('HOT');
       setQuantity(1);
+
+      // 온도 제한에 따른 초기 온도 설정
+      if (menuItem.temperatureRestriction === 'ICE_ONLY') {
+        setSelectedTemperature('ICE');
+      } else if (menuItem.temperatureRestriction === 'HOT_ONLY') {
+        setSelectedTemperature('HOT');
+      } else {
+        // 제한이 없는 경우 기본값은 HOT
+        setSelectedTemperature('HOT');
+      }
     }
   }, [visible, menuItem]);
 
@@ -96,6 +105,7 @@ export default function MenuDetailModal({
             <TemperatureSelector
               selectedTemperature={selectedTemperature}
               setSelectedTemperature={setSelectedTemperature}
+              temperatureRestriction={menuItem?.temperatureRestriction}
             />
 
             {/* 추가 옵션 선택 섹션 */}
