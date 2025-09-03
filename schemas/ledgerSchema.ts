@@ -26,12 +26,13 @@ export const ledgerRegistrationSchema = z.object({
   phoneNumber: z
     .string()
     .trim() // 앞뒤 공백 제거
-    .min(1, '전화번호를 입력해주세요')
-    .regex(PHONE_REGEX, '올바른 전화번호 형식이 아닙니다 (010-1234-5678)')
-    .refine(
-      phone => phone.startsWith('010'),
-      '010으로 시작하는 전화번호만 입력 가능합니다'
-    ),
+    .min(1, '휴대폰 번호를 입력해주세요')
+    .regex(PHONE_REGEX, '올바른 휴대폰 번호 형식이 아닙니다 (010-1234-5678)')
+    .refine(phone => {
+      const numbersOnly = phone.replace(/\D/g, '');
+      // 휴대폰 번호만 허용 (010, 011, 016, 017, 018, 019)
+      return /^(010|011|016|017|018|019)\d{7,8}$/.test(numbersOnly);
+    }, '휴대폰 번호만 입력 가능합니다 (010, 011, 016, 017, 018, 019)'),
 
   initialAmount: z
     .string()

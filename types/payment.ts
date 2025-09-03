@@ -55,7 +55,7 @@ export interface DiscountModalProps extends ModalProps {
 }
 
 export interface NumberInputModalProps extends ModalProps {
-  onConfirm: (number: string) => void;
+  onConfirm: (number: string) => boolean;
   type?: NumberInputType;
   errorMessage?: string;
   onInputChange?: () => void;

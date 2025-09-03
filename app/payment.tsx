@@ -330,9 +330,9 @@ export default function Payment() {
       if (matchingLedgers.length === 0) {
         // 일치하는 장부가 없는 경우
         setModalErrorMessage(
-          '해당 핸드폰 뒷자리와 일치하는 장부가 없습니다. 다시 확인해주세요.'
+          `입력하신 번호 "${number}"와 일치하는 장부를 찾을 수 없습니다.\n장부에 등록된 핸드폰 번호의 뒷자리 4자리를 정확히 입력해주세요.`
         );
-        return;
+        return false; // 에러 발생으로 모달 유지
       } else if (matchingLedgers.length === 1) {
         // 일치하는 장부가 하나인 경우 자동 선택
         const ledger = matchingLedgers[0];
@@ -343,9 +343,9 @@ export default function Payment() {
 
         if (currentAmount < totalAmount) {
           setModalErrorMessage(
-            `장부 잔액이 부족합니다. 잔액: ${ledger.chargeAmount}, 결제 금액: ${totalAmount.toLocaleString()}원`
+            `${ledger.name}님의 장부 잔액이 부족합니다.\n\n잔액: ${ledger.chargeAmount}\n결제 금액: ${totalAmount.toLocaleString()}원\n\n충전 후 다시 시도해주세요.`
           );
-          return;
+          return false; // 에러 발생으로 모달 유지
         }
 
         setSelectedLedger(ledger);
@@ -355,10 +355,18 @@ export default function Payment() {
         // 일치하는 장부가 여러 개인 경우 선택 모달 표시
         setIsLedgerSelectionModalVisible(true);
         closeModal();
-        return;
+        return true; // 성공적으로 처리됨 (모달 전환)
       }
     } else {
       // 픽업 번호 입력 완료 또는 일반 결제 완료
+
+      // 장부 결제인데 선택된 장부가 없는 경우 차단
+      if (selectedPaymentMethod === PaymentMethod.LEDGER && !selectedLedger) {
+        setModalErrorMessage(
+          '장부 결제 오류가 발생했습니다.\n장부를 다시 선택해주세요.'
+        );
+        return false; // 에러 발생으로 모달 유지
+      }
 
       // 거래내역 저장
       const transactionId = addTransaction({
@@ -413,7 +421,7 @@ export default function Payment() {
           });
         } catch (error) {
           closeModal();
-          return;
+          return false; // 에러 발생
         }
       }
 
@@ -429,13 +437,8 @@ export default function Payment() {
       // 메뉴 선택 페이지로 이동
       router.push('/(tabs)');
     }
-  };
 
-  const handleModalClose = () => {
-    if (!isLedgerFirstStep) {
-      setModalErrorMessage(''); // 에러 메시지 초기화
-      closeModal();
-    }
+    return true; // 성공적으로 처리됨
   };
 
   // 장부 선택 핸들러
@@ -450,7 +453,6 @@ export default function Payment() {
     }
 
     setSelectedLedger(ledger);
-    setIsLedgerSelectionModalVisible(false);
     setIsLedgerFirstStep(false);
     setModalType('pickup');
     openModal('numberInput');
@@ -561,7 +563,10 @@ export default function Payment() {
           {/* 번호 입력 모달 */}
           <NumberInputModal
             visible={isModalOpen('numberInput')}
-            onClose={handleModalClose}
+            onClose={() => {
+              setModalErrorMessage(''); // 에러 메시지 초기화
+              closeModal();
+            }}
             onConfirm={handleModalConfirm}
             type={modalType}
             errorMessage={modalErrorMessage}

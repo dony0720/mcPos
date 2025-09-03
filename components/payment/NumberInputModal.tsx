@@ -48,7 +48,19 @@ export default function NumberInputModal({
       ? inputNumber.length === maxLength
       : inputNumber.length > 0;
     if (isValid) {
-      onConfirm(inputNumber);
+      try {
+        const result = onConfirm(inputNumber);
+        // onConfirm이 명시적으로 false를 반환하면 에러 상황으로 간주
+        if (!result) {
+          setInputNumber('');
+          // 모달은 닫지 않음 (에러 메시지 표시를 위해)
+          return;
+        }
+      } catch {
+        // onConfirm이 에러를 던지는 경우
+      }
+
+      // 기본 동작: 입력값 초기화하고 모달 닫기
       setInputNumber('');
       onClose();
     }
@@ -150,7 +162,7 @@ export default function NumberInputModal({
                     'text-gray-500': !isInputValid,
                   })}
                 >
-                  주문완료
+                  입력완료
                 </Text>
               </View>
             </Pressable>

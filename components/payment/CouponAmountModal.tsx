@@ -103,44 +103,42 @@ export default function CouponAmountModal({
           </View>
 
           {/* 남은 금액 표시 */}
-          {couponAmount > 0 && (
-            <View className='mb-6'>
-              <Text className='text-center text-lg text-gray-600 mb-2'>
-                {remainingAmount > 0
-                  ? '남은 금액 (현금 결제)'
-                  : remainingAmount === 0
-                    ? '완료'
-                    : '초과 결제'}
-              </Text>
-              <Text
-                className={clsx('text-center text-3xl font-bold', {
-                  'text-green-600': remainingAmount <= 0,
-                  'text-blue-600': remainingAmount > 0,
-                })}
-              >
-                {remainingAmount >= 0
-                  ? `${remainingAmount.toLocaleString()}원`
-                  : `${Math.abs(remainingAmount).toLocaleString()}원 초과`}
-              </Text>
+          <View className='mb-6'>
+            <Text className='text-center text-lg text-gray-600 mb-2'>
+              {remainingAmount > 0
+                ? '남은 금액 (현금 결제)'
+                : remainingAmount === 0
+                  ? '완료'
+                  : '초과 결제'}
+            </Text>
+            <Text
+              className={clsx('text-center text-3xl font-bold', {
+                'text-green-600': remainingAmount <= 0,
+                'text-blue-600': remainingAmount > 0,
+              })}
+            >
+              {remainingAmount >= 0
+                ? `${remainingAmount.toLocaleString()}원`
+                : `${Math.abs(remainingAmount).toLocaleString()}원 초과`}
+            </Text>
 
-              {/* 안내 메시지 */}
-              {remainingAmount > 0 && (
-                <Text className='text-center text-sm text-gray-500 mt-2'>
-                  남은 금액은 현금으로 결제됩니다
-                </Text>
-              )}
-              {remainingAmount === 0 && (
-                <Text className='text-center text-sm text-green-600 mt-2'>
-                  쿠폰으로 전액 결제 완료
-                </Text>
-              )}
-              {remainingAmount < 0 && (
-                <Text className='text-center text-sm text-green-600 mt-2'>
-                  쿠폰으로 초과 결제 (거스름돈 없음)
-                </Text>
-              )}
-            </View>
-          )}
+            {/* 안내 메시지 */}
+            {remainingAmount > 0 && (
+              <Text className='text-center text-sm text-gray-500 mt-2'>
+                남은 금액은 현금으로 결제됩니다
+              </Text>
+            )}
+            {remainingAmount === 0 && (
+              <Text className='text-center text-sm text-green-600 mt-2'>
+                쿠폰으로 전액 결제 완료
+              </Text>
+            )}
+            {remainingAmount < 0 && (
+              <Text className='text-center text-sm text-green-600 mt-2'>
+                쿠폰으로 초과 결제 (거스름돈 없음)
+              </Text>
+            )}
+          </View>
 
           {/* 번호 입력 키패드 섹션 */}
           <Keypad
