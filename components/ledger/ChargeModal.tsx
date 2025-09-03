@@ -60,9 +60,7 @@ export default function ChargeModal({
   // 접수자 옵션 (스토어에서 중복 제거)
   const allStaffs = useStaffStore(state => state.staffs);
   const receptionistOptions = allStaffs.filter(
-    (staff, index, self) =>
-      index ===
-      self.findIndex(s => s.name === staff.name && s.phone === staff.phone)
+    (staff, index, self) => index === self.findIndex(s => s.name === staff.name)
   );
 
   const paymentMethods = ['현금', '계좌이체'];
@@ -235,9 +233,8 @@ export default function ChargeModal({
                               key={index}
                               className='px-4 py-3 border-b border-gray-100 last:border-b-0 active:bg-gray-50'
                               onPress={() => {
-                                const displayText = `${option.name} (${option.phone})`;
-                                onChange(displayText);
-                                setValue('receptionist', displayText);
+                                onChange(option.name);
+                                setValue('receptionist', option.name);
                                 setShowReceptionistDropdown(false);
                               }}
                             >
@@ -246,12 +243,8 @@ export default function ChargeModal({
                                   <Text className='text-gray-800 font-medium'>
                                     {option.name}
                                   </Text>
-                                  <Text className='text-gray-500 text-sm'>
-                                    {option.phone}
-                                  </Text>
                                 </View>
-                                {value ===
-                                  `${option.name} (${option.phone})` && (
+                                {value === option.name && (
                                   <Ionicons
                                     name='checkmark'
                                     size={20}
