@@ -30,6 +30,9 @@ export default function LedgerSelectionModal({
     onSelect(ledger);
     onClose();
   };
+  const handleClose = () => {
+    onClose();
+  };
 
   return (
     <Modal
@@ -40,7 +43,7 @@ export default function LedgerSelectionModal({
     >
       <Pressable
         className='flex-1 bg-black/50 justify-center items-center'
-        onPress={onClose}
+        onPress={handleClose}
       >
         <Pressable
           className='bg-white rounded-3xl w-full max-w-lg mx-4'
@@ -106,10 +109,16 @@ export default function LedgerSelectionModal({
                 return (
                   <Pressable
                     key={ledger.memberNumber}
-                    onPress={() => !isInsufficient && handleSelect(ledger)}
+                    onPress={() => {
+                      if (isInsufficient) {
+                        // 잔액 부족 시 알림 (진동이나 토스트 등으로 확장 가능)
+                        return;
+                      }
+                      handleSelect(ledger);
+                    }}
                     className={`p-4 border-b border-gray-100 ${
                       index === ledgers.length - 1 ? 'border-b-0' : ''
-                    } ${isInsufficient ? 'opacity-50' : ''}`}
+                    } ${isInsufficient ? 'opacity-50' : 'active:bg-gray-50'}`}
                     disabled={isInsufficient}
                   >
                     <View className='flex-row items-center justify-between'>
@@ -136,7 +145,13 @@ export default function LedgerSelectionModal({
                           )}
                         </Text>
                       </View>
-                      {!isInsufficient && (
+                      {isInsufficient ? (
+                        <View className='bg-red-100 px-2 py-1 rounded'>
+                          <Text className='text-red-600 text-xs font-medium'>
+                            잔액부족
+                          </Text>
+                        </View>
+                      ) : (
                         <Ionicons
                           name='chevron-forward'
                           size={20}
@@ -153,7 +168,7 @@ export default function LedgerSelectionModal({
           {/* 하단 버튼 섹션 */}
           <View className='p-6 border-t border-gray-200'>
             <Pressable
-              onPress={onClose}
+              onPress={handleClose}
               className={`w-full h-12 rounded-lg flex items-center justify-center ${
                 ledgers.every(ledger => {
                   const currentAmount = parseInt(
