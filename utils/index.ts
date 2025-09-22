@@ -3,4 +3,6 @@ export * from './imagePickerUtils';
 export * from './phoneFormatter';
 export * from './priceCalculator';
 export * from './priceFormatter';
+export * from './printerService';
+export * from './SewooThermalPrinter';
 export * from './toastUtils';

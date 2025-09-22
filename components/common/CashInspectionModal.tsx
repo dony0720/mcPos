@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import {
   Modal,
@@ -10,7 +11,12 @@ import {
   View,
 } from 'react-native';
 
-import { CashDrawerMoneyItem, CashInspectionModalProps } from '../../types';
+import {
+  CashDrawerMoneyItem,
+  CashInspectionModalProps,
+  CashInspectionReceiptData,
+} from '../../types';
+import { createPrinterService } from '../../utils';
 
 export default function CashInspectionModal({
   visible,
@@ -19,6 +25,8 @@ export default function CashInspectionModal({
   initialData,
 }: CashInspectionModalProps) {
   const [cashData, setCashData] = useState<CashDrawerMoneyItem[]>([]);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const printerService = createPrinterService();
 
   // 모달이 열릴 때 초기 데이터 설정
   useEffect(() => {
@@ -59,6 +67,55 @@ export default function CashInspectionModal({
     return cashData
       .reduce((total, item) => total + item.quantity * item.unitValue, 0)
       .toLocaleString();
+  };
+
+  /**
+   * 시재 점검 영수증 출력 핸들러
+   * - SRP: 시재 점검 영수증 출력만 담당
+   */
+  const handlePrintInspection = async () => {
+    if (isPrinting) return;
+
+    setIsPrinting(true);
+    try {
+      // 시재 점검 데이터 생성
+      const totalAmount = cashData.reduce(
+        (total, item) => total + item.quantity * item.unitValue,
+        0
+      );
+
+      const inspectionData: CashInspectionReceiptData = {
+        header: {
+          storeName: 'MC카페',
+          title: '시재 점검 영수증',
+          dateTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        },
+        cashData: cashData.map(item => ({
+          denomination: `${item.unitValue.toLocaleString()}원`,
+          quantity: item.quantity,
+          amount: item.quantity * item.unitValue,
+        })),
+        summary: {
+          totalAmount,
+          inspector: '관리자', // 실제로는 현재 로그인한 사용자 정보를 사용
+        },
+      };
+
+      // 프린터로 출력
+      const result = await printerService.printCashInspection(inspectionData);
+
+      if (result.success) {
+        console.log('시재 점검 영수증 출력 성공:', result.message);
+        // 성공 토스트 메시지 표시 (옵션)
+      } else {
+        console.error('시재 점검 영수증 출력 실패:', result.message);
+        // 실패 토스트 메시지 표시 (옵션)
+      }
+    } catch (error) {
+      console.error('시재 점검 영수증 출력 중 오류:', error);
+    } finally {
+      setIsPrinting(false);
+    }
   };
 
   return (
@@ -184,6 +241,27 @@ export default function CashInspectionModal({
                     취소
                   </Text>
                 </Pressable>
+
+                {/* 영수증 출력 버튼 */}
+                <Pressable
+                  onPress={handlePrintInspection}
+                  disabled={isPrinting}
+                  className={`flex-1 ${
+                    isPrinting ? 'bg-gray-400' : 'bg-blue-500'
+                  } rounded-xl p-4 items-center`}
+                >
+                  <View className='flex-row items-center gap-2'>
+                    <Ionicons
+                      name={isPrinting ? 'hourglass' : 'print'}
+                      size={18}
+                      color='white'
+                    />
+                    <Text className='text-white font-medium text-lg'>
+                      {isPrinting ? '출력 중...' : '영수증 출력'}
+                    </Text>
+                  </View>
+                </Pressable>
+
                 <Pressable
                   onPress={handleConfirm}
                   className='flex-1 bg-green-500 rounded-xl p-4 items-center'

@@ -1,15 +1,24 @@
 import { BaseItem, ModalProps, Optionable } from './common';
+import { Discount } from './discount'; // 할인 타입은 discount.ts에서 import
 import {
-  DiscountType,
   OrderReceiptMethod as OrderReceiptMethodEnum,
   PaymentMethod
 } from './enums';
+
+// Ionicons 아이콘 이름 타입 정의 (결제 관련 아이콘들)
+export type PaymentIconName =
+  | 'cash-outline'
+  | 'card-outline'
+  | 'ticket-outline'
+  | 'book-outline'
+  | 'bag-outline'
+  | 'restaurant-outline';
 
 // ===== 기본 엔티티 타입들 =====
 
 export interface CashRegisterPayment extends Pick<BaseItem, 'id' | 'name'> {
   id: CashRegisterPaymentId;
-  icon: string;
+  icon: PaymentIconName; // 구체적인 아이콘 타입으로 변경
 }
 
 // OrderReceiptMethod는 enums.ts에서 enum으로 정의됨
@@ -21,13 +30,7 @@ export interface PaymentOrderItem extends Optionable {
 }
 
 
-export interface Discount {
-  id: string;
-  name: string;
-  value: number;
-  type: DiscountType; // fixed: 고정가격으로 변경, deduction: 차감
-  isActive?: boolean | undefined;
-}
+// Discount 인터페이스는 discount.ts에서 정의됨 (DRY 원칙)
 
 // ===== 컴포넌트 Props 타입들 =====
 
@@ -130,7 +133,7 @@ export const CASH_REGISTER_PAYMENTS: CashRegisterPayment[] = [
 export const ORDER_RECEIPT_METHODS: Array<{
   id: OrderReceiptMethodId;
   name: string;
-  icon: string;
+  icon: PaymentIconName; // 구체적인 아이콘 타입으로 변경
 }> = [
   {
     id: OrderReceiptMethodEnum.TAKEOUT,

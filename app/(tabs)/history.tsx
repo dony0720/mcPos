@@ -3,7 +3,7 @@ import 'dayjs/locale/ko';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import React, { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
 
 import { AdminProtectedRoute } from '../../components';
 import PageHeader from '../../components/common/PageHeader';
@@ -15,7 +15,13 @@ import {
   TransactionItem,
 } from '../../components/history';
 import { useTransactionStore } from '../../stores';
-import { FilterType, Transaction, TransactionType } from '../../types';
+import {
+  CashInspectionReceiptData,
+  FilterType,
+  Transaction,
+  TransactionType,
+} from '../../types';
+import { createPrinterService } from '../../utils';
 
 // Day.js 설정
 dayjs.locale('ko');
@@ -61,16 +67,110 @@ export default function History() {
     setSelectedTransaction(null);
   };
 
-  // 출력 버튼 핸들러 (영수증용)
-  const handleReceiptPrint = () => {
-    // 실제 출력 로직 구현
-    closeReceiptModal();
+  /**
+   * 현금 거래를 영수증 데이터로 변환하는 함수 (SRP: 단일 책임 원칙)
+   * @param transaction - 현금 거래 정보
+   * @returns CashInspectionReceiptData - 프린터 출력용 데이터
+   */
+  const convertToCashReceiptData = (
+    transaction: Transaction
+  ): CashInspectionReceiptData => {
+    const transactionTypeText =
+      transaction.type === TransactionType.CASH_DEPOSIT
+        ? '현금 입금'
+        : '현금 출금';
+    const currentDate = new Date().toLocaleString('ko-KR');
+
+    return {
+      header: {
+        storeName: 'MC POS',
+        title: `${transactionTypeText} 영수증`,
+        dateTime: currentDate,
+      },
+      cashData: transaction.cashBreakdown?.map(breakdown => ({
+        denomination: `${breakdown.denomination.toLocaleString()}원`,
+        quantity: breakdown.quantity,
+        amount: breakdown.total,
+      })) || [
+        {
+          denomination: '총 금액',
+          quantity: 1,
+          amount: transaction.totalAmount,
+        },
+      ],
+      summary: {
+        totalAmount: transaction.totalAmount,
+        inspector: '관리자', // 실제 로그인한 사용자 이름으로 대체 가능
+      },
+    };
   };
 
-  // 출력 버튼 핸들러 (입출금용)
-  const handleCashTransactionPrint = () => {
-    // 실제 출력 로직 구현
-    closeCashTransactionModal();
+  // 현금 거래 영수증 출력 핸들러 (실제 프린터 연동)
+  const handleCashTransactionPrint = async () => {
+    if (!selectedTransaction) {
+      return;
+    }
+
+    const transactionTypeText =
+      selectedTransaction.type === TransactionType.CASH_DEPOSIT
+        ? '입금'
+        : '출금';
+
+    Alert.alert(
+      '영수증 출력',
+      `${transactionTypeText} 영수증을 출력하시겠습니까?`,
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '출력',
+          onPress: async () => {
+            try {
+              // 프린터 서비스 인스턴스 생성 (DIP: 의존성 역전 원칙)
+              const printerService = createPrinterService();
+
+              // 현금 거래 데이터를 영수증 데이터로 변환
+              const receiptData = convertToCashReceiptData(selectedTransaction);
+
+              // 프린터로 영수증 출력
+              const result =
+                await printerService.printCashInspection(receiptData);
+
+              if (result.success) {
+                Alert.alert(
+                  '출력 완료',
+                  `${transactionTypeText} 영수증이 출력되었습니다.`
+                );
+              } else {
+                Alert.alert(
+                  '출력 실패',
+                  result.message || '영수증 출력 중 오류가 발생했습니다.',
+                  [
+                    { text: '확인' },
+                    {
+                      text: '재시도',
+                      onPress: () => handleCashTransactionPrint(),
+                    },
+                  ]
+                );
+              }
+            } catch {
+              // 영수증 출력 오류 처리
+              Alert.alert(
+                '출력 오류',
+                '영수증 출력 중 예상치 못한 오류가 발생했습니다.',
+                [
+                  { text: '확인' },
+                  {
+                    text: '재시도',
+                    onPress: () => handleCashTransactionPrint(),
+                  },
+                ]
+              );
+            }
+          },
+        },
+      ]
+    );
   };
 
   // 결제 방법 ID를 한글로 변환
@@ -137,9 +237,8 @@ export default function History() {
 
           {/* 거래내역 목록 */}
           <ScrollView
-            className='flex-1 mt-6'
+            className='flex-1 mt-6 pb-5'
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
           >
             {filteredTransactions.length === 0 ? (
               <EmptyState selectedFilter={selectedFilter} />
@@ -161,7 +260,6 @@ export default function History() {
             visible={receiptModalVisible}
             transaction={selectedTransaction}
             onClose={closeReceiptModal}
-            onPrint={handleReceiptPrint}
           />
 
           {/* 입출금 거래 모달 */}

@@ -1,26 +1,88 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import dayjs from 'dayjs';
+import React, { useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
-import { DiscountType, Transaction } from '../../types';
+import { DiscountType, ReceiptData, Transaction } from '../../types';
+import { createPrinterService } from '../../utils';
 
 interface ReceiptModalProps {
   visible: boolean;
   transaction?: Transaction | null;
   onClose: () => void;
-  onPrint: () => void;
 }
 
 export default function ReceiptModal({
   visible,
   transaction,
   onClose,
-  onPrint,
 }: ReceiptModalProps) {
+  const [isPrinting, setIsPrinting] = useState(false);
+  const printerService = createPrinterService();
+
   // 거래 정보가 없으면 빈 모달 표시
   if (!transaction) {
     return null;
   }
+
+  /**
+   * 영수증 출력 핸들러
+   * - SRP: 영수증 출력만 담당
+   */
+  const handlePrint = async () => {
+    if (isPrinting) return;
+
+    setIsPrinting(true);
+    try {
+      // 거래 데이터를 영수증 데이터로 변환
+      const receiptData: ReceiptData = {
+        header: {
+          storeName: 'MC카페',
+          storeAddress: '서울시 강남구 테헤란로 123',
+          storePhone: '02-1234-5678',
+          receiptNumber: transaction.id,
+          dateTime: dayjs(transaction.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+        },
+        items:
+          transaction.items?.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            unitPrice: item.basePrice,
+            totalPrice: item.totalPrice,
+            options: item.options?.map(opt => `${opt.name}: ${opt.value}`),
+          })) || [],
+        summary: {
+          subtotal: transaction.subtotal || transaction.totalAmount,
+          discount: transaction.discountAmount || 0,
+          tax: 0, // 세금 정보가 있다면 추가
+          total: transaction.totalAmount,
+          paymentMethod: getPaymentMethodLabel(
+            transaction.paymentMethod || 'cash'
+          ),
+          receivedAmount: transaction.receivedAmount,
+          changeAmount: transaction.changeAmount,
+        },
+        footer: {
+          message: '감사합니다. 또 오세요!',
+        },
+      };
+
+      // 프린터로 출력
+      const result = await printerService.printReceipt(receiptData);
+
+      if (result.success) {
+        console.log('영수증 출력 성공:', result.message);
+        // 성공 토스트 메시지 표시 (옵션)
+      } else {
+        console.error('영수증 출력 실패:', result.message);
+        // 실패 토스트 메시지 표시 (옵션)
+      }
+    } catch (error) {
+      console.error('영수증 출력 중 오류:', error);
+    } finally {
+      setIsPrinting(false);
+    }
+  };
 
   // 결제 방법 ID를 한글로 변환
   const getPaymentMethodLabel = (paymentMethodId: string) => {
@@ -179,12 +241,21 @@ export default function ReceiptModal({
 
           {/* 출력 버튼 */}
           <Pressable
-            onPress={onPrint}
-            className='bg-blue-500 rounded-lg py-3 px-6 items-center'
+            onPress={handlePrint}
+            disabled={isPrinting}
+            className={`${
+              isPrinting ? 'bg-gray-400' : 'bg-blue-500'
+            } rounded-lg py-3 px-6 items-center`}
           >
             <View className='flex-row items-center'>
-              <Ionicons name='print' size={20} color='white' />
-              <Text className='text-white font-medium ml-2'>출력하기</Text>
+              <Ionicons
+                name={isPrinting ? 'hourglass' : 'print'}
+                size={20}
+                color='white'
+              />
+              <Text className='text-white font-medium ml-2'>
+                {isPrinting ? '출력 중...' : '출력하기'}
+              </Text>
             </View>
           </Pressable>
         </View>

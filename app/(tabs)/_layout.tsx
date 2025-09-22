@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 
-import { useAuthStore } from '../../stores/useAuthStore';
+import { useAuthStore } from '../../stores';
 
 // Tailwind 색상을 변수로 정의
 const COLORS = {
