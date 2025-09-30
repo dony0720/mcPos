@@ -29,8 +29,7 @@
         {
           "action": "android.hardware.usb.action.USB_DEVICE_ATTACHED"
         }
-      ],
-      "hardwareAccelerated": true
+      ]
     },
     "web": {
       "bundler": "metro",
