@@ -51,6 +51,15 @@ export default function Settings() {
         router.push('/staffManagement');
       },
     },
+    {
+      id: 'printer',
+      title: '프린터 테스트',
+      description: 'Sewoo SLK-TS100 프린터 연결 및 출력 테스트',
+      icon: 'print-outline' as const,
+      onPress: () => {
+        router.push('/printerTest');
+      },
+    },
   ];
 
   return (

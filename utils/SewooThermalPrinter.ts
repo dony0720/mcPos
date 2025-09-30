@@ -5,6 +5,8 @@
  * - SOLID 원칙 준수: DIP (의존성 역전 원칙)
  */
 
+import { NativeModules, PermissionsAndroid, Platform } from 'react-native';
+
 import {
   CashInspectionReceiptData,
   OrderReceiptData,
@@ -17,6 +19,14 @@ import {
   PrinterError,
   ESCPOSCommand,
 } from '../types';
+
+// USB Serial Port 라이브러리 임포트
+let UsbSerial: any = null;
+try {
+  UsbSerial = NativeModules.UsbSerial || require('react-native-usb-serialport-for-android');
+} catch (error) {
+  console.warn('USB Serial 라이브러리를 로드할 수 없습니다:', error);
+}
 
 /**
  * Sewoo SLK-TS100 프린터 구현체
@@ -71,11 +81,26 @@ export class SewooThermalPrinter implements PrinterService {
         };
       }
 
-      // 3. 프린터 연결
+      // 3. USB Serial 연결 열기
+      const openResult = await UsbSerial.open(device.deviceId, {
+        baudRate: 115200,
+        dataBits: 8,
+        stopBits: 1,
+        parity: 0,
+        flowControl: 0,
+      });
+
+      if (!openResult || openResult.success === false) {
+        throw new Error(openResult?.error || 'USB 연결을 열 수 없습니다.');
+      }
+
+      // 4. 프린터 연결 상태 설정
       this.printerDevice = device;
       this.isConnectedState = true;
 
-      // 4. 초기화 명령어 전송
+      console.log('USB Serial 연결이 열렸습니다:', openResult);
+
+      // 5. 초기화 명령어 전송
       await this.sendInitializeCommand();
 
       return {
@@ -97,8 +122,15 @@ export class SewooThermalPrinter implements PrinterService {
    */
   async disconnect(): Promise<PrintResult> {
     try {
-      if (this.printerDevice) {
-        // TODO: 실제 연결 해제 로직 구현
+      if (this.printerDevice && UsbSerial) {
+        // USB Serial 연결 닫기
+        try {
+          const closeResult = await UsbSerial.close(this.printerDevice.deviceId);
+          console.log('USB Serial 연결 닫기 결과:', closeResult);
+        } catch (closeError) {
+          console.warn('USB Serial 연결 닫기 오류:', closeError);
+        }
+        
         this.printerDevice = null;
       }
       
@@ -377,11 +409,37 @@ export class SewooThermalPrinter implements PrinterService {
    */
   private async requestUSBPermission(): Promise<boolean> {
     try {
-      // TODO: React Native USB 라이브러리를 사용하여 권한 요청
-      // 예: UsbSerial.requestPermission() 또는 유사 메서드
-      return true; // 임시로 true 반환
+      if (Platform.OS !== 'android') {
+        console.warn('USB OTG는 Android에서만 지원됩니다.');
+        return false;
+      }
+
+      if (!UsbSerial) {
+        console.error('USB Serial 라이브러리가 로드되지 않았습니다.');
+        return false;
+      }
+
+      // Android 권한 요청
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.USB_PERMISSION || 'android.permission.USB_PERMISSION',
+        {
+          title: 'USB 프린터 권한 요청',
+          message: 'MC POS가 USB 프린터에 접근하려고 합니다.',
+          buttonNeutral: '나중에',
+          buttonNegative: '거부',
+          buttonPositive: '허용',
+        }
+      );
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('USB 권한이 허용되었습니다.');
+        return true;
+      } else {
+        console.log('USB 권한이 거부되었습니다.');
+        return false;
+      }
     } catch (error) {
-      console.error('USB 권한 요청 실패:', error);
+      console.error('USB 권한 요청 중 오류:', error);
       return false;
     }
   }
@@ -391,9 +449,54 @@ export class SewooThermalPrinter implements PrinterService {
    */
   private async findPrinterDevice(): Promise<any> {
     try {
-      // TODO: USB 기기 목록에서 Sewoo 프린터 찾기
-      // vendorId와 productId로 필터링
-      return {}; // 임시 객체 반환
+      if (!UsbSerial) {
+        throw new Error('USB Serial 라이브러리가 없습니다.');
+      }
+
+      // USB 기기 목록 가져오기
+      const deviceList = await UsbSerial.list();
+      console.log('연결된 USB 기기 목록:', deviceList);
+
+      if (!deviceList || deviceList.length === 0) {
+        console.log('연결된 USB 기기가 없습니다.');
+        return null;
+      }
+
+      // Sewoo SLK-TS100 프린터 찾기
+      const printerDevice = deviceList.find((device: any) => {
+        const isSewooPrinter = 
+          // Vendor ID로 필터링 (실제 값으로 수정 필요)
+          (device.vendorId === this.config.vendorId || 
+           device.vendorId === 0x1A00 || // Sewoo 예상 Vendor ID
+           device.vendorId === 6656) ||  // 16진수를 10진수로 변환한 값
+          
+          // 제품명으로 필터링
+          (device.productName && 
+           (device.productName.toLowerCase().includes('sewoo') ||
+            device.productName.toLowerCase().includes('slk') ||
+            device.productName.toLowerCase().includes('ts100'))) ||
+          
+          // Product ID로 필터링 (실제 값으로 수정 필요)
+          device.productId === this.config.productId;
+
+        console.log(`기기 확인: ${device.productName}, VID: ${device.vendorId}, PID: ${device.productId}, Sewoo?: ${isSewooPrinter}`);
+        
+        return isSewooPrinter;
+      });
+
+      if (printerDevice) {
+        console.log('Sewoo SLK-TS100 프린터를 찾았습니다:', printerDevice);
+        return printerDevice;
+      } else {
+        // 프린터가 특정되지 않으면 첫 번째 기기 사용 (테스트용)
+        if (deviceList.length > 0) {
+          console.log('Sewoo 프린터를 찾지 못했습니다. 첫 번째 기기를 사용합니다:', deviceList[0]);
+          return deviceList[0];
+        }
+        
+        console.log('호환되는 프린터를 찾을 수 없습니다.');
+        return null;
+      }
     } catch (error) {
       console.error('프린터 기기 찾기 실패:', error);
       return null;
@@ -441,13 +544,61 @@ export class SewooThermalPrinter implements PrinterService {
       throw new Error('프린터가 연결되지 않았습니다.');
     }
 
+    if (!UsbSerial) {
+      throw new Error('USB Serial 라이브러리가 없습니다.');
+    }
+
     try {
-      // TODO: 실제 USB 데이터 전송 구현
-      // 예: await this.printerDevice.write(data);
-      console.log('Sending to printer:', data);
+      console.log('프린터로 전송할 데이터:', data);
+      
+      // 문자열을 바이트 배열로 변환 (ESC/POS 명령어)
+      const dataBytes = this.stringToBytes(data);
+      console.log('전송할 바이트 데이터:', dataBytes);
+      
+      // USB Serial로 데이터 전송
+      const result = await UsbSerial.writeHexString(
+        this.printerDevice.deviceId, 
+        this.bytesToHexString(dataBytes)
+      );
+      
+      console.log('데이터 전송 결과:', result);
+      
+      if (!result || result.success === false) {
+        throw new Error(result?.error || '데이터 전송에 실패했습니다.');
+      }
+      
     } catch (error) {
+      console.error('데이터 전송 오류:', error);
       throw new Error(`데이터 전송 실패: ${error}`);
     }
+  }
+
+  /**
+   * 문자열을 바이트 배열로 변환
+   */
+  private stringToBytes(str: string): number[] {
+    const bytes: number[] = [];
+    for (let i = 0; i < str.length; i++) {
+      const charCode = str.charCodeAt(i);
+      if (charCode < 0x80) {
+        bytes.push(charCode);
+      } else if (charCode < 0x800) {
+        bytes.push(0xc0 | (charCode >> 6));
+        bytes.push(0x80 | (charCode & 0x3f));
+      } else {
+        bytes.push(0xe0 | (charCode >> 12));
+        bytes.push(0x80 | ((charCode >> 6) & 0x3f));
+        bytes.push(0x80 | (charCode & 0x3f));
+      }
+    }
+    return bytes;
+  }
+
+  /**
+   * 바이트 배열을 16진수 문자열로 변환
+   */
+  private bytesToHexString(bytes: number[]): string {
+    return bytes.map(byte => byte.toString(16).padStart(2, '0')).join('');
   }
 
   /**
