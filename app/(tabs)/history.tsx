@@ -3,7 +3,7 @@ import 'dayjs/locale/ko';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import React, { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
 
 import { AdminProtectedRoute } from '../../components';
 import PageHeader from '../../components/common/PageHeader';
@@ -14,8 +14,15 @@ import {
   ReceiptModal,
   TransactionItem,
 } from '../../components/history';
+import { usePrinter } from '../../hooks';
 import { useTransactionStore } from '../../stores';
-import { FilterType, Transaction, TransactionType } from '../../types';
+import {
+  CashInspectionReceiptData,
+  FilterType,
+  OrderReceiptData,
+  Transaction,
+  TransactionType,
+} from '../../types';
 
 // Day.js 설정
 dayjs.locale('ko');
@@ -24,6 +31,15 @@ dayjs.extend(relativeTime);
 export default function History() {
   // 거래내역 스토어에서 데이터 가져오기
   const { transactions: storeTransactions } = useTransactionStore();
+
+  // 프린터 훅 사용 (SRP: 프린터 기능만 담당)
+  const {
+    printOrderReceipt,
+    printCashInspection,
+    isConnected: isPrinterConnected,
+    isPrinting,
+    lastError: printerError,
+  } = usePrinter();
 
   const [selectedFilter, setSelectedFilter] = useState<FilterType>(
     FilterType.ALL
@@ -61,16 +77,209 @@ export default function History() {
     setSelectedTransaction(null);
   };
 
-  // 출력 버튼 핸들러 (영수증용)
-  const handleReceiptPrint = () => {
-    // 실제 출력 로직 구현
-    closeReceiptModal();
+  /**
+   * 주문 영수증 출력 핸들러 (SRP: 단일 책임 원칙)
+   * @description 선택된 주문 거래의 영수증을 출력합니다
+   */
+  const handleReceiptPrint = async () => {
+    if (!selectedTransaction) {
+      Alert.alert('오류', '선택된 거래가 없습니다.');
+      return;
+    }
+
+    // 주문 거래가 아닌 경우 처리
+    if (selectedTransaction.type !== TransactionType.ORDER) {
+      Alert.alert('오류', '주문 거래만 영수증을 출력할 수 있습니다.');
+      return;
+    }
+
+    // 프린터 연결 상태 확인
+    if (!isPrinterConnected) {
+      Alert.alert('프린터 오류', '프린터가 연결되지 않았습니다.\n프린터 연결을 확인해주세요.');
+      return;
+    }
+
+    try {
+      // 거래 데이터를 영수증 데이터로 변환
+      const receiptData = convertToOrderReceiptData(selectedTransaction);
+      
+      // 출력 확인 다이얼로그
+      Alert.alert(
+        '영수증 출력',
+        '주문 영수증을 출력하시겠습니까?',
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '출력',
+            onPress: async () => {
+              const success = await printOrderReceipt(receiptData);
+              
+              if (success) {
+                Alert.alert('출력 완료', '영수증이 출력되었습니다.');
+                closeReceiptModal();
+              } else {
+                Alert.alert(
+                  '출력 실패', 
+                  printerError || '영수증 출력 중 오류가 발생했습니다.',
+                  [
+                    { text: '확인' },
+                    { text: '재시도', onPress: handleReceiptPrint },
+                  ]
+                );
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert('오류', `영수증 데이터 변환 중 오류가 발생했습니다: ${error}`);
+    }
   };
 
-  // 출력 버튼 핸들러 (입출금용)
-  const handleCashTransactionPrint = () => {
-    // 실제 출력 로직 구현
-    closeCashTransactionModal();
+  /**
+   * 현금 거래 영수증 출력 핸들러
+   * @description 입금/출금 거래의 영수증을 출력합니다
+   */
+  const handleCashTransactionPrint = async () => {
+    if (!selectedTransaction) {
+      Alert.alert('오류', '선택된 거래가 없습니다.');
+      return;
+    }
+
+    // 현금 거래가 아닌 경우 처리
+    if (
+      selectedTransaction.type !== TransactionType.CASH_DEPOSIT &&
+      selectedTransaction.type !== TransactionType.CASH_WITHDRAWAL
+    ) {
+      Alert.alert('오류', '현금 입출금 거래만 출력할 수 있습니다.');
+      return;
+    }
+
+    // 프린터 연결 상태 확인
+    if (!isPrinterConnected) {
+      Alert.alert('프린터 오류', '프린터가 연결되지 않았습니다.\n프린터 연결을 확인해주세요.');
+      return;
+    }
+
+    try {
+      const transactionTypeText =
+        selectedTransaction.type === TransactionType.CASH_DEPOSIT ? '입금' : '출금';
+
+      // 거래 데이터를 영수증 데이터로 변환
+      const receiptData = convertToCashInspectionReceiptData(selectedTransaction);
+      
+      // 출력 확인 다이얼로그
+      Alert.alert(
+        '영수증 출력',
+        `${transactionTypeText} 영수증을 출력하시겠습니까?`,
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '출력',
+            onPress: async () => {
+              const success = await printCashInspection(receiptData);
+              
+              if (success) {
+                Alert.alert('출력 완료', `${transactionTypeText} 영수증이 출력되었습니다.`);
+                closeCashTransactionModal();
+              } else {
+                Alert.alert(
+                  '출력 실패',
+                  printerError || '영수증 출력 중 오류가 발생했습니다.',
+                  [
+                    { text: '확인' },
+                    { text: '재시도', onPress: handleCashTransactionPrint },
+                  ]
+                );
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert('오류', `영수증 데이터 변환 중 오류가 발생했습니다: ${error}`);
+    }
+  };
+
+  /**
+   * 주문 거래를 영수증 데이터로 변환하는 함수 (SRP: 단일 책임 원칙)
+   * @param transaction - 주문 거래 정보
+   * @returns OrderReceiptData - 프린터 출력용 데이터
+   */
+  const convertToOrderReceiptData = (transaction: Transaction): OrderReceiptData => {
+    const currentDate = new Date(transaction.timestamp).toLocaleString('ko-KR');
+
+    return {
+      header: {
+        storeName: 'MC POS',
+        title: '주문 영수증',
+        dateTime: currentDate,
+        transactionId: `#${transaction.id.substring(0, 8)}`,
+      },
+      orderItems: transaction.orderItems?.map(item => ({
+        name: item.menuItem.name,
+        quantity: item.quantity,
+        unitPrice: item.menuItem.price,
+        totalPrice: item.menuItem.price * item.quantity,
+        options: item.options || [],
+        discount: item.discount ? {
+          name: item.discount.name,
+          amount: item.discount.value,
+        } : undefined,
+      })) || [],
+      summary: {
+        totalAmount: transaction.totalAmount,
+        subtotal: transaction.totalAmount,
+        discountAmount: 0, // TODO: 할인 금액 계산
+        finalAmount: transaction.totalAmount,
+        paymentMethod: getPaymentMethodLabel(transaction.paymentMethod || ''),
+      },
+      footer: {
+        pickupNumber: transaction.pickupNumber,
+        orderMethod: transaction.orderMethod ? 
+          (transaction.orderMethod === 'takeout' ? '테이크아웃' : '매장') : 
+          undefined,
+      },
+    };
+  };
+
+  /**
+   * 현금 거래를 영수증 데이터로 변환하는 함수 (SRP: 단일 책임 원칙)
+   * @param transaction - 현금 거래 정보
+   * @returns CashInspectionReceiptData - 프린터 출력용 데이터
+   */
+  const convertToCashInspectionReceiptData = (
+    transaction: Transaction
+  ): CashInspectionReceiptData => {
+    const transactionTypeText =
+      transaction.type === TransactionType.CASH_DEPOSIT
+        ? '현금 입금'
+        : '현금 출금';
+    const currentDate = new Date(transaction.timestamp).toLocaleString('ko-KR');
+
+    return {
+      header: {
+        storeName: 'MC POS',
+        title: `${transactionTypeText} 영수증`,
+        dateTime: currentDate,
+        transactionId: `#${transaction.id.substring(0, 8)}`,
+      },
+      cashData: transaction.cashBreakdown?.map(breakdown => ({
+        denomination: `${breakdown.denomination.toLocaleString()}원`,
+        quantity: breakdown.quantity,
+        amount: breakdown.total,
+      })) || [
+        {
+          denomination: '총 금액',
+          quantity: 1,
+          amount: transaction.totalAmount,
+        },
+      ],
+      summary: {
+        totalAmount: transaction.totalAmount,
+        inspector: '관리자', // 실제 로그인한 사용자 이름으로 대체 가능
+      },
+    };
   };
 
   // 결제 방법 ID를 한글로 변환

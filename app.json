@@ -20,7 +20,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/mcPosIcon.svg",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.USB_PERMISSION",
+        "android.hardware.usb.host"
+      ],
+      "intentFilters": [
+        {
+          "action": "android.hardware.usb.action.USB_DEVICE_ATTACHED"
+        }
+      ],
+      "hardwareAccelerated": true
     },
     "web": {
       "bundler": "metro",
