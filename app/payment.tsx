@@ -3,7 +3,14 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  Alert,
+  Animated,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 
 import {
   CashAmountModal,
@@ -35,10 +42,11 @@ import {
   PaymentDetails,
   PaymentDetailsType,
   PaymentMethod,
+  ReceiptData,
   TransactionStatus,
   TransactionType,
 } from '../types';
-import { calculateDiscountedUnitPrice } from '../utils';
+import { calculateDiscountedUnitPrice, createPrinterService } from '../utils';
 
 export default function Payment() {
   // Zustand 스토어에서 주문 데이터 가져오기
@@ -170,6 +178,97 @@ export default function Payment() {
     }
 
     return breakdown;
+  };
+
+  // 영수증 출력 함수
+  const printReceipt = async (
+    transactionId: string,
+    pickupNumber: string
+  ): Promise<void> => {
+    try {
+      const printerService = createPrinterService();
+
+      // 영수증 데이터 생성
+      const receiptData: ReceiptData = {
+        header: {
+          storeName: 'MC POS',
+          storeAddress: '',
+          storePhone: '',
+          receiptNumber: pickupNumber,
+          dateTime: new Date().toLocaleString('ko-KR'),
+        },
+        items: orderItems.map(item => {
+          const unitPrice = calculateDiscountedUnitPrice(item);
+
+          // 옵션을 간단한 텍스트로 포맷팅
+          const formattedOptions =
+            item.options.length > 0 ? item.options : undefined;
+
+          return {
+            name: `${item.menuItem.name} (${item.menuItem.temperature})`,
+            quantity: item.quantity,
+            unitPrice: unitPrice,
+            totalPrice: unitPrice * item.quantity,
+            options: formattedOptions,
+          };
+        }),
+        summary: {
+          subtotal: totalAmount,
+          discount: 0, // 할인은 이미 아이템 가격에 반영됨
+          total: totalAmount,
+          paymentMethod: getPaymentMethodName(selectedPaymentMethod),
+          receivedAmount: receivedAmount > 0 ? receivedAmount : undefined,
+          changeAmount: changeAmount > 0 ? changeAmount : undefined,
+        },
+        footer: {
+          message: getOrderMethodName(selectedOrderMethod),
+        },
+      };
+
+      // 영수증 출력
+      const result = await printerService.printReceipt(receiptData);
+
+      if (result.success) {
+        console.log('✅ 영수증 출력 성공');
+      } else {
+        console.error('❌ 영수증 출력 실패:', result.message);
+        Alert.alert(
+          '영수증 출력 실패',
+          result.message || '영수증 출력에 실패했습니다.'
+        );
+      }
+    } catch (err) {
+      console.error('❌ 영수증 출력 오류:', err);
+      Alert.alert('영수증 출력 오류', '영수증 출력 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 결제 방법 이름 변환
+  const getPaymentMethodName = (method: CashRegisterPaymentId): string => {
+    switch (method) {
+      case PaymentMethod.CASH:
+        return '현금';
+      case PaymentMethod.COUPON:
+        return remainingAmount > 0 ? '쿠폰+현금' : '쿠폰';
+      case PaymentMethod.TRANSFER:
+        return '계좌이체';
+      case PaymentMethod.LEDGER:
+        return '장부결제';
+      default:
+        return '기타';
+    }
+  };
+
+  // 주문 방법 이름 변환
+  const getOrderMethodName = (method: OrderReceiptMethodId): string => {
+    switch (method) {
+      case OrderReceiptMethodEnum.DINE_IN:
+        return '매장 식사';
+      case OrderReceiptMethodEnum.TAKEOUT:
+        return '포장';
+      default:
+        return '';
+    }
   };
 
   // 페이지 포커스 시 선택 상태만 초기화 (할인은 유지)
@@ -419,11 +518,14 @@ export default function Payment() {
             amount: totalAmount,
             receptionist: 'POS 시스템',
           });
-        } catch (error) {
+        } catch {
           closeModal();
           return false; // 에러 발생
         }
       }
+
+      // 영수증 출력
+      printReceipt(transactionId, number);
 
       // 결제 완료 후 주문 데이터 초기화
       clearOrder();

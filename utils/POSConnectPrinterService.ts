@@ -183,7 +183,7 @@ export class POSConnectPrinterService implements PrinterService {
       }
 
       // 용지 커팅
-      const cutResult = await POSConnectPrinter.cutPaper();
+      await POSConnectPrinter.cutPaper();
 
       return {
         success: true,
@@ -228,7 +228,7 @@ export class POSConnectPrinterService implements PrinterService {
       }
 
       // 용지 커팅
-      const cutResult = await POSConnectPrinter.cutPaper();
+      await POSConnectPrinter.cutPaper();
 
       return {
         success: true,
@@ -282,7 +282,7 @@ POSConnect SDK 연결 성공!
       }
 
       // 용지 커팅
-      const cutResult = await POSConnectPrinter.cutPaper();
+      await POSConnectPrinter.cutPaper();
 
       return {
         success: true,
@@ -314,19 +314,23 @@ POSConnect SDK 연결 성공!
       lines.push(`       ${data.header.storePhone}       `);
     }
     lines.push('================================');
-    lines.push(`영수증 번호: ${data.header.receiptNumber}`);
+    lines.push(`수령번호: ${data.header.receiptNumber}`);
+    if (data.footer?.message) {
+      lines.push(`주문방식: ${data.footer.message}`);
+    }
     lines.push(`일시: ${data.header.dateTime}`);
     lines.push('--------------------------------');
+    lines.push('');
 
     // 상품 목록
-    lines.push('상품명           수량  단가    금액');
+    lines.push('상품명         수량  단가    금액');
     lines.push('--------------------------------');
 
     data.items.forEach(item => {
       const nameLength = 12;
       const truncatedName =
         item.name.length > nameLength
-          ? item.name.substring(0, nameLength - 1) + '…'
+          ? item.name.substring(0, nameLength - 1) + '~'
           : item.name.padEnd(nameLength);
 
       const quantity = item.quantity.toString().padStart(3);
@@ -341,15 +345,15 @@ POSConnect SDK 연결 성공!
           lines.push(`  └ ${option}`);
         });
       }
+
+      // 상품 간 공백
+      lines.push('');
     });
 
     lines.push('--------------------------------');
+    lines.push('');
 
     // 합계
-    lines.push(
-      `소계:                ${data.summary.subtotal.toLocaleString()}원`
-    );
-
     if (data.summary.discount && data.summary.discount > 0) {
       lines.push(
         `할인:               -${data.summary.discount.toLocaleString()}원`
@@ -361,7 +365,7 @@ POSConnect SDK 연결 성공!
     }
 
     lines.push('================================');
-    lines.push(`총액:                ${data.summary.total.toLocaleString()}원`);
+    lines.push(`합계:                ${data.summary.total.toLocaleString()}원`);
     lines.push(`결제방법:            ${data.summary.paymentMethod}`);
 
     if (data.summary.receivedAmount) {
@@ -377,14 +381,8 @@ POSConnect SDK 연결 성공!
     }
 
     lines.push('================================');
-
-    // 푸터
-    if (data.footer?.message) {
-      lines.push('');
-      lines.push(data.footer.message);
-      lines.push('');
-    }
-
+    lines.push('');
+    lines.push('');
     lines.push('     감사합니다. 또 오세요!     ');
     lines.push('');
     lines.push('');
@@ -434,4 +432,3 @@ POSConnect SDK 연결 성공!
     return lines.join('\n');
   }
 }
-

@@ -174,7 +174,7 @@ class POSConnectPrinterModule(reactContext: ReactApplicationContext) :
     }
 
     /**
-     * 텍스트 출력
+     * 텍스트 출력 (한글 지원)
      */
     @ReactMethod
     fun printText(text: String, promise: Promise) {
@@ -189,6 +189,22 @@ class POSConnectPrinterModule(reactContext: ReactApplicationContext) :
                 return
             }
 
+            // 한글 출력을 위한 코드셋 설정
+            try {
+                // 방법 1: KSC5601 (한국어 표준) 시도
+                printer?.setCharSet("KSC5601")
+                Log.d(TAG, "한글 코드셋 설정: KSC5601")
+            } catch (e: Exception) {
+                try {
+                    // 방법 2: 코드페이지 선택 시도
+                    printer?.selectCodePage(255)
+                    Log.d(TAG, "한글 코드페이지 설정: 255")
+                } catch (e2: Exception) {
+                    Log.w(TAG, "코드셋 설정 실패, 기본 설정으로 출력 시도", e2)
+                }
+            }
+
+            // 텍스트 출력
             printer?.printString(text)
             
             Log.d(TAG, "텍스트 출력 완료")
