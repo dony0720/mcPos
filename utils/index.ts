@@ -4,3 +4,4 @@ export * from './phoneFormatter';
 export * from './priceCalculator';
 export * from './priceFormatter';
 export * from './toastUtils';
+export * from './printerService';

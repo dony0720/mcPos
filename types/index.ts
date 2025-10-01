@@ -11,3 +11,4 @@ export * from './payment';
 export * from './staff';
 export * from './transaction';
 export * from './management';
+export * from './printer';

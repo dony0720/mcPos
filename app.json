@@ -4,10 +4,10 @@
     "slug": "mcPos",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/mcPosIcon.svg",
+    "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/mcPosLogo.svg",
+      "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -18,14 +18,23 @@
     "android": {
       "package": "com.mcpos.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/mcPosIcon.svg",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.USB_PERMISSION",
+        "android.hardware.usb.host"
+      ],
+      "intentFilters": [
+        {
+          "action": "android.hardware.usb.action.USB_DEVICE_ATTACHED"
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/mcPosIcon.svg"
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": ["expo-router"],
     "experiments": {

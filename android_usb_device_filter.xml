@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  USB 디바이스 필터 설정 파일
+  Sewoo SLK-TS100 프린터용 설정
+  
+  주의: 실제 Vendor ID와 Product ID는 프린터 연결 후 확인해야 합니다.
+  adb shell lsusb 또는 /proc/bus/usb/devices 에서 확인 가능
+-->
+<resources>
+    <!-- Sewoo SLK-TS100 프린터 디바이스 필터 -->
+    <usb-device 
+        vendor-id="6656" 
+        product-id="1" 
+        class="7" 
+        subclass="1" 
+        protocol="2" />
+    
+    <!-- 
+    실제 값 확인 방법:
+    1. 프린터를 Android 기기에 USB OTG로 연결
+    2. adb shell 접속
+    3. lsusb 명령어로 vendor-id, product-id 확인
+    4. 위 값들을 실제 값으로 수정 필요
+    
+    예시:
+    - vendor-id: Sewoo Technology의 실제 Vendor ID
+    - product-id: SLK-TS100의 실제 Product ID
+    - class: 7 (프린터 클래스)
+    - subclass: 1 (프린터 서브클래스) 
+    - protocol: 2 (양방향 프로토콜)
+    -->
+</resources>
