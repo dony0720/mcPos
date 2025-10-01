@@ -1,9 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import { AdminProtectedRoute } from '../../components';
+import { createPrinterService } from '../../utils';
 
 /**
  * 설정 화면 컴포넌트
@@ -12,6 +20,72 @@ import { AdminProtectedRoute } from '../../components';
  */
 export default function Settings() {
   const router = useRouter();
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  // USB 장치 확인 함수
+  const handleCheckUsbDevices = async () => {
+    try {
+      console.log('🔌 USB 장치 확인 시작...');
+      const printerService = createPrinterService();
+
+      if ('getUsbDevices' in printerService) {
+        const devices = await (printerService as any).getUsbDevices();
+        console.log('=== USB 장치 목록 ===');
+        console.log('장치 수:', devices.length);
+
+        if (devices.length === 0) {
+          Alert.alert('USB 장치 없음', 'USB 프린터가 연결되어 있지 않습니다.');
+        } else {
+          let message = `총 ${devices.length}개의 USB 장치 발견:\n\n`;
+          devices.forEach((device: any, index: number) => {
+            console.log(
+              `${index + 1}. ${device.deviceName || device.devicePath}`
+            );
+            message += `${index + 1}. ${device.deviceName || 'USB 장치'}\n`;
+          });
+          Alert.alert('USB 장치 확인', message);
+        }
+      }
+    } catch (error) {
+      console.error('❌ USB 확인 오류:', error);
+      Alert.alert('오류', 'USB 장치 확인 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 프린터 테스트 함수
+  const handlePrinterTest = async () => {
+    setIsPrinting(true);
+    try {
+      console.log('🖨️ === 프린터 테스트 시작 ===');
+      const printerService = createPrinterService();
+
+      // USB 장치 목록 확인
+      if ('getUsbDevices' in printerService) {
+        const devices = await (printerService as any).getUsbDevices();
+        console.log('🔌 USB 장치 목록:', devices);
+        console.log('📊 장치 개수:', devices.length);
+      }
+
+      console.log('📝 프린터 테스트 출력 시도...');
+      const result = await printerService.printTest();
+
+      console.log('✅ 테스트 결과:', result);
+
+      if (result.success) {
+        console.log('✓ 프린터 테스트 성공');
+        Alert.alert('성공', '프린터 테스트가 완료되었습니다!');
+      } else {
+        console.log('✗ 프린터 테스트 실패:', result.message);
+        Alert.alert('실패', result.message || '프린터 테스트에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('❌ 프린터 테스트 오류:', error);
+      Alert.alert('오류', '프린터 테스트 중 오류가 발생했습니다.');
+    } finally {
+      setIsPrinting(false);
+      console.log('🖨️ === 프린터 테스트 종료 ===');
+    }
+  };
 
   // 설정 메뉴 아이템들
   const settingMenuItems = [
@@ -51,6 +125,22 @@ export default function Settings() {
         router.push('/staffManagement');
       },
     },
+    {
+      id: 'usbCheck',
+      title: 'USB 장치 확인',
+      description: '연결된 USB 프린터 확인',
+      icon: 'hardware-chip-outline' as const,
+      onPress: handleCheckUsbDevices,
+      isAction: true,
+    },
+    {
+      id: 'printer',
+      title: '프린터 테스트',
+      description: 'USB 프린터 연결 및 출력 테스트',
+      icon: 'print-outline' as const,
+      onPress: handlePrinterTest,
+      isAction: true,
+    },
   ];
 
   return (
@@ -70,11 +160,16 @@ export default function Settings() {
                   key={item.id}
                   className='bg-white border border-gray-200 rounded-xl p-6 shadow-sm active:bg-gray-50'
                   onPress={item.onPress}
+                  disabled={item.id === 'printer' && isPrinting}
                 >
                   <View className='flex-row items-center'>
                     {/* 아이콘 */}
                     <View className='w-12 h-12 bg-primaryGreen rounded-full justify-center items-center mr-4'>
-                      <Ionicons name={item.icon} size={24} color='white' />
+                      {item.id === 'printer' && isPrinting ? (
+                        <ActivityIndicator color='white' />
+                      ) : (
+                        <Ionicons name={item.icon} size={24} color='white' />
+                      )}
                     </View>
 
                     {/* 텍스트 정보 */}
@@ -83,16 +178,20 @@ export default function Settings() {
                         {item.title}
                       </Text>
                       <Text className='text-sm text-gray-500'>
-                        {item.description}
+                        {item.id === 'printer' && isPrinting
+                          ? '프린터 테스트 중...'
+                          : item.description}
                       </Text>
                     </View>
 
-                    {/* 화살표 아이콘 */}
-                    <Ionicons
-                      name='chevron-forward-outline'
-                      size={20}
-                      color='#9CA3AF'
-                    />
+                    {/* 화살표 아이콘 (액션 버튼이 아닌 경우만) */}
+                    {!(item as any).isAction && (
+                      <Ionicons
+                        name='chevron-forward-outline'
+                        size={20}
+                        color='#9CA3AF'
+                      />
+                    )}
                   </View>
                 </TouchableOpacity>
               ))}

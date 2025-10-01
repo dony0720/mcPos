@@ -1,7 +1,7 @@
 /**
- * Sewoo SLK-TS100 프린터 서비스 구현
+ * POSConnect SDK 프린터 서비스 구현
  * - SOLID 원칙에 따른 프린터 서비스 인터페이스 구현
- * - DIP: 추상화에 의존하여 테스트 가능하고 확장 가능한 구조
+ * - USB 프린터 연결 지원
  */
 
 import {
@@ -11,23 +11,50 @@ import {
   PrintResult,
   ReceiptData,
 } from '../types';
-import { POSConnectPrinterService } from './POSConnectPrinterService';
-import SewooThermalPrinter from './SewooThermalPrinter';
+import POSConnectPrinter, { USBDevice } from './POSConnectPrinter';
 
-/**
- * Sewoo SLK-TS100 프린터 서비스 구현체
- * - SRP: 프린터 출력만을 담당
- * - OCP: 새로운 출력 형식 추가 시 기존 코드 수정 없이 확장 가능
- */
-export class SewooThermalPrinterService implements PrinterService {
+export class POSConnectPrinterService implements PrinterService {
   private isConnectionActive = false;
+  private connectedDevice: string | null = null;
+  private isInitialized = false;
+
+  /**
+   * SDK 초기화
+   */
+  private async ensureInitialized(): Promise<boolean> {
+    if (this.isInitialized) {
+      return true;
+    }
+
+    try {
+      const result = await POSConnectPrinter.initialize();
+      this.isInitialized = result.success;
+      return result.success;
+    } catch (error) {
+      console.error('POSConnect SDK 초기화 실패:', error);
+      return false;
+    }
+  }
+
+  /**
+   * USB 장치 목록 가져오기
+   */
+  async getUsbDevices(): Promise<USBDevice[]> {
+    try {
+      await this.ensureInitialized();
+      return await POSConnectPrinter.getUsbDevices();
+    } catch (error) {
+      console.error('USB 장치 목록 가져오기 실패:', error);
+      return [];
+    }
+  }
 
   /**
    * 프린터 연결 상태 확인
    */
   async isConnected(): Promise<boolean> {
     try {
-      const connected = await SewooThermalPrinter.isConnected();
+      const connected = await POSConnectPrinter.isConnected();
       this.isConnectionActive = connected;
       return connected;
     } catch (error) {
@@ -38,26 +65,56 @@ export class SewooThermalPrinterService implements PrinterService {
   }
 
   /**
-   * 프린터 연결
+   * USB 프린터 연결
    */
   async connect(config?: PrinterConfig): Promise<PrintResult> {
     try {
-      const defaultConfig = {
-        deviceName: 'SLK-TS100',
-        baudRate: 9600,
-        dataBits: 8,
-        stopBits: 1,
-        parity: 'none',
-        ...config,
-      };
+      // SDK 초기화
+      const initialized = await this.ensureInitialized();
+      if (!initialized) {
+        return {
+          success: false,
+          message: 'SDK 초기화 실패',
+          errorCode: 'INIT_FAILED',
+        };
+      }
 
-      const result = await SewooThermalPrinter.connect(defaultConfig);
+      // USB 장치 목록 가져오기
+      const devices = await this.getUsbDevices();
+      if (devices.length === 0) {
+        return {
+          success: false,
+          message: 'USB 프린터를 찾을 수 없습니다.',
+          errorCode: 'NO_DEVICE',
+        };
+      }
+
+      // 첫 번째 장치에 연결 (또는 config에서 지정된 장치)
+      const targetDevice = config?.deviceName
+        ? devices.find(d => d.deviceName === config.deviceName)
+        : devices[0];
+
+      if (!targetDevice) {
+        return {
+          success: false,
+          message: '지정된 프린터를 찾을 수 없습니다.',
+          errorCode: 'DEVICE_NOT_FOUND',
+        };
+      }
+
+      // 프린터 연결
+      const result = await POSConnectPrinter.connectUSB(
+        targetDevice.devicePath
+      );
       this.isConnectionActive = result.success;
+      if (result.success) {
+        this.connectedDevice = targetDevice.devicePath;
+      }
 
       return {
         success: result.success,
         message: result.success
-          ? '프린터 연결 성공'
+          ? `프린터 연결 성공: ${targetDevice.deviceName}`
           : result.message || '프린터 연결 실패',
         errorCode: result.errorCode,
       };
@@ -77,8 +134,9 @@ export class SewooThermalPrinterService implements PrinterService {
    */
   async disconnect(): Promise<PrintResult> {
     try {
-      const result = await SewooThermalPrinter.disconnect();
+      const result = await POSConnectPrinter.disconnect();
       this.isConnectionActive = false;
+      this.connectedDevice = null;
 
       return {
         success: result.success,
@@ -115,14 +173,21 @@ export class SewooThermalPrinterService implements PrinterService {
       const receiptText = this.formatReceiptText(receiptData);
 
       // 프린터로 출력
-      const result = await SewooThermalPrinter.printReceipt(receiptText);
+      const printResult = await POSConnectPrinter.printText(receiptText);
+      if (!printResult.success) {
+        return {
+          success: false,
+          message: printResult.message || '영수증 출력 실패',
+          errorCode: printResult.errorCode,
+        };
+      }
+
+      // 용지 커팅
+      const cutResult = await POSConnectPrinter.cutPaper();
 
       return {
-        success: result.success,
-        message: result.success
-          ? '영수증 출력 완료'
-          : result.message || '영수증 출력 실패',
-        errorCode: result.errorCode,
+        success: true,
+        message: '영수증 출력 완료',
       };
     } catch (error) {
       console.error('영수증 출력 실패:', error);
@@ -153,14 +218,21 @@ export class SewooThermalPrinterService implements PrinterService {
       const inspectionText = this.formatCashInspectionText(inspectionData);
 
       // 프린터로 출력
-      const result = await SewooThermalPrinter.printReceipt(inspectionText);
+      const printResult = await POSConnectPrinter.printText(inspectionText);
+      if (!printResult.success) {
+        return {
+          success: false,
+          message: printResult.message || '시재 점검 영수증 출력 실패',
+          errorCode: printResult.errorCode,
+        };
+      }
+
+      // 용지 커팅
+      const cutResult = await POSConnectPrinter.cutPaper();
 
       return {
-        success: result.success,
-        message: result.success
-          ? '시재 점검 영수증 출력 완료'
-          : result.message || '시재 점검 영수증 출력 실패',
-        errorCode: result.errorCode,
+        success: true,
+        message: '시재 점검 영수증 출력 완료',
       };
     } catch (error) {
       console.error('시재 점검 영수증 출력 실패:', error);
@@ -177,14 +249,44 @@ export class SewooThermalPrinterService implements PrinterService {
    */
   async printTest(): Promise<PrintResult> {
     try {
-      const result = await SewooThermalPrinter.printTest();
+      // 연결 상태 확인
+      if (!this.isConnectionActive) {
+        const connectResult = await this.connect();
+        if (!connectResult.success) {
+          return connectResult;
+        }
+      }
+
+      // 테스트 메시지 출력
+      const testText = `
+================================
+    USB Receipt Printer Test
+================================
+POSConnect SDK 연결 성공!
+
+프린터가 정상 작동 중입니다.
+
+테스트 완료: ${new Date().toLocaleString('ko-KR')}
+================================
+
+
+`;
+
+      const printResult = await POSConnectPrinter.printText(testText);
+      if (!printResult.success) {
+        return {
+          success: false,
+          message: printResult.message || '테스트 출력 실패',
+          errorCode: printResult.errorCode,
+        };
+      }
+
+      // 용지 커팅
+      const cutResult = await POSConnectPrinter.cutPaper();
 
       return {
-        success: result.success,
-        message: result.success
-          ? '테스트 출력 완료'
-          : result.message || '테스트 출력 실패',
-        errorCode: result.errorCode,
+        success: true,
+        message: '테스트 출력 완료',
       };
     } catch (error) {
       console.error('테스트 출력 실패:', error);
@@ -198,7 +300,6 @@ export class SewooThermalPrinterService implements PrinterService {
 
   /**
    * 영수증 텍스트 포맷팅
-   * - SRP: 영수증 포맷팅만 담당
    */
   private formatReceiptText(data: ReceiptData): string {
     const lines: string[] = [];
@@ -294,7 +395,6 @@ export class SewooThermalPrinterService implements PrinterService {
 
   /**
    * 시재 점검 영수증 텍스트 포맷팅
-   * - SRP: 시재 점검 영수증 포맷팅만 담당
    */
   private formatCashInspectionText(data: CashInspectionReceiptData): string {
     const lines: string[] = [];
@@ -335,104 +435,3 @@ export class SewooThermalPrinterService implements PrinterService {
   }
 }
 
-/**
- * 개발/테스트용 Mock 프린터 서비스
- * - LSP: PrinterService 인터페이스를 완전히 대체 가능
- */
-export class MockPrinterService implements PrinterService {
-  private mockConnected = false;
-
-  async isConnected(): Promise<boolean> {
-    return this.mockConnected;
-  }
-
-  async connect(config?: PrinterConfig): Promise<PrintResult> {
-    console.log('Mock 프린터 연결:', config);
-    this.mockConnected = true;
-    return {
-      success: true,
-      message: 'Mock 프린터 연결 성공',
-    };
-  }
-
-  async disconnect(): Promise<PrintResult> {
-    console.log('Mock 프린터 연결 해제');
-    this.mockConnected = false;
-    return {
-      success: true,
-      message: 'Mock 프린터 연결 해제 성공',
-    };
-  }
-
-  async printReceipt(receiptData: ReceiptData): Promise<PrintResult> {
-    console.log('Mock 영수증 출력:', receiptData);
-    // 개발 중에는 콘솔에 영수증 내용을 출력
-    console.log('=== 영수증 출력 ===');
-    console.log(`매장: ${receiptData.header.storeName}`);
-    console.log(`영수증 번호: ${receiptData.header.receiptNumber}`);
-    console.log(`일시: ${receiptData.header.dateTime}`);
-    console.log('--- 상품 목록 ---');
-    receiptData.items.forEach(item => {
-      console.log(
-        `${item.name} x${item.quantity} = ${item.totalPrice.toLocaleString()}원`
-      );
-    });
-    console.log(`총액: ${receiptData.summary.total.toLocaleString()}원`);
-    console.log('================');
-
-    return {
-      success: true,
-      message: 'Mock 영수증 출력 완료',
-    };
-  }
-
-  async printCashInspection(
-    inspectionData: CashInspectionReceiptData
-  ): Promise<PrintResult> {
-    console.log('Mock 시재 점검 영수증 출력:', inspectionData);
-    // 개발 중에는 콘솔에 시재 점검 내용을 출력
-    console.log('=== 시재 점검 영수증 ===');
-    console.log(`매장: ${inspectionData.header.storeName}`);
-    console.log(`일시: ${inspectionData.header.dateTime}`);
-    console.log('--- 시재 내역 ---');
-    inspectionData.cashData.forEach(item => {
-      console.log(
-        `${item.denomination}: ${item.quantity}개 = ${item.amount.toLocaleString()}원`
-      );
-    });
-    console.log(
-      `총 시재 금액: ${inspectionData.summary.totalAmount.toLocaleString()}원`
-    );
-    console.log(`점검자: ${inspectionData.summary.inspector}`);
-    console.log('====================');
-
-    return {
-      success: true,
-      message: 'Mock 시재 점검 영수증 출력 완료',
-    };
-  }
-
-  async printTest(): Promise<PrintResult> {
-    console.log('Mock 테스트 출력');
-    return {
-      success: true,
-      message: 'Mock 테스트 출력 완료',
-    };
-  }
-}
-
-/**
- * 프린터 서비스 팩토리
- * - DIP: 구체적 구현체가 아닌 추상화에 의존
- * - 환경에 따라 적절한 서비스 인스턴스 제공
- */
-export const createPrinterService = (): PrinterService => {
-  // 개발/프로덕션 환경 모두 POSConnect SDK 기반 프린터 서비스 사용
-  // (실제 프린터 테스트를 위해 항상 실제 서비스 사용)
-  return new POSConnectPrinterService();
-
-  // Mock 서비스가 필요한 경우 아래 주석 해제
-  // if (__DEV__) {
-  //   return new MockPrinterService();
-  // }
-};

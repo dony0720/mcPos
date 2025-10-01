@@ -2,6 +2,9 @@
  * 환경변수 타입 정의
  */
 
+// React Native 전역 변수
+declare const __DEV__: boolean;
+
 declare module '@env' {
   // EAS 프로젝트 설정
   export const EAS_PROJECT_ID: string;
