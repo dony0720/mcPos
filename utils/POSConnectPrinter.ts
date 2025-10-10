@@ -85,3 +85,5 @@ const printer: NativePOSConnectModule =
 
 export default printer;
 
+
+

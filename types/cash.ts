@@ -66,6 +66,7 @@ export interface CashInspectionModalProps {
   onClose: () => void;
   onConfirm: (updatedData: CashDrawerMoneyItem[]) => void;
   initialData: CashDrawerMoneyItem[];
+  mode?: 'inspection' | 'settlement'; // inspection: 시재 점검, settlement: 일일 정산
 }
 
 export interface CashTransactionModalProps {

@@ -60,6 +60,35 @@ export interface CashInspectionReceiptData {
   };
 }
 
+export interface DailySettlementReceiptData {
+  header: {
+    storeName: string;
+    title: string;
+    dateTime: string;
+  };
+  sales: {
+    totalSales: number;
+    cashSales: number;
+    cardSales: number;
+  };
+  cash: {
+    initialCash: number;
+    deposits: number;
+    withdrawals: number;
+    expectedCash: number;
+    actualCash: number;
+    difference: number;
+  };
+  cashBreakdown: Array<{
+    denomination: string;
+    quantity: number;
+    amount: number;
+  }>;
+  summary: {
+    inspector: string;
+  };
+}
+
 export interface PrintResult {
   success: boolean;
   message?: string;
@@ -90,10 +119,14 @@ export interface PrinterService {
   /**
    * 시재 점검 영수증 출력
    */
-  printCashInspection(inspectionData: CashInspectionReceiptData): Promise<PrintResult>;
+  printCashInspection(
+    inspectionData: CashInspectionReceiptData
+  ): Promise<PrintResult>;
 
   /**
-   * 테스트 출력
+   * 일일 정산 영수증 출력
    */
-  printTest(): Promise<PrintResult>;
+  printDailySettlement(
+    settlementData: DailySettlementReceiptData
+  ): Promise<PrintResult>;
 }

@@ -6,6 +6,7 @@
 
 import {
   CashInspectionReceiptData,
+  DailySettlementReceiptData,
   PrinterConfig,
   PrinterService,
   PrintResult,
@@ -31,7 +32,6 @@ export class POSConnectPrinterService implements PrinterService {
       this.isInitialized = result.success;
       return result.success;
     } catch (error) {
-      console.error('POSConnect SDK 초기화 실패:', error);
       return false;
     }
   }
@@ -44,7 +44,6 @@ export class POSConnectPrinterService implements PrinterService {
       await this.ensureInitialized();
       return await POSConnectPrinter.getUsbDevices();
     } catch (error) {
-      console.error('USB 장치 목록 가져오기 실패:', error);
       return [];
     }
   }
@@ -58,7 +57,6 @@ export class POSConnectPrinterService implements PrinterService {
       this.isConnectionActive = connected;
       return connected;
     } catch (error) {
-      console.error('프린터 연결 상태 확인 실패:', error);
       this.isConnectionActive = false;
       return false;
     }
@@ -119,7 +117,6 @@ export class POSConnectPrinterService implements PrinterService {
         errorCode: result.errorCode,
       };
     } catch (error) {
-      console.error('프린터 연결 실패:', error);
       this.isConnectionActive = false;
       return {
         success: false,
@@ -146,7 +143,6 @@ export class POSConnectPrinterService implements PrinterService {
         errorCode: result.errorCode,
       };
     } catch (error) {
-      console.error('프린터 연결 해제 실패:', error);
       this.isConnectionActive = false;
       return {
         success: false,
@@ -190,7 +186,6 @@ export class POSConnectPrinterService implements PrinterService {
         message: '영수증 출력 완료',
       };
     } catch (error) {
-      console.error('영수증 출력 실패:', error);
       return {
         success: false,
         message: '영수증 출력 중 오류가 발생했습니다.',
@@ -235,64 +230,9 @@ export class POSConnectPrinterService implements PrinterService {
         message: '시재 점검 영수증 출력 완료',
       };
     } catch (error) {
-      console.error('시재 점검 영수증 출력 실패:', error);
       return {
         success: false,
         message: '시재 점검 영수증 출력 중 오류가 발생했습니다.',
-        errorCode: 'PRINT_ERROR',
-      };
-    }
-  }
-
-  /**
-   * 테스트 출력
-   */
-  async printTest(): Promise<PrintResult> {
-    try {
-      // 연결 상태 확인
-      if (!this.isConnectionActive) {
-        const connectResult = await this.connect();
-        if (!connectResult.success) {
-          return connectResult;
-        }
-      }
-
-      // 테스트 메시지 출력
-      const testText = `
-================================
-    USB Receipt Printer Test
-================================
-POSConnect SDK 연결 성공!
-
-프린터가 정상 작동 중입니다.
-
-테스트 완료: ${new Date().toLocaleString('ko-KR')}
-================================
-
-
-`;
-
-      const printResult = await POSConnectPrinter.printText(testText);
-      if (!printResult.success) {
-        return {
-          success: false,
-          message: printResult.message || '테스트 출력 실패',
-          errorCode: printResult.errorCode,
-        };
-      }
-
-      // 용지 커팅
-      await POSConnectPrinter.cutPaper();
-
-      return {
-        success: true,
-        message: '테스트 출력 완료',
-      };
-    } catch (error) {
-      console.error('테스트 출력 실패:', error);
-      return {
-        success: false,
-        message: '테스트 출력 중 오류가 발생했습니다.',
         errorCode: 'PRINT_ERROR',
       };
     }
@@ -425,6 +365,112 @@ POSConnect SDK 연결 성공!
     lines.push(`점검자: ${data.summary.inspector}`);
     lines.push('');
     lines.push('     시재 점검이 완료되었습니다     ');
+    lines.push('');
+    lines.push('');
+    lines.push('');
+
+    return lines.join('\n');
+  }
+
+  /**
+   * 일일 정산 영수증 출력
+   * - 매출 현황, 시재 현황을 포함한 정산 보고서 출력
+   */
+  async printDailySettlement(
+    data: DailySettlementReceiptData
+  ): Promise<PrintResult> {
+    try {
+      // 연결 상태 확인
+      if (!this.isConnectionActive) {
+        const connectResult = await this.connect();
+        if (!connectResult.success) {
+          return connectResult;
+        }
+      }
+
+      // 영수증 텍스트 생성
+      const receiptText = this.formatDailySettlement(data);
+
+      // 프린터로 출력
+      const printResult = await POSConnectPrinter.printText(receiptText);
+      if (!printResult.success) {
+        return {
+          success: false,
+          message: printResult.message || '일일 정산 영수증 출력 실패',
+          errorCode: printResult.errorCode,
+        };
+      }
+
+      // 용지 커팅
+      await POSConnectPrinter.cutPaper();
+
+      return {
+        success: true,
+        message: '일일 정산 영수증 출력 완료',
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: `출력 실패: ${error.message}`,
+        errorCode: 'PRINT_FAILED',
+      };
+    }
+  }
+
+  /**
+   * 일일 정산 영수증 포맷팅
+   */
+  private formatDailySettlement(data: DailySettlementReceiptData): string {
+    const lines: string[] = [];
+
+    // 헤더
+    lines.push('================================');
+    lines.push(`         ${data.header.storeName}         `);
+    lines.push('================================');
+    lines.push(`         ${data.header.title}         `);
+    lines.push(`정산일시: ${data.header.dateTime}`);
+    lines.push('================================');
+    lines.push('');
+
+    // 매출 현황
+    lines.push('[매출 현황]');
+    lines.push('--------------------------------');
+    lines.push(`총 매출:          ${data.sales.totalSales.toLocaleString()}원`);
+    lines.push(`현금 매출:        ${data.sales.cashSales.toLocaleString()}원`);
+    lines.push(`카드 매출:        ${data.sales.cardSales.toLocaleString()}원`);
+    lines.push('');
+
+    // 시재 현황
+    lines.push('[시재 현황]');
+    lines.push('--------------------------------');
+    lines.push(`초기 시재금:      ${data.cash.initialCash.toLocaleString()}원`);
+    lines.push(`입금 합계:        ${data.cash.deposits.toLocaleString()}원`);
+    lines.push(`출금 합계:        ${data.cash.withdrawals.toLocaleString()}원`);
+    lines.push(
+      `예상 시재금:      ${data.cash.expectedCash.toLocaleString()}원`
+    );
+    lines.push(`실제 시재금:      ${data.cash.actualCash.toLocaleString()}원`);
+    lines.push(`차액:             ${data.cash.difference.toLocaleString()}원`);
+    lines.push('');
+
+    // 권종별 현황
+    lines.push('[권종별 현황]');
+    lines.push('--------------------------------');
+    lines.push('권종               수량      금액');
+    lines.push('--------------------------------');
+
+    data.cashBreakdown.forEach(item => {
+      const denomination = item.denomination.padEnd(15);
+      const quantity = item.quantity.toString().padStart(4);
+      const amount = item.amount.toLocaleString().padStart(9);
+
+      lines.push(`${denomination} ${quantity} ${amount}원`);
+    });
+
+    lines.push('================================');
+    lines.push(`정산자: ${data.summary.inspector}`);
+    lines.push('');
+    lines.push('     일일 정산이 완료되었습니다     ');
     lines.push('');
     lines.push('');
     lines.push('');

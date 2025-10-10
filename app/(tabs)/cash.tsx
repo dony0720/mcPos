@@ -55,6 +55,7 @@ export default function CashManagement() {
             onClose={handleInspectionClose}
             onConfirm={handleInspectionConfirm}
             initialData={cashDrawer}
+            mode='settlement'
           />
         </View>
       </View>

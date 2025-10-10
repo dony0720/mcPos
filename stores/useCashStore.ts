@@ -68,6 +68,9 @@ export interface CashStoreActions {
   // 입출금 조회
   getTodayDeposits: () => number;
   getTodayWithdrawals: () => number;
+
+  // 일일 정산 후 초기화
+  resetDailyCash: () => void;
 }
 
 // 현금 스토어 상태
@@ -82,42 +85,42 @@ const INITIAL_CASH_DRAWER: CashDrawerMoneyItem[] = [
     type: '지폐',
     title: '5만원',
     theme: CashTheme.YELLOW,
-    quantity: 8,
+    quantity: 0,
     unitValue: 50000,
   },
   {
     type: '지폐',
     title: '1만원',
     theme: CashTheme.GREEN,
-    quantity: 15,
+    quantity: 0,
     unitValue: 10000,
   },
   {
     type: '지폐',
     title: '5천원',
     theme: CashTheme.ORANGE,
-    quantity: 12,
+    quantity: 0,
     unitValue: 5000,
   },
   {
     type: '지폐',
     title: '1천원',
     theme: CashTheme.BLUE,
-    quantity: 25,
+    quantity: 0,
     unitValue: 1000,
   },
   {
     type: '동전',
     title: '500원',
     theme: CashTheme.GRAY,
-    quantity: 30,
+    quantity: 0,
     unitValue: 500,
   },
   {
     type: '동전',
     title: '100원',
     theme: CashTheme.GRAY,
-    quantity: 50,
+    quantity: 0,
     unitValue: 100,
   },
 ];
@@ -443,6 +446,18 @@ export const useCashStore = create<CashState>()(
         return todayTransactions
           .filter(t => t.type === CashTransactionType.MANUAL_WITHDRAW)
           .reduce((sum, t) => sum + Math.abs(t.totalAmount), 0);
+      },
+
+      // 일일 정산 후 초기화
+      resetDailyCash: () => {
+        const { cashDrawer } = get();
+        set({
+          cashDrawer: cashDrawer.map(item => ({
+            ...item,
+            quantity: 0,
+          })),
+          // 거래 내역은 유지 (히스토리 보존)
+        });
       },
     }),
     {
