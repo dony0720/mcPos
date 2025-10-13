@@ -14,9 +14,7 @@ interface CategoryStore {
   getCategoryById: (id: string) => Category | undefined;
 }
 
-const initialCategories: Category[] = [
-  { id: 'All', name: '전체', displayOrder: 1, menuCount: 0 },
-];
+const initialCategories: Category[] = [];
 
 /**
  * 카테고리 상태 관리 Store

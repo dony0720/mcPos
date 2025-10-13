@@ -18,3 +18,6 @@ class POSConnectPrinterPackage : ReactPackage {
 
 
 
+
+
+

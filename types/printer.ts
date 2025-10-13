@@ -79,6 +79,11 @@ export interface DailySettlementReceiptData {
     actualCash: number;
     difference: number;
   };
+  initialCashBreakdown?: Array<{
+    denomination: string;
+    quantity: number;
+    amount: number;
+  }>;
   cashBreakdown: Array<{
     denomination: string;
     quantity: number;

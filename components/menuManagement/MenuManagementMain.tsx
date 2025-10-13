@@ -62,10 +62,13 @@ export default function MenuManagementMain() {
       : menus.filter(menu => menu.categories?.includes(selectedCategory));
 
   // 카테고리 목록을 동적으로 생성 (메뉴 ID와 카테고리 ID 매핑)
-  const menuCategories = categories.map(category => ({
-    id: category.id as MenuCategory,
-    name: category.name,
-  }));
+  // "전체" 카테고리는 제외 (하드코딩된 "전체" 버튼 사용)
+  const menuCategories = categories
+    .filter(category => category.id !== 'All' && category.id !== 'ALL')
+    .map(category => ({
+      id: category.id as MenuCategory,
+      name: category.name,
+    }));
 
   // 이벤트 핸들러
   const handleAddMenu = () => {

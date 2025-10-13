@@ -13,11 +13,12 @@ import {
   View,
 } from 'react-native';
 
-import { useCashStore } from '../../stores';
+import { useCashStore, useTransactionStore } from '../../stores';
 import {
   CashDrawerMoneyItem,
   CashInspectionModalProps,
-  CashInspectionReceiptData,
+  DailySettlementReceiptData,
+  PaymentMethod,
 } from '../../types';
 import { createPrinterService } from '../../utils';
 
@@ -33,7 +34,9 @@ export default function CashInspectionModal({
   const [showSettlementConfirmModal, setShowSettlementConfirmModal] =
     useState(false);
   const printerService = createPrinterService();
-  const { resetDailyCash } = useCashStore();
+  const { resetDailyCash, getTodayDeposits, getTodayWithdrawals } =
+    useCashStore();
+  const { getTransactionStats, clearAllTransactions } = useTransactionStore();
 
   // 모달이 열릴 때 초기 데이터 설정
   useEffect(() => {
@@ -68,23 +71,111 @@ export default function CashInspectionModal({
   // 일일 정산 실행 핸들러
   const handleExecuteSettlement = async () => {
     setShowSettlementConfirmModal(false);
+    setIsPrinting(true);
 
     try {
-      // 시재 설정 상태 초기화
+      // 1. 일일 정산 영수증 출력
+      const totalAmount = cashData.reduce(
+        (total, item) => total + item.quantity * item.unitValue,
+        0
+      );
+
+      // 매출 통계 가져오기
+      const stats = getTransactionStats();
+
+      // 현금/카드 매출 계산
+      const cashSales = stats.paymentMethodBreakdown[PaymentMethod.CASH] || 0;
+      const cardSales =
+        stats.paymentMethodBreakdown[PaymentMethod.TRANSFER] || 0;
+
+      // 입출금 내역
+      const deposits = getTodayDeposits();
+      const withdrawals = getTodayWithdrawals();
+
+      // 초기 시재 데이터 가져오기
+      let initialCashBreakdownData: CashDrawerMoneyItem[] = [];
+      try {
+        const storedData = await AsyncStorage.getItem(
+          '@mcpos_initial_cash_data'
+        );
+        if (storedData) {
+          initialCashBreakdownData = JSON.parse(storedData);
+        }
+      } catch (error) {
+        // 초기 데이터를 가져올 수 없는 경우 빈 배열 사용
+      }
+
+      // 초기 시재금 계산
+      const initialCash = initialCashBreakdownData.reduce(
+        (total, item) => total + item.quantity * item.unitValue,
+        0
+      );
+
+      // 예상 시재금 계산 (초기 시재금 + 현금매출 + 입금 - 출금)
+      const expectedCash = initialCash + cashSales + deposits - withdrawals;
+
+      const settlementData: DailySettlementReceiptData = {
+        header: {
+          storeName: 'MC카페',
+          title: '일일 정산 보고서',
+          dateTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+        },
+        sales: {
+          totalSales: stats.totalSales,
+          cashSales,
+          cardSales,
+        },
+        cash: {
+          initialCash,
+          deposits,
+          withdrawals,
+          expectedCash,
+          actualCash: totalAmount,
+          difference: totalAmount - expectedCash,
+        },
+        initialCashBreakdown:
+          initialCashBreakdownData.length > 0
+            ? initialCashBreakdownData.map(item => ({
+                denomination: item.title,
+                quantity: item.quantity,
+                amount: item.quantity * item.unitValue,
+              }))
+            : undefined,
+        cashBreakdown: cashData.map(item => ({
+          denomination: item.title,
+          quantity: item.quantity,
+          amount: item.quantity * item.unitValue,
+        })),
+        summary: {
+          inspector: '관리자',
+        },
+      };
+
+      await printerService.printDailySettlement(settlementData);
+
+      // 2. 시재 설정 상태 초기화
       await AsyncStorage.setItem('@mcpos_opening_cash_set', 'false');
 
-      // 데이터 초기화 (모든 권종을 0으로)
+      // 3. 초기 시재 데이터 초기화
+      await AsyncStorage.removeItem('@mcpos_initial_cash_data');
+
+      // 4. 데이터 초기화 (모든 권종을 0으로)
       resetDailyCash();
 
-      // 모달 닫기
+      // 5. 거래내역 초기화
+      clearAllTransactions();
+
+      // 6. 모달 닫기
       onClose();
 
-      // 모든 화면을 닫고 시작 화면으로 이동
+      // 7. 모든 화면을 닫고 시작 화면으로 이동
       router.dismissAll();
       router.replace('/');
     } catch {
       // 에러 처리
       onClose();
+    } finally {
+      setIsPrinting(false);
     }
   };
 
@@ -103,47 +194,6 @@ export default function CashInspectionModal({
     return cashData
       .reduce((total, item) => total + item.quantity * item.unitValue, 0)
       .toLocaleString();
-  };
-
-  /**
-   * 시재 점검 영수증 출력 핸들러
-   * - 영수증 출력 버튼에서만 사용
-   */
-  const handlePrintInspection = async () => {
-    if (isPrinting) return;
-
-    setIsPrinting(true);
-    try {
-      // 시재 점검 데이터 생성
-      const totalAmount = cashData.reduce(
-        (total, item) => total + item.quantity * item.unitValue,
-        0
-      );
-
-      const inspectionData: CashInspectionReceiptData = {
-        header: {
-          storeName: 'MC카페',
-          title: '시재 점검 영수증',
-          dateTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-        },
-        cashData: cashData.map(item => ({
-          denomination: `${item.unitValue.toLocaleString()}원`,
-          quantity: item.quantity,
-          amount: item.quantity * item.unitValue,
-        })),
-        summary: {
-          totalAmount,
-          inspector: '관리자',
-        },
-      };
-
-      // 프린터로 출력
-      await printerService.printCashInspection(inspectionData);
-    } catch {
-      // 에러 처리
-    } finally {
-      setIsPrinting(false);
-    }
   };
 
   return (
@@ -273,33 +323,25 @@ export default function CashInspectionModal({
                     </Text>
                   </Pressable>
 
-                  {/* 영수증 출력 버튼 */}
                   <Pressable
-                    onPress={handlePrintInspection}
+                    onPress={handleConfirm}
                     disabled={isPrinting}
                     className={`flex-1 ${
-                      isPrinting ? 'bg-gray-400' : 'bg-blue-500'
+                      isPrinting ? 'bg-gray-400' : 'bg-green-500'
                     } rounded-xl p-4 items-center`}
                   >
                     <View className='flex-row items-center gap-2'>
-                      <Ionicons
-                        name={isPrinting ? 'hourglass' : 'print'}
-                        size={18}
-                        color='white'
-                      />
+                      {isPrinting && (
+                        <Ionicons name='hourglass' size={18} color='white' />
+                      )}
                       <Text className='text-white font-medium text-lg'>
-                        {isPrinting ? '출력 중...' : '영수증 출력'}
+                        {isPrinting
+                          ? '처리 중...'
+                          : mode === 'settlement'
+                            ? '정산 완료'
+                            : '확인'}
                       </Text>
                     </View>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={handleConfirm}
-                    className='flex-1 bg-green-500 rounded-xl p-4 items-center'
-                  >
-                    <Text className='text-white font-medium text-lg'>
-                      {mode === 'settlement' ? '정산 완료' : '확인'}
-                    </Text>
                   </Pressable>
                 </View>
               </View>
@@ -325,25 +367,32 @@ export default function CashInspectionModal({
               </Text>
               <Text className='text-base text-gray-600 text-center'>
                 일일 정산을 진행하시겠습니까?{'\n'}
-                모든 데이터가 초기화되고{'\n'}
-                시작 화면으로 이동합니다.
+                영수증이 출력되고{'\n'}
+                모든 시재 및 거래내역이 초기화됩니다.
               </Text>
             </View>
 
             <View className='flex-row gap-3'>
               <Pressable
                 onPress={() => setShowSettlementConfirmModal(false)}
-                className='flex-1 bg-gray-100 rounded-xl p-4 items-center'
+                disabled={isPrinting}
+                className={`flex-1 ${isPrinting ? 'bg-gray-300' : 'bg-gray-100'} rounded-xl p-4 items-center`}
               >
                 <Text className='text-gray-700 font-medium text-lg'>취소</Text>
               </Pressable>
               <Pressable
                 onPress={handleExecuteSettlement}
-                className='flex-1 bg-red-500 rounded-xl p-4 items-center'
+                disabled={isPrinting}
+                className={`flex-1 ${isPrinting ? 'bg-gray-400' : 'bg-red-500'} rounded-xl p-4 items-center`}
               >
-                <Text className='text-white font-medium text-lg'>
-                  정산 진행
-                </Text>
+                <View className='flex-row items-center gap-2'>
+                  {isPrinting && (
+                    <Ionicons name='hourglass' size={18} color='white' />
+                  )}
+                  <Text className='text-white font-medium text-lg'>
+                    {isPrinting ? '처리 중...' : '정산 진행'}
+                  </Text>
+                </View>
               </Pressable>
             </View>
           </View>

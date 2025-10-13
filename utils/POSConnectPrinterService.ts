@@ -243,31 +243,35 @@ export class POSConnectPrinterService implements PrinterService {
    */
   private formatReceiptText(data: ReceiptData): string {
     const lines: string[] = [];
+    const WIDTH = 40; // 영수증 너비
 
-    // 헤더
-    lines.push('================================');
-    lines.push(`         ${data.header.storeName}         `);
+    // 헤더 (중앙 정렬)
+    lines.push('========================================');
+    lines.push(this.centerText(data.header.storeName, WIDTH));
     if (data.header.storeAddress) {
-      lines.push(`     ${data.header.storeAddress}     `);
+      lines.push(this.centerText(data.header.storeAddress, WIDTH));
     }
     if (data.header.storePhone) {
-      lines.push(`       ${data.header.storePhone}       `);
+      lines.push(this.centerText(data.header.storePhone, WIDTH));
     }
-    lines.push('================================');
+    lines.push('========================================');
+
+    // 수령번호, 주문방식, 일시 (왼쪽 정렬)
     lines.push(`수령번호: ${data.header.receiptNumber}`);
     if (data.footer?.message) {
       lines.push(`주문방식: ${data.footer.message}`);
     }
     lines.push(`일시: ${data.header.dateTime}`);
-    lines.push('--------------------------------');
+    lines.push('----------------------------------------');
     lines.push('');
 
     // 상품 목록
-    lines.push('상품명         수량  단가    금액');
-    lines.push('--------------------------------');
+    lines.push('상품명            수량   단가      금액');
+    lines.push('----------------------------------------');
 
     data.items.forEach(item => {
-      const nameLength = 12;
+      // 상품명 (최대 14자)
+      const nameLength = 14;
       const truncatedName =
         item.name.length > nameLength
           ? item.name.substring(0, nameLength - 1) + '~'
@@ -275,9 +279,9 @@ export class POSConnectPrinterService implements PrinterService {
 
       const quantity = item.quantity.toString().padStart(3);
       const unitPrice = item.unitPrice.toLocaleString().padStart(6);
-      const totalPrice = item.totalPrice.toLocaleString().padStart(7);
+      const totalPrice = item.totalPrice.toLocaleString().padStart(8);
 
-      lines.push(`${truncatedName} ${quantity} ${unitPrice} ${totalPrice}`);
+      lines.push(`${truncatedName}  ${quantity}  ${unitPrice}  ${totalPrice}`);
 
       // 옵션 표시
       if (item.options && item.options.length > 0) {
@@ -290,40 +294,41 @@ export class POSConnectPrinterService implements PrinterService {
       lines.push('');
     });
 
-    lines.push('--------------------------------');
-    lines.push('');
+    lines.push('----------------------------------------');
 
-    // 합계
+    // 합계 (오른쪽 정렬)
     if (data.summary.discount && data.summary.discount > 0) {
-      lines.push(
-        `할인:               -${data.summary.discount.toLocaleString()}원`
-      );
+      const discountText = `할인`;
+      const discountAmount = `-${data.summary.discount.toLocaleString()}원`;
+      lines.push(this.rightAlignAmount(discountText, discountAmount, WIDTH));
     }
 
-    if (data.summary.tax && data.summary.tax > 0) {
-      lines.push(`세금:                ${data.summary.tax.toLocaleString()}원`);
-    }
+    lines.push('========================================');
+    const totalText = `합계`;
+    const totalAmount = `${data.summary.total.toLocaleString()}원`;
+    lines.push(this.rightAlignAmount(totalText, totalAmount, WIDTH));
 
-    lines.push('================================');
-    lines.push(`합계:                ${data.summary.total.toLocaleString()}원`);
-    lines.push(`결제방법:            ${data.summary.paymentMethod}`);
+    const paymentText = `결제방법`;
+    lines.push(`${paymentText}: ${data.summary.paymentMethod}`);
 
     if (data.summary.receivedAmount) {
-      lines.push(
-        `받은금액:            ${data.summary.receivedAmount.toLocaleString()}원`
-      );
+      const receivedText = `받은금액`;
+      const receivedAmount = `${data.summary.receivedAmount.toLocaleString()}원`;
+      lines.push(this.rightAlignAmount(receivedText, receivedAmount, WIDTH));
     }
 
     if (data.summary.changeAmount) {
-      lines.push(
-        `거스름돈:            ${data.summary.changeAmount.toLocaleString()}원`
-      );
+      const changeText = `거스름돈`;
+      const changeAmount = `${data.summary.changeAmount.toLocaleString()}원`;
+      lines.push(this.rightAlignAmount(changeText, changeAmount, WIDTH));
     }
 
-    lines.push('================================');
+    lines.push('========================================');
+    lines.push('');
+    lines.push(this.centerText('감사합니다. 또 오세요!', WIDTH));
     lines.push('');
     lines.push('');
-    lines.push('     감사합니다. 또 오세요!     ');
+    lines.push('');
     lines.push('');
     lines.push('');
     lines.push('');
@@ -332,39 +337,85 @@ export class POSConnectPrinterService implements PrinterService {
   }
 
   /**
+   * 텍스트 중앙 정렬
+   */
+  private centerText(text: string, width: number): string {
+    const textLength = this.getTextWidth(text);
+    const padding = Math.max(0, Math.floor((width - textLength) / 2));
+    return ' '.repeat(padding) + text;
+  }
+
+  /**
+   * 금액 오른쪽 정렬 (레이블: 금액 형식)
+   */
+  private rightAlignAmount(
+    label: string,
+    amount: string,
+    width: number
+  ): string {
+    const combined = `${label}: ${amount}`;
+    const combinedLength = this.getTextWidth(combined);
+    const padding = Math.max(0, width - combinedLength);
+    return ' '.repeat(padding) + combined;
+  }
+
+  /**
+   * 텍스트 너비 계산 (한글 2바이트, 영문/숫자 1바이트)
+   */
+  private getTextWidth(text: string): number {
+    let width = 0;
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      // 한글, 한자 등 2바이트 문자
+      if (
+        char.match(/[\u3131-\u314e\u314f-\u3163\uac00-\ud7a3\u4e00-\u9fa5]/)
+      ) {
+        width += 2;
+      } else {
+        width += 1;
+      }
+    }
+    return width;
+  }
+
+  /**
    * 시재 점검 영수증 텍스트 포맷팅
    */
   private formatCashInspectionText(data: CashInspectionReceiptData): string {
     const lines: string[] = [];
+    const WIDTH = 40; // 영수증 너비
 
-    // 헤더
-    lines.push('================================');
-    lines.push(`         ${data.header.storeName}         `);
-    lines.push('================================');
-    lines.push(`         ${data.header.title}         `);
-    lines.push(`일시: ${data.header.dateTime}`);
-    lines.push('--------------------------------');
+    // 헤더 (중앙 정렬)
+    lines.push('========================================');
+    lines.push(this.centerText(data.header.storeName, WIDTH));
+    lines.push('========================================');
+    lines.push(this.centerText(data.header.title, WIDTH));
+    lines.push(this.centerText(`일시: ${data.header.dateTime}`, WIDTH));
+    lines.push('----------------------------------------');
 
     // 시재 내역
-    lines.push('권종               수량      금액');
-    lines.push('--------------------------------');
+    lines.push('권종                   수량        금액');
+    lines.push('----------------------------------------');
 
     data.cashData.forEach(item => {
-      const denomination = item.denomination.padEnd(15);
-      const quantity = item.quantity.toString().padStart(4);
-      const amount = item.amount.toLocaleString().padStart(9);
+      const denomination = item.denomination.padEnd(18);
+      const quantity = item.quantity.toString().padStart(5);
+      const amount = item.amount.toLocaleString().padStart(10);
 
       lines.push(`${denomination} ${quantity} ${amount}원`);
     });
 
-    lines.push('--------------------------------');
+    lines.push('----------------------------------------');
     lines.push(
-      `총 시재 금액:        ${data.summary.totalAmount.toLocaleString()}원`
+      `총 시재 금액:           ${data.summary.totalAmount.toLocaleString()}원`
     );
-    lines.push('================================');
+    lines.push('========================================');
     lines.push(`점검자: ${data.summary.inspector}`);
     lines.push('');
-    lines.push('     시재 점검이 완료되었습니다     ');
+    lines.push(this.centerText('시재 점검이 완료되었습니다', WIDTH));
+    lines.push('');
+    lines.push('');
+    lines.push('');
     lines.push('');
     lines.push('');
     lines.push('');
@@ -422,55 +473,93 @@ export class POSConnectPrinterService implements PrinterService {
    */
   private formatDailySettlement(data: DailySettlementReceiptData): string {
     const lines: string[] = [];
+    const WIDTH = 40; // 영수증 너비
 
-    // 헤더
-    lines.push('================================');
-    lines.push(`         ${data.header.storeName}         `);
-    lines.push('================================');
-    lines.push(`         ${data.header.title}         `);
-    lines.push(`정산일시: ${data.header.dateTime}`);
-    lines.push('================================');
+    // 헤더 (중앙 정렬)
+    lines.push('========================================');
+    lines.push(this.centerText(data.header.storeName, WIDTH));
+    lines.push('========================================');
+    lines.push(this.centerText(data.header.title, WIDTH));
+    lines.push(this.centerText(`정산일시: ${data.header.dateTime}`, WIDTH));
+    lines.push('========================================');
     lines.push('');
 
     // 매출 현황
     lines.push('[매출 현황]');
-    lines.push('--------------------------------');
-    lines.push(`총 매출:          ${data.sales.totalSales.toLocaleString()}원`);
-    lines.push(`현금 매출:        ${data.sales.cashSales.toLocaleString()}원`);
-    lines.push(`카드 매출:        ${data.sales.cardSales.toLocaleString()}원`);
+    lines.push('----------------------------------------');
+    lines.push(
+      `총 매출:              ${data.sales.totalSales.toLocaleString()}원`
+    );
+    lines.push(
+      `현금 매출:            ${data.sales.cashSales.toLocaleString()}원`
+    );
+    lines.push(
+      `카드 매출:            ${data.sales.cardSales.toLocaleString()}원`
+    );
     lines.push('');
 
     // 시재 현황
     lines.push('[시재 현황]');
-    lines.push('--------------------------------');
-    lines.push(`초기 시재금:      ${data.cash.initialCash.toLocaleString()}원`);
-    lines.push(`입금 합계:        ${data.cash.deposits.toLocaleString()}원`);
-    lines.push(`출금 합계:        ${data.cash.withdrawals.toLocaleString()}원`);
+    lines.push('----------------------------------------');
     lines.push(
-      `예상 시재금:      ${data.cash.expectedCash.toLocaleString()}원`
+      `초기 시재금:          ${data.cash.initialCash.toLocaleString()}원`
     );
-    lines.push(`실제 시재금:      ${data.cash.actualCash.toLocaleString()}원`);
-    lines.push(`차액:             ${data.cash.difference.toLocaleString()}원`);
+    lines.push(
+      `입금 합계:            ${data.cash.deposits.toLocaleString()}원`
+    );
+    lines.push(
+      `출금 합계:            ${data.cash.withdrawals.toLocaleString()}원`
+    );
+    lines.push(
+      `예상 시재금:          ${data.cash.expectedCash.toLocaleString()}원`
+    );
+    lines.push(
+      `실제 시재금:          ${data.cash.actualCash.toLocaleString()}원`
+    );
+    lines.push(
+      `차액:                 ${data.cash.difference.toLocaleString()}원`
+    );
     lines.push('');
 
-    // 권종별 현황
-    lines.push('[권종별 현황]');
-    lines.push('--------------------------------');
-    lines.push('권종               수량      금액');
-    lines.push('--------------------------------');
+    // 초기 권종별 내역
+    if (data.initialCashBreakdown && data.initialCashBreakdown.length > 0) {
+      lines.push('[초기 권종별 내역]');
+      lines.push('----------------------------------------');
+      lines.push('권종                   수량        금액');
+      lines.push('----------------------------------------');
+
+      data.initialCashBreakdown.forEach(item => {
+        const denomination = item.denomination.padEnd(18);
+        const quantity = item.quantity.toString().padStart(5);
+        const amount = item.amount.toLocaleString().padStart(10);
+
+        lines.push(`${denomination} ${quantity} ${amount}원`);
+      });
+
+      lines.push('');
+    }
+
+    // 마감 권종별 내역
+    lines.push('[마감 권종별 내역]');
+    lines.push('----------------------------------------');
+    lines.push('권종                   수량        금액');
+    lines.push('----------------------------------------');
 
     data.cashBreakdown.forEach(item => {
-      const denomination = item.denomination.padEnd(15);
-      const quantity = item.quantity.toString().padStart(4);
-      const amount = item.amount.toLocaleString().padStart(9);
+      const denomination = item.denomination.padEnd(18);
+      const quantity = item.quantity.toString().padStart(5);
+      const amount = item.amount.toLocaleString().padStart(10);
 
       lines.push(`${denomination} ${quantity} ${amount}원`);
     });
 
-    lines.push('================================');
+    lines.push('========================================');
     lines.push(`정산자: ${data.summary.inspector}`);
     lines.push('');
-    lines.push('     일일 정산이 완료되었습니다     ');
+    lines.push(this.centerText('일일 정산이 완료되었습니다', WIDTH));
+    lines.push('');
+    lines.push('');
+    lines.push('');
     lines.push('');
     lines.push('');
     lines.push('');

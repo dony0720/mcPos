@@ -10,6 +10,7 @@ import { useCashStore } from '../stores';
 import { CashDrawerMoneyItem } from '../types';
 
 const OPENING_CASH_KEY = '@mcpos_opening_cash_set';
+const INITIAL_CASH_DATA_KEY = '@mcpos_initial_cash_data';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -47,6 +48,12 @@ export default function HomeScreen() {
     try {
       // 현금 서랍 데이터 업데이트
       updateCashDrawer(updatedCashData);
+
+      // 초기 시재 데이터 저장 (일일정산 시 사용)
+      await AsyncStorage.setItem(
+        INITIAL_CASH_DATA_KEY,
+        JSON.stringify(updatedCashData)
+      );
 
       // 시재 설정 완료 상태 저장
       await AsyncStorage.setItem(OPENING_CASH_KEY, 'true');

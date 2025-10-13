@@ -225,20 +225,19 @@ export default function Payment() {
         },
       };
 
-      // 영수증 출력
-      const result = await printerService.printReceipt(receiptData);
+      // 영수증 2장 출력
+      for (let i = 0; i < 2; i++) {
+        const result = await printerService.printReceipt(receiptData);
 
-      if (result.success) {
-        console.log('✅ 영수증 출력 성공');
-      } else {
-        console.error('❌ 영수증 출력 실패:', result.message);
-        Alert.alert(
-          '영수증 출력 실패',
-          result.message || '영수증 출력에 실패했습니다.'
-        );
+        if (!result.success) {
+          Alert.alert(
+            '영수증 출력 실패',
+            result.message || `${i + 1}번째 영수증 출력에 실패했습니다.`
+          );
+          break; // 첫 번째 출력 실패 시 중단
+        }
       }
-    } catch (err) {
-      console.error('❌ 영수증 출력 오류:', err);
+    } catch {
       Alert.alert('영수증 출력 오류', '영수증 출력 중 오류가 발생했습니다.');
     }
   };

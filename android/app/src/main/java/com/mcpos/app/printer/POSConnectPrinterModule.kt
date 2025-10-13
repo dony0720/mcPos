@@ -204,6 +204,14 @@ class POSConnectPrinterModule(reactContext: ReactApplicationContext) :
                 }
             }
 
+            // 정렬 설정 (왼쪽 정렬)
+            try {
+                printer?.setAlignment(0) // 0: 왼쪽, 1: 중앙, 2: 오른쪽
+                Log.d(TAG, "정렬 설정: 왼쪽")
+            } catch (e: Exception) {
+                Log.w(TAG, "정렬 설정 실패, 기본 정렬로 출력 시도", e)
+            }
+
             // 텍스트 출력
             printer?.printString(text)
             
