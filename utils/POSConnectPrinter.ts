@@ -84,9 +84,3 @@ const printer: NativePOSConnectModule =
   POSConnectPrinter || createDummyModule();
 
 export default printer;
-
-
-
-
-
-

@@ -17,7 +17,9 @@ export default function HistoryModal({
 }: HistoryModalProps) {
   // Zustand store에서 거래 내역 가져오기 (상태 구독)
   const { transactions } = useLedgerStore();
-  const transactionHistory = transactions[customerInfo.memberNumber] || [];
+  const transactionHistory = (transactions[customerInfo.memberNumber] || [])
+    .slice()
+    .reverse();
 
   const getTransactionIcon = (type: TransactionType) => {
     switch (type) {
@@ -68,7 +70,7 @@ export default function HistoryModal({
             <View className='flex-row justify-between mb-1'>
               <Text className='text-gray-600'>회원번호:</Text>
               <Text className='text-gray-800 font-medium'>
-                {customerInfo.memberNumber}
+                {customerInfo.phoneNumber.slice(-4)}
               </Text>
             </View>
             <View className='flex-row justify-between mb-1'>

@@ -132,7 +132,7 @@ export default function ChargeModal({
               <View className='flex-row justify-between mb-2'>
                 <Text className='text-gray-600'>회원번호:</Text>
                 <Text className='text-gray-800 font-medium'>
-                  {customerInfo.memberNumber}
+                  {customerInfo.phoneNumber.slice(-4)}
                 </Text>
               </View>
               <View className='flex-row justify-between mb-2'>

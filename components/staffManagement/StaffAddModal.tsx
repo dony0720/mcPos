@@ -64,7 +64,7 @@ export default function StaffAddModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl w-4/5 h-[20%] max-w-md max-h-[600px]'>
+        <View className='bg-white rounded-2xl w-4/5 h-[30%] max-w-md max-h-[600px]'>
           {/* 헤더 */}
           <View className='flex-row justify-between items-center p-6 pb-4'>
             <Text className='text-xl font-bold text-gray-800'>

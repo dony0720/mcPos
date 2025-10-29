@@ -26,6 +26,7 @@ export interface ReceiptData {
     tax?: number;
     total: number;
     paymentMethod: string;
+    couponAmount?: number;
     receivedAmount?: number;
     changeAmount?: number;
   };

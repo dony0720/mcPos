@@ -180,7 +180,7 @@ export default function MenuAddModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl w-4/5 h-4/5  max-w-lg max-h-[1500px]'>
+        <View className='bg-white rounded-2xl w-4/5 h-4/5 max-w-lg max-h-[1600px] '>
           {/* 헤더 */}
           <View className='p-6 border-b border-gray-200'>
             <View className='flex-row justify-between items-center'>
@@ -196,6 +196,7 @@ export default function MenuAddModal({
           {/* 폼 내용 */}
           <ScrollView
             className='flex-1 p-6'
+            contentContainerClassName='pb-20'
             showsVerticalScrollIndicator={false}
           >
             {/* 메뉴명 입력 */}
@@ -286,40 +287,42 @@ export default function MenuAddModal({
               {/* 드롭다운 목록 (체크박스 형태) */}
               {showCategoryDropdown && (
                 <View className='border border-t-0 border-gray-300 rounded-b-lg bg-white'>
-                  {categories.map((category, index) => {
-                    const isSelected =
-                      selectedCategories?.includes(category.id) || false;
-                    return (
-                      <TouchableOpacity
-                        key={category.id}
-                        className={clsx(
-                          'px-4 py-4 flex-row items-center justify-between',
-                          index !== categories.length - 1 &&
-                            'border-b border-gray-100',
-                          isSelected && 'bg-green-50'
-                        )}
-                        onPress={() => handleCategoryToggle(category.id)}
-                      >
-                        <Text
+                  {categories
+                    .filter(cat => cat.id !== 'All' && cat.id !== 'ALL')
+                    .map((category, index, filteredArray) => {
+                      const isSelected =
+                        selectedCategories?.includes(category.id) || false;
+                      return (
+                        <TouchableOpacity
+                          key={category.id}
                           className={clsx(
-                            'text-base',
-                            isSelected
-                              ? 'text-primaryGreen font-medium'
-                              : 'text-gray-800'
+                            'px-4 py-4 flex-row items-center justify-between',
+                            index !== filteredArray.length - 1 &&
+                              'border-b border-gray-100',
+                            isSelected && 'bg-green-50'
                           )}
+                          onPress={() => handleCategoryToggle(category.id)}
                         >
-                          {category.name}
-                        </Text>
-                        {isSelected && (
-                          <Ionicons
-                            name='checkmark-circle'
-                            size={20}
-                            color='#10B981'
-                          />
-                        )}
-                      </TouchableOpacity>
-                    );
-                  })}
+                          <Text
+                            className={clsx(
+                              'text-base',
+                              isSelected
+                                ? 'text-primaryGreen font-medium'
+                                : 'text-gray-800'
+                            )}
+                          >
+                            {category.name}
+                          </Text>
+                          {isSelected && (
+                            <Ionicons
+                              name='checkmark-circle'
+                              size={20}
+                              color='#10B981'
+                            />
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })}
                 </View>
               )}
 
@@ -510,7 +513,7 @@ export default function MenuAddModal({
               </View>
               {/* 옵션 추가 폼 */}
               {showAddOption && (
-                <View className='border border-gray-200 rounded-lg p-4 bg-gray-50'>
+                <View className='border border-gray-200 rounded-lg p-4 bg-gray-50 mb-3'>
                   <Text className='text-sm font-medium text-gray-700 mb-3'>
                     새 옵션 추가
                   </Text>
@@ -610,11 +613,11 @@ export default function MenuAddModal({
               )}
               {/* 옵션 목록 */}
               {availableOptions.length > 0 && (
-                <View className='flex-1 gap-2'>
+                <View className='gap-3'>
                   {availableOptions.map((option, index) => (
                     <View
                       key={index}
-                      className='flex-row justify-between items-center p-3 border border-gray-300 rounded-lg'
+                      className='flex-row justify-between items-center p-3 border border-gray-300 rounded-lg bg-white'
                     >
                       <View>
                         <Text className='text-gray-800 font-medium'>

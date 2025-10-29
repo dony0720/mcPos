@@ -109,21 +109,8 @@ export default function TransactionItem({
     const dayjsDate = dayjs(date);
     return {
       date: dayjsDate.format('YYYY.MM.DD'),
-      time: dayjsDate.format('HH:mm'),
-      isToday: dayjsDate.isSame(dayjs(), 'day'),
-      isYesterday: dayjsDate.isSame(dayjs().subtract(1, 'day'), 'day'),
+      time: dayjsDate.format('A hh:mm'),
     };
-  };
-
-  // 날짜 표시 텍스트 생성
-  const getDateDisplayText = (formattedDate: ReturnType<typeof formatDate>) => {
-    if (formattedDate.isToday) {
-      return '오늘';
-    } else if (formattedDate.isYesterday) {
-      return '어제';
-    } else {
-      return formattedDate.date;
-    }
   };
 
   const transactionLabel = getTransactionLabel(transaction);
@@ -145,7 +132,7 @@ export default function TransactionItem({
             )}
           >
             <Ionicons
-              name={paymentStyle.icon as any}
+              name={paymentStyle.icon as keyof typeof Ionicons.glyphMap}
               size={24}
               color={paymentStyle.iconColor}
             />
@@ -154,7 +141,7 @@ export default function TransactionItem({
           <View className='flex-1'>
             <View className='flex flex-row items-center gap-2 mb-1'>
               <Text className='text-gray-600 text-sm'>
-                #{transaction.id.substring(4, 12)}
+                #{transaction.pickupNumber}
               </Text>
               <View
                 className={clsx('px-2 py-1 rounded-full', paymentStyle.bgClass)}
@@ -172,7 +159,7 @@ export default function TransactionItem({
 
             <View className='flex flex-row items-center gap-2'>
               <Text className='text-gray-600 text-sm font-medium'>
-                {getDateDisplayText(formattedDate)}
+                {formattedDate.date}
               </Text>
               <Text className='text-gray-400 text-sm'>
                 {formattedDate.time}

@@ -311,6 +311,12 @@ export class POSConnectPrinterService implements PrinterService {
     const paymentText = `결제방법`;
     lines.push(`${paymentText}: ${data.summary.paymentMethod}`);
 
+    if (data.summary.couponAmount && data.summary.couponAmount > 0) {
+      const couponText = `쿠폰금액`;
+      const couponAmount = `${data.summary.couponAmount.toLocaleString()}원`;
+      lines.push(this.rightAlignAmount(couponText, couponAmount, WIDTH));
+    }
+
     if (data.summary.receivedAmount) {
       const receivedText = `받은금액`;
       const receivedAmount = `${data.summary.receivedAmount.toLocaleString()}원`;

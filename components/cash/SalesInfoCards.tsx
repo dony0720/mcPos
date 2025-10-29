@@ -1,20 +1,40 @@
-import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
-import {
-  useCashStore,
-  useLedgerStore,
-  useTransactionStore,
-} from '../../stores';
-import { SalesTheme, TransactionType } from '../../types';
+import { useCashStore, useTransactionStore } from '../../stores';
+import { CashDrawerMoneyItem, SalesTheme, TransactionType } from '../../types';
 import SalesInfoCard from './SalesInfoCard';
 
+const INITIAL_CASH_DATA_KEY = '@mcpos_initial_cash_data';
+
 export default function SalesInfoCards() {
+  const [initialCashAmount, setInitialCashAmount] = useState(0);
+
   // 실제 데이터 가져오기
-  const { getTodayDeposits, getTodayWithdrawals, getTotalCashAmount } =
-    useCashStore();
+  const { getTodayDeposits, getTodayWithdrawals } = useCashStore();
   const { getTransactionStats, getTodayTransactions } = useTransactionStore();
-  const { ledgerData, parseAmount } = useLedgerStore();
+
+  // 초기 시재 금액 불러오기
+  useEffect(() => {
+    const loadInitialCash = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem(INITIAL_CASH_DATA_KEY);
+        if (storedData) {
+          const initialData: CashDrawerMoneyItem[] = JSON.parse(storedData);
+          const total = initialData.reduce(
+            (sum, item) => sum + item.quantity * item.unitValue,
+            0
+          );
+          setInitialCashAmount(total);
+        }
+      } catch {
+        setInitialCashAmount(0);
+      }
+    };
+
+    loadInitialCash();
+  }, []);
 
   // 오늘의 통계 계산
   const todayStats = getTransactionStats({
@@ -23,7 +43,6 @@ export default function SalesInfoCards() {
   });
 
   const todayTransactions = getTodayTransactions();
-  const totalCash = getTotalCashAmount();
 
   // 오늘 입출금 데이터
   const todayDeposits = getTodayDeposits();
@@ -59,27 +78,22 @@ export default function SalesInfoCards() {
     return sum + (t.paymentMethod === 'coupon' ? t.totalAmount : 0);
   }, 0);
 
-  // 장부 결제 매출 (현재는 사용하지 않지만 나중에 필요할 수 있음)
-  // const ledgerSales = completedOrderTransactions.reduce((sum, t) => {
-  //   if (t.paymentBreakdown?.ledger) {
-  //     return sum + t.paymentBreakdown.ledger;
-  //   }
-  //   return sum + (t.paymentMethod === 'ledger' ? t.totalAmount : 0);
-  // }, 0);
-
-  // 장부관리의 모든 장부 총 충전 금액 계산
-  const totalLedgerAmount = ledgerData.reduce((sum, ledger) => {
-    return sum + parseAmount(ledger.chargeAmount);
+  // 장부 결제 매출 계산
+  const ledgerSales = completedOrderTransactions.reduce((sum, t) => {
+    if (t.paymentBreakdown?.ledger) {
+      return sum + t.paymentBreakdown.ledger;
+    }
+    return sum + (t.paymentMethod === 'ledger' ? t.totalAmount : 0);
   }, 0);
 
   // 실제 데이터로 카드 구성
   const salesInfoData = [
-    // 첫 번째 행: 시작금액, 오늘 매출, 현금 서랍, 거스름돈
+    // 첫 번째 행: 시작금액, 오늘 매출, 입금, 출금
     [
       {
         icon: 'play-circle' as const,
         title: '시작금액',
-        amount: `${totalCash.toLocaleString()}원`, // 고정값 (나중에 설정 가능하게 할 수 있음)
+        amount: `${initialCashAmount.toLocaleString()}원`,
         theme: SalesTheme.GRAY,
       },
       {
@@ -124,7 +138,7 @@ export default function SalesInfoCards() {
       {
         icon: 'book' as const,
         title: '장부',
-        amount: `${totalLedgerAmount.toLocaleString()}원`,
+        amount: `${ledgerSales.toLocaleString()}원`,
         theme: SalesTheme.INDIGO,
       },
     ],

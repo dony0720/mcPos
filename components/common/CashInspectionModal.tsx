@@ -1,3 +1,5 @@
+import 'dayjs/locale/ko';
+
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import dayjs from 'dayjs';
@@ -12,6 +14,8 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+
+dayjs.locale('ko');
 
 import { useCashStore, useTransactionStore } from '../../stores';
 import {
@@ -101,7 +105,7 @@ export default function CashInspectionModal({
         if (storedData) {
           initialCashBreakdownData = JSON.parse(storedData);
         }
-      } catch (error) {
+      } catch {
         // 초기 데이터를 가져올 수 없는 경우 빈 배열 사용
       }
 
@@ -118,7 +122,7 @@ export default function CashInspectionModal({
         header: {
           storeName: 'MC카페',
           title: '일일 정산 보고서',
-          dateTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+          dateTime: dayjs().format('YYYY-MM-DD A hh:mm:ss'),
         },
         sales: {
           totalSales: stats.totalSales,

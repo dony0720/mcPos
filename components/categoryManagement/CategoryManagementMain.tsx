@@ -50,10 +50,10 @@ export default function CategoryManagementMain() {
     }
   }, [isModalOpen, pendingSuccessToast]);
 
-  // 표시 순서별로 정렬된 카테고리
-  const sortedCategories = [...categories].sort(
-    (a, b) => a.displayOrder - b.displayOrder
-  );
+  // 표시 순서별로 정렬된 카테고리 ("전체" 카테고리 제외)
+  const sortedCategories = [...categories]
+    .filter(cat => cat.id !== 'All' && cat.id !== 'ALL')
+    .sort((a, b) => a.displayOrder - b.displayOrder);
 
   // 이벤트 핸들러
   const handleAddCategory = () => {

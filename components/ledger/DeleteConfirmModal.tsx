@@ -50,7 +50,7 @@ export default function DeleteConfirmModal({
               <View className='flex-row justify-between mb-2'>
                 <Text className='text-gray-600'>회원번호:</Text>
                 <Text className='text-gray-800 font-medium'>
-                  {item.memberNumber}
+                  {item.phoneNumber.slice(-4)}
                 </Text>
               </View>
               <View className='flex-row justify-between mb-2'>

@@ -1,3 +1,5 @@
+import 'dayjs/locale/ko';
+
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
@@ -5,6 +7,8 @@ import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { DiscountType, ReceiptData, Transaction } from '../../types';
 import { createPrinterService } from '../../utils';
+
+dayjs.locale('ko');
 
 interface ReceiptModalProps {
   visible: boolean;
@@ -34,51 +38,73 @@ export default function ReceiptModal({
 
     setIsPrinting(true);
     try {
+      // 쿠폰 금액 추출
+      let couponAmount = 0;
+      if (transaction.paymentDetails) {
+        if (
+          transaction.paymentDetails.type === 'COUPON' ||
+          transaction.paymentDetails.type === 'COUPON_CASH'
+        ) {
+          couponAmount = transaction.paymentDetails.couponAmount;
+        }
+      }
+
+      // 받은 금액과 거스름돈 추출
+      let receivedAmount: number | undefined;
+      let changeAmount: number | undefined;
+      if (transaction.paymentDetails) {
+        if (transaction.paymentDetails.type === 'CASH') {
+          receivedAmount = transaction.paymentDetails.receivedAmount;
+          changeAmount = transaction.paymentDetails.changeAmount;
+        } else if (transaction.paymentDetails.type === 'COUPON_CASH') {
+          receivedAmount = transaction.paymentDetails.receivedAmount;
+          changeAmount = transaction.paymentDetails.changeAmount;
+        }
+      }
+
       // 거래 데이터를 영수증 데이터로 변환
       const receiptData: ReceiptData = {
         header: {
-          storeName: 'MC카페',
-          storeAddress: '서울시 강남구 테헤란로 123',
-          storePhone: '02-1234-5678',
-          receiptNumber: transaction.id,
-          dateTime: dayjs(transaction.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+          storeName: 'MC POS',
+          storeAddress: '',
+          storePhone: '',
+          receiptNumber: transaction.pickupNumber || transaction.id,
+          dateTime: dayjs(transaction.timestamp).format(
+            'YYYY-MM-DD A hh:mm:ss'
+          ),
         },
         items:
-          transaction.items?.map(item => ({
-            name: item.name,
+          transaction.orderItems?.map(item => ({
+            name: `${item.menuItem.name} (${item.menuItem.temperature})`,
             quantity: item.quantity,
-            unitPrice: item.basePrice,
-            totalPrice: item.totalPrice,
-            options: item.options?.map(opt => `${opt.name}: ${opt.value}`),
+            unitPrice: item.menuItem.price,
+            totalPrice: item.menuItem.price * item.quantity,
+            options: item.options.length > 0 ? item.options : undefined,
           })) || [],
         summary: {
-          subtotal: transaction.subtotal || transaction.totalAmount,
-          discount: transaction.discountAmount || 0,
-          tax: 0, // 세금 정보가 있다면 추가
+          subtotal: transaction.totalAmount,
+          discount: 0, // 할인은 이미 아이템 가격에 반영됨
           total: transaction.totalAmount,
           paymentMethod: getPaymentMethodLabel(
             transaction.paymentMethod || 'cash'
           ),
-          receivedAmount: transaction.receivedAmount,
-          changeAmount: transaction.changeAmount,
+          couponAmount: couponAmount > 0 ? couponAmount : undefined,
+          receivedAmount:
+            receivedAmount && receivedAmount > 0 ? receivedAmount : undefined,
+          changeAmount:
+            changeAmount && changeAmount > 0 ? changeAmount : undefined,
         },
         footer: {
-          message: '감사합니다. 또 오세요!',
+          message: transaction.orderMethod
+            ? getOrderMethodLabel(transaction.orderMethod)
+            : '',
         },
       };
 
       // 프린터로 출력
-      const result = await printerService.printReceipt(receiptData);
-
-      if (result.success) {
-        console.log('영수증 출력 성공:', result.message);
-        // 성공 토스트 메시지 표시 (옵션)
-      } else {
-        console.error('영수증 출력 실패:', result.message);
-        // 실패 토스트 메시지 표시 (옵션)
-      }
-    } catch (error) {
-      console.error('영수증 출력 중 오류:', error);
+      await printerService.printReceipt(receiptData);
+    } catch {
+      // 에러 무시
     } finally {
       setIsPrinting(false);
     }
@@ -105,8 +131,8 @@ export default function ReceiptModal({
     switch (orderMethodId) {
       case 'takeout':
         return '테이크아웃';
-      case 'store':
-        return '매장';
+      case 'dine-in':
+        return '매장식사';
       default:
         return '기타';
     }

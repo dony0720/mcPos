@@ -217,6 +217,10 @@ export default function Payment() {
           discount: 0, // 할인은 이미 아이템 가격에 반영됨
           total: totalAmount,
           paymentMethod: getPaymentMethodName(selectedPaymentMethod),
+          couponAmount:
+            selectedPaymentMethod === PaymentMethod.COUPON && couponAmount > 0
+              ? couponAmount
+              : undefined,
           receivedAmount: receivedAmount > 0 ? receivedAmount : undefined,
           changeAmount: changeAmount > 0 ? changeAmount : undefined,
         },
@@ -262,9 +266,9 @@ export default function Payment() {
   const getOrderMethodName = (method: OrderReceiptMethodId): string => {
     switch (method) {
       case OrderReceiptMethodEnum.DINE_IN:
-        return '매장 식사';
+        return '매장식사';
       case OrderReceiptMethodEnum.TAKEOUT:
-        return '포장';
+        return '테이크아웃';
       default:
         return '';
     }
@@ -449,6 +453,8 @@ export default function Payment() {
         setSelectedLedger(ledger);
         setIsLedgerFirstStep(false);
         setModalType('pickup');
+        // 수령 번호 입력을 위해 모달 유지 (자동으로 수령 번호 모드로 전환)
+        return false;
       } else {
         // 일치하는 장부가 여러 개인 경우 선택 모달 표시
         setIsLedgerSelectionModalVisible(true);
@@ -456,7 +462,7 @@ export default function Payment() {
         return true; // 성공적으로 처리됨 (모달 전환)
       }
     } else {
-      // 픽업 번호 입력 완료 또는 일반 결제 완료
+      // 수령 번호 입력 완료 또는 일반 결제 완료
 
       // 장부 결제인데 선택된 장부가 없는 경우 차단
       if (selectedPaymentMethod === PaymentMethod.LEDGER && !selectedLedger) {
@@ -554,9 +560,10 @@ export default function Payment() {
     }
 
     setSelectedLedger(ledger);
+    setIsLedgerSelectionModalVisible(false); // 장부 선택 모달 닫기
     setIsLedgerFirstStep(false);
     setModalType('pickup');
-    openModal('numberInput');
+    openModal('numberInput'); // 수령번호 입력 모달 열기
   };
 
   return (

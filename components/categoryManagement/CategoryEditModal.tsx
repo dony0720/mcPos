@@ -74,7 +74,7 @@ export default function CategoryEditModal({
   return (
     <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
       <View className='flex-1 justify-center items-center bg-black/50'>
-        <View className='bg-white rounded-2xl w-4/5 h-[42%] max-w-lg max-h-[500px]'>
+        <View className='bg-white rounded-2xl w-4/5 h-3/5 max-w-lg max-h-[600px]'>
           {/* 헤더 */}
           <View className='p-6 border-b border-gray-200'>
             <View className='flex-row justify-between items-center'>

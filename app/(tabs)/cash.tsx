@@ -1,6 +1,10 @@
+import 'dayjs/locale/ko';
+
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { Alert, View } from 'react-native';
+
+dayjs.locale('ko');
 
 import {
   AdminProtectedRoute,
@@ -38,7 +42,7 @@ export default function CashManagement() {
         header: {
           storeName: 'MC카페',
           title: '시재 점검 영수증',
-          dateTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+          dateTime: dayjs().format('YYYY-MM-DD A hh:mm:ss'),
         },
         cashData: cashDrawer.map(item => ({
           denomination: `${item.unitValue.toLocaleString()}원`,

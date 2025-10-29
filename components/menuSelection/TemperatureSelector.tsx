@@ -27,8 +27,8 @@ export default function TemperatureSelector({
       value: 'ICE',
       label: 'ICE',
       emoji: '🧊',
-      price: 500,
-      priceLabel: '+500원',
+      price: temperatureRestriction === 'ICE_ONLY' ? 0 : 500,
+      priceLabel: temperatureRestriction === 'ICE_ONLY' ? '' : '+500원',
     },
   ];
 
