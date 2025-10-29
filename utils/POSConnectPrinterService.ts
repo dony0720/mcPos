@@ -270,18 +270,25 @@ export class POSConnectPrinterService implements PrinterService {
     lines.push('----------------------------------------');
 
     data.items.forEach(item => {
-      // 상품명 (최대 14자)
       const nameLength = 14;
+      const quantityLength = 5;
+      const unitPriceLength = 10;
+      const totalPriceLength = 11;
+
       const truncatedName =
         item.name.length > nameLength
           ? item.name.substring(0, nameLength - 1) + '~'
           : item.name.padEnd(nameLength);
 
-      const quantity = item.quantity.toString().padStart(3);
-      const unitPrice = item.unitPrice.toLocaleString().padStart(6);
-      const totalPrice = item.totalPrice.toLocaleString().padStart(8);
+      const quantity = item.quantity.toString().padStart(quantityLength);
+      const unitPrice = item.unitPrice
+        .toLocaleString()
+        .padStart(unitPriceLength);
+      const totalPrice = item.totalPrice
+        .toLocaleString()
+        .padStart(totalPriceLength);
 
-      lines.push(`${truncatedName}  ${quantity}  ${unitPrice}  ${totalPrice}`);
+      lines.push(`${truncatedName} ${quantity} ${unitPrice} ${totalPrice}`);
 
       // 옵션 표시
       if (item.options && item.options.length > 0) {
