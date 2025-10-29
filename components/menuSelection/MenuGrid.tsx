@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { useModal } from '../../hooks';
 import { useMenuStore } from '../../stores';
@@ -64,42 +65,60 @@ export default function MenuGrid({
     setSelectedMenuItem(null);
   };
 
+  // 위아래 스와이프 제스처 설정
+  const panGesture = Gesture.Pan()
+    .onEnd(event => {
+      const { translationY, velocityY } = event;
+
+      // 위로 스와이프 (다음 페이지)
+      if (translationY < -50 && velocityY < 0) {
+        handleDownPress();
+      }
+      // 아래로 스와이프 (이전 페이지)
+      else if (translationY > 50 && velocityY > 0) {
+        handleUpPress();
+      }
+    })
+    .runOnJS(true);
+
   return (
     <View className='flex flex-row w-full flex-[13] box-border px-[5%] py-[3%] items-center'>
       {/* 메뉴 그리드 섹션 - 3x2 레이아웃 */}
-      <View className='flex-1 h-full'>
-        <View className='h-full flex flex-col justify-between'>
-          {/* 첫 번째 행 (3개) */}
-          <View className='flex-row h-[48%] gap-5'>
-            {currentItems.slice(0, 3).map(item => (
-              <View key={item.id} className='w-[30%]'>
-                <MenuItemComponent
-                  id={item.id}
-                  name={item.name}
-                  price={`${item.price.toLocaleString()}원`}
-                  image={item.image}
-                  onPress={() => handleMenuItemPress(item)}
-                />
-              </View>
-            ))}
-          </View>
+      <GestureDetector gesture={panGesture}>
+        <View className='flex-1 h-full'>
+          <View className='h-full flex flex-col justify-between'>
+            {/* 첫 번째 행 (3개) */}
+            <View className='flex-row h-[48%] gap-5'>
+              {currentItems.slice(0, 3).map(item => (
+                <View key={item.id} className='w-[30%]'>
+                  <MenuItemComponent
+                    id={item.id}
+                    name={item.name}
+                    price={`${item.price.toLocaleString()}원`}
+                    image={item.image}
+                    onPress={() => handleMenuItemPress(item)}
+                  />
+                </View>
+              ))}
+            </View>
 
-          {/* 두 번째 행 (3개) */}
-          <View className='flex-row h-[48%] gap-5'>
-            {currentItems.slice(3, 6).map(item => (
-              <View key={item.id} className='w-[30%]'>
-                <MenuItemComponent
-                  id={item.id}
-                  name={item.name}
-                  price={`${item.price.toLocaleString()}원`}
-                  image={item.image}
-                  onPress={() => handleMenuItemPress(item)}
-                />
-              </View>
-            ))}
+            {/* 두 번째 행 (3개) */}
+            <View className='flex-row h-[48%] gap-5'>
+              {currentItems.slice(3, 6).map(item => (
+                <View key={item.id} className='w-[30%]'>
+                  <MenuItemComponent
+                    id={item.id}
+                    name={item.name}
+                    price={`${item.price.toLocaleString()}원`}
+                    image={item.image}
+                    onPress={() => handleMenuItemPress(item)}
+                  />
+                </View>
+              ))}
+            </View>
           </View>
         </View>
-      </View>
+      </GestureDetector>
 
       {/* 페이지네이션 버튼 섹션 */}
       <PaginationButtons

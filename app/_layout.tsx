@@ -2,12 +2,13 @@ import '../global.css';
 
 import { Stack } from 'expo-router';
 import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ToastProvider } from '../components';
 
 export default function RootLayout() {
   return (
-    <>
+    <GestureHandlerRootView className='flex-1'>
       <Stack
         screenOptions={{
           headerShown: false, // 모든 화면의 헤더를 숨김
@@ -32,6 +33,6 @@ export default function RootLayout() {
         {/* <Stack.Screen name="Details" component={DetailsScreen} /> */}
       </Stack>
       <ToastProvider />
-    </>
+    </GestureHandlerRootView>
   );
 }

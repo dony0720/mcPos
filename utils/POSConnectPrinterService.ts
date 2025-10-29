@@ -239,6 +239,61 @@ export class POSConnectPrinterService implements PrinterService {
   }
 
   /**
+   * 문자열의 실제 표시 폭 계산 (한글=2, 영문/숫자=1)
+   */
+  private getDisplayWidth(str: string): number {
+    let width = 0;
+    for (let i = 0; i < str.length; i++) {
+      const code = str.charCodeAt(i);
+      // 한글, 한자 등 2바이트 문자
+      if (code > 0x7f && code < 0xffff) {
+        width += 2;
+      } else {
+        width += 1;
+      }
+    }
+    return width;
+  }
+
+  /**
+   * 지정된 표시 폭에 맞춰 문자열 패딩 (왼쪽 정렬)
+   */
+  private padToWidth(str: string, targetWidth: number): string {
+    const currentWidth = this.getDisplayWidth(str);
+    if (currentWidth >= targetWidth) {
+      // 너무 긴 경우 자르기
+      let result = '';
+      let width = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        const charWidth = str.charCodeAt(i) > 0x7f ? 2 : 1;
+        if (width + charWidth > targetWidth - 1) {
+          result += '~';
+          break;
+        }
+        result += char;
+        width += charWidth;
+      }
+      return (
+        result +
+        ' '.repeat(Math.max(0, targetWidth - this.getDisplayWidth(result)))
+      );
+    }
+    return str + ' '.repeat(targetWidth - currentWidth);
+  }
+
+  /**
+   * 지정된 표시 폭에 맞춰 문자열 패딩 (오른쪽 정렬)
+   */
+  private padToWidthRight(str: string, targetWidth: number): string {
+    const currentWidth = this.getDisplayWidth(str);
+    if (currentWidth > targetWidth) {
+      return str.substring(str.length - targetWidth);
+    }
+    return ' '.repeat(targetWidth - currentWidth) + str;
+  }
+
+  /**
    * 영수증 텍스트 포맷팅
    */
   private formatReceiptText(data: ReceiptData): string {
@@ -265,30 +320,46 @@ export class POSConnectPrinterService implements PrinterService {
     lines.push('----------------------------------------');
     lines.push('');
 
-    // 상품 목록
-    lines.push('상품명            수량   단가      금액');
+    // 각 컬럼의 표시 폭 (한글=2칸, 영문=1칸 기준)
+    // 총 폭: 16 + 4 + 8 + 9 + 3(공백) = 40
+    const nameWidth = 16; // 상품명
+    const quantityWidth = 4; // 수량
+    const unitPriceWidth = 8; // 단가
+    const totalPriceWidth = 9; // 금액
+
+    // 상품 목록 헤더 (데이터와 동일한 폭으로 정렬)
+    const headerName = this.padToWidth('상품명', nameWidth);
+    const headerQuantity = this.padToWidthRight('수량', quantityWidth);
+    const headerUnitPrice = this.padToWidthRight('단가', unitPriceWidth);
+    const headerTotalPrice = this.padToWidthRight('금액', totalPriceWidth);
+    lines.push(
+      `${headerName} ${headerQuantity} ${headerUnitPrice} ${headerTotalPrice}`
+    );
     lines.push('----------------------------------------');
 
     data.items.forEach(item => {
-      const nameLength = 14;
-      const quantityLength = 5;
-      const unitPriceLength = 10;
-      const totalPriceLength = 11;
+      // 상품명 (왼쪽 정렬)
+      const name = this.padToWidth(item.name, nameWidth);
 
-      const truncatedName =
-        item.name.length > nameLength
-          ? item.name.substring(0, nameLength - 1) + '~'
-          : item.name.padEnd(nameLength);
+      // 수량 (오른쪽 정렬)
+      const quantity = this.padToWidthRight(
+        item.quantity.toString(),
+        quantityWidth
+      );
 
-      const quantity = item.quantity.toString().padStart(quantityLength);
-      const unitPrice = item.unitPrice
-        .toLocaleString()
-        .padStart(unitPriceLength);
-      const totalPrice = item.totalPrice
-        .toLocaleString()
-        .padStart(totalPriceLength);
+      // 단가 (오른쪽 정렬)
+      const unitPrice = this.padToWidthRight(
+        item.unitPrice.toLocaleString(),
+        unitPriceWidth
+      );
 
-      lines.push(`${truncatedName} ${quantity} ${unitPrice} ${totalPrice}`);
+      // 금액 (오른쪽 정렬)
+      const totalPrice = this.padToWidthRight(
+        item.totalPrice.toLocaleString(),
+        totalPriceWidth
+      );
+
+      lines.push(`${name} ${quantity} ${unitPrice} ${totalPrice}`);
 
       // 옵션 표시
       if (item.options && item.options.length > 0) {
