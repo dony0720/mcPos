@@ -31,7 +31,7 @@ export class POSConnectPrinterService implements PrinterService {
       const result = await POSConnectPrinter.initialize();
       this.isInitialized = result.success;
       return result.success;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -43,7 +43,7 @@ export class POSConnectPrinterService implements PrinterService {
     try {
       await this.ensureInitialized();
       return await POSConnectPrinter.getUsbDevices();
-    } catch (error) {
+    } catch {
       return [];
     }
   }
@@ -56,7 +56,7 @@ export class POSConnectPrinterService implements PrinterService {
       const connected = await POSConnectPrinter.isConnected();
       this.isConnectionActive = connected;
       return connected;
-    } catch (error) {
+    } catch {
       this.isConnectionActive = false;
       return false;
     }
@@ -116,7 +116,7 @@ export class POSConnectPrinterService implements PrinterService {
           : result.message || '프린터 연결 실패',
         errorCode: result.errorCode,
       };
-    } catch (error) {
+    } catch {
       this.isConnectionActive = false;
       return {
         success: false,
@@ -142,7 +142,7 @@ export class POSConnectPrinterService implements PrinterService {
           : result.message || '프린터 연결 해제 실패',
         errorCode: result.errorCode,
       };
-    } catch (error) {
+    } catch {
       this.isConnectionActive = false;
       return {
         success: false,
@@ -185,7 +185,7 @@ export class POSConnectPrinterService implements PrinterService {
         success: true,
         message: '영수증 출력 완료',
       };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         message: '영수증 출력 중 오류가 발생했습니다.',
@@ -229,7 +229,7 @@ export class POSConnectPrinterService implements PrinterService {
         success: true,
         message: '시재 점검 영수증 출력 완료',
       };
-    } catch (error) {
+    } catch {
       return {
         success: false,
         message: '시재 점검 영수증 출력 중 오류가 발생했습니다.',
@@ -302,6 +302,11 @@ export class POSConnectPrinterService implements PrinterService {
     });
 
     lines.push('----------------------------------------');
+
+    // 총 잔 수를 영수증에 추가
+    const totalItems = data.items.reduce((sum, item) => sum + item.quantity, 0);
+    lines.push(`총 ${totalItems} 잔`);
+    lines.push('========================================');
 
     // 합계 (오른쪽 정렬)
     if (data.summary.discount && data.summary.discount > 0) {
