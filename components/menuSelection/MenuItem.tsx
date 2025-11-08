@@ -15,16 +15,10 @@ export default function MenuItem({
   onPress,
 }: MenuItemProps) {
   return (
-    <View key={id} className='w-full h-full box-border'>
-      <TouchableOpacity onPress={onPress} className='w-full h-full'>
-        <View className='w-full h-full flex flex-col rounded-lg gap-2'>
+    <View key={id} className='w-full box-border'>
+      <TouchableOpacity onPress={onPress} className='w-full'>
+        <View className='w-full flex flex-col rounded-lg gap-2'>
           {/* 메뉴 아이콘 섹션 */}
-          {/*    <View className='overflow-hidden rounded-lg aspect-square'>
-            <Image
-              source={require('../../assets/images/coffeeTest.png')}
-              className='w-full h-full'
-              resizeMode='cover'
-            /> */}
           <View className='bg-gray-100 rounded-lg aspect-square flex items-center justify-center overflow-hidden'>
             {image ? (
               <Image

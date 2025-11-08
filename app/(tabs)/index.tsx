@@ -65,7 +65,7 @@ export default function MenuSelection() {
 
   return (
     <View className='h-full w-full bg-white flex flex-col'>
-      <View className='flex-1 max-w-7xl mx-auto w-full'>
+      <View className='flex-1 max-w-7xl mx-auto w-full flex flex-col'>
         {/* 헤더 섹션 - 로고와 관리자 모드 버튼이 포함된 상단 헤더 */}
         <View className='w-full h-[80px] box-border px-[5%] mt-[25px] flex flex-row justify-between items-center '>
           {/* 로고 */}
@@ -99,7 +99,9 @@ export default function MenuSelection() {
         />
 
         {/* 메뉴 아이템 그리드 - 선택된 카테고리의 메뉴들을 표시 */}
-        <MenuGrid selectedCategory={selectedCategory} onAddItem={addItem} />
+        <View className='flex-[13]'>
+          <MenuGrid selectedCategory={selectedCategory} onAddItem={addItem} />
+        </View>
 
         {/* 주문 내역 섹션 */}
         {/* 주문 내역 제목 */}

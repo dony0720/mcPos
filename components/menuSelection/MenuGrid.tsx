@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import React, { useState } from 'react';
+import { ScrollView, View } from 'react-native';
 
 import { useModal } from '../../hooks';
 import { useMenuStore } from '../../stores';
 import type { MenuGridProps, MenuItem } from '../../types';
 import { MenuDetailModal, MenuItem as MenuItemComponent } from './index';
-import PaginationButtons from './PaginationButtons';
 
 export default function MenuGrid({
   selectedCategory,
@@ -20,40 +18,11 @@ export default function MenuGrid({
       ? menus
       : menus.filter(menu => menu.categories?.includes(selectedCategory));
 
-  // 페이지네이션 상태 관리
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 6; // 3x2 그리드
-  const totalPages = Math.ceil(filteredMenuItems.length / itemsPerPage);
-
-  // 현재 페이지의 아이템들
-  const currentItems = filteredMenuItems.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
-
-  // 카테고리 변경 시 페이지 리셋
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [selectedCategory]);
-
   // 모달 상태 관리
   const { openModal, closeModal, isModalOpen } = useModal();
   const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(
     null
   );
-
-  // 페이지네이션 핸들러
-  const handleUpPress = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleDownPress = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
 
   const handleMenuItemPress = (item: MenuItem) => {
     setSelectedMenuItem(item);
@@ -65,66 +34,26 @@ export default function MenuGrid({
     setSelectedMenuItem(null);
   };
 
-  // 위아래 스와이프 제스처 설정
-  const panGesture = Gesture.Pan()
-    .onEnd(event => {
-      const { translationY, velocityY } = event;
-
-      // 위로 스와이프 (다음 페이지)
-      if (translationY < -50 && velocityY < 0) {
-        handleDownPress();
-      }
-      // 아래로 스와이프 (이전 페이지)
-      else if (translationY > 50 && velocityY > 0) {
-        handleUpPress();
-      }
-    })
-    .runOnJS(true);
-
   return (
-    <View className='flex flex-row w-full flex-[13] box-border px-[5%] py-[3%] items-center'>
-      {/* 메뉴 그리드 섹션 - 3x2 레이아웃 */}
-      <GestureDetector gesture={panGesture}>
-        <View className='flex-1 h-full'>
-          <View className='h-full flex flex-col justify-between'>
-            {/* 첫 번째 행 (3개) */}
-            <View className='flex-row h-[48%] gap-5'>
-              {currentItems.slice(0, 3).map(item => (
-                <View key={item.id} className='w-[30%]'>
-                  <MenuItemComponent
-                    id={item.id}
-                    name={item.name}
-                    price={`${item.price.toLocaleString()}원`}
-                    image={item.image}
-                    onPress={() => handleMenuItemPress(item)}
-                  />
-                </View>
-              ))}
-            </View>
-
-            {/* 두 번째 행 (3개) */}
-            <View className='flex-row h-[48%] gap-5'>
-              {currentItems.slice(3, 6).map(item => (
-                <View key={item.id} className='w-[30%]'>
-                  <MenuItemComponent
-                    id={item.id}
-                    name={item.name}
-                    price={`${item.price.toLocaleString()}원`}
-                    image={item.image}
-                    onPress={() => handleMenuItemPress(item)}
-                  />
-                </View>
-              ))}
-            </View>
+    <View className='h-full w-full box-border px-[5%] py-[3%]'>
+      {/* 메뉴 그리드 섹션 - 3열 스크롤뷰 */}
+      <ScrollView
+        className='flex-1'
+        showsVerticalScrollIndicator={false}
+        contentContainerClassName='flex-row flex-wrap gap-7'
+      >
+        {filteredMenuItems.map(item => (
+          <View key={item.id} className='w-[31%]'>
+            <MenuItemComponent
+              id={item.id}
+              name={item.name}
+              price={`${item.price.toLocaleString()}원`}
+              image={item.image}
+              onPress={() => handleMenuItemPress(item)}
+            />
           </View>
-        </View>
-      </GestureDetector>
-
-      {/* 페이지네이션 버튼 섹션 */}
-      <PaginationButtons
-        onUpPress={handleUpPress}
-        onDownPress={handleDownPress}
-      />
+        ))}
+      </ScrollView>
 
       {/* 모달 섹션 - 메뉴 상세 모달 */}
       <MenuDetailModal
