@@ -33,8 +33,8 @@ export default function MenuItem({
 
           {/* 메뉴 정보 섹션 */}
           <View className='px-1'>
-            <Text className='font-semibold text-lg'>{name}</Text>
-            <Text className='text-gray-600 text-base mt-1'>{price}</Text>
+            <Text className='font-semibold text-2xl'>{name}</Text>
+            <Text className='text-gray-600 text-xl mt-1'>{price}</Text>
           </View>
         </View>
       </TouchableOpacity>
