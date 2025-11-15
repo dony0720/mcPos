@@ -7,8 +7,15 @@ import { DiscountType, MenuItem, OrderItem } from '../types';
 /**
  * 온도별 추가 가격 계산
  */
-export const calculateTemperaturePrice = (temperature?: string): number => {
+export const calculateTemperaturePrice = (
+  temperature?: string,
+  temperatureRestriction?: string
+): number => {
   if (temperature === 'ICE') {
+    // ICE_ONLY 메뉴는 추가 요금 없음
+    if (temperatureRestriction === 'ICE_ONLY') {
+      return 0;
+    }
     return 500; // 아이스 500원 추가
   }
   return 0; // HOT은 추가 요금 없음
@@ -33,7 +40,10 @@ export const calculateMenuOptionPrice = (
  */
 export const calculateItemPrice = (item: OrderItem): number => {
   const optionPrice = calculateMenuOptionPrice(item.options, item.menuItem);
-  const temperaturePrice = calculateTemperaturePrice(item.menuItem.temperature);
+  const temperaturePrice = calculateTemperaturePrice(
+    item.menuItem.temperature,
+    item.menuItem.temperatureRestriction
+  );
   const basePrice = item.menuItem.price + optionPrice + temperaturePrice;
 
   // 할인이 적용된 경우
@@ -69,7 +79,10 @@ export const calculateMenuUnitPrice = (
   options: string[]
 ): number => {
   const optionPrice = calculateMenuOptionPrice(options, menuItem);
-  const temperaturePrice = calculateTemperaturePrice(menuItem.temperature);
+  const temperaturePrice = calculateTemperaturePrice(
+    menuItem.temperature,
+    menuItem.temperatureRestriction
+  );
   return menuItem.price + optionPrice + temperaturePrice;
 };
 
@@ -78,7 +91,10 @@ export const calculateMenuUnitPrice = (
  */
 export const calculateDiscountedUnitPrice = (item: OrderItem): number => {
   const optionPrice = calculateMenuOptionPrice(item.options, item.menuItem);
-  const temperaturePrice = calculateTemperaturePrice(item.menuItem.temperature);
+  const temperaturePrice = calculateTemperaturePrice(
+    item.menuItem.temperature,
+    item.menuItem.temperatureRestriction
+  );
   const basePrice = item.menuItem.price + optionPrice + temperaturePrice;
 
   // 할인이 적용된 경우

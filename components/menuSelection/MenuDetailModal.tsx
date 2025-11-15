@@ -35,7 +35,10 @@ export default function MenuDetailModal({
     : 0;
 
   // 온도별 추가 가격 계산
-  const temperaturePrice = calculateTemperaturePrice(selectedTemperature);
+  const temperaturePrice = calculateTemperaturePrice(
+    selectedTemperature,
+    menuItem?.temperatureRestriction
+  );
 
   const totalPrice = menuItem
     ? (menuItem.price + optionPrice + temperaturePrice) * quantity
