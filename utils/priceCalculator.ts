@@ -44,27 +44,26 @@ export const calculateItemPrice = (item: OrderItem): number => {
     item.menuItem.temperature,
     item.menuItem.temperatureRestriction
   );
-  // 메뉴 기본 가격 (옵션 제외, 온도 포함)
-  const menuBasePrice = item.menuItem.price + temperaturePrice;
+  // 전체 가격 (메뉴 + 온도 + 옵션)
+  const totalPrice = item.menuItem.price + temperaturePrice + optionPrice;
 
   // 할인이 적용된 경우
   if (item.discount) {
     if (item.discount.type === DiscountType.FIXED_AMOUNT) {
-      // 고정가격으로 변경 (옵션 가격은 별도 추가)
-      return (item.discount.value + optionPrice) * item.quantity;
+      // 고정가격으로 변경
+      return item.discount.value * item.quantity;
     } else if (item.discount.type === DiscountType.PERCENTAGE) {
-      // 메뉴 기본 가격에만 할인 적용 (최소 0원)
-      const discountedMenuPrice = Math.max(
+      // 전체 가격에 할인 적용 (최소 0원)
+      const discountedPrice = Math.max(
         0,
-        menuBasePrice * (1 - item.discount.value / 100)
+        totalPrice * (1 - item.discount.value / 100)
       );
-      // 할인된 메뉴 가격 + 옵션 가격
-      return (discountedMenuPrice + optionPrice) * item.quantity;
+      return discountedPrice * item.quantity;
     }
   }
 
-  // 할인 없는 경우: 메뉴 기본 가격 + 옵션 가격
-  return (menuBasePrice + optionPrice) * item.quantity;
+  // 할인 없는 경우: 전체 가격
+  return totalPrice * item.quantity;
 };
 
 /**
@@ -98,25 +97,24 @@ export const calculateDiscountedUnitPrice = (item: OrderItem): number => {
     item.menuItem.temperature,
     item.menuItem.temperatureRestriction
   );
-  // 메뉴 기본 가격 (옵션 제외, 온도 포함)
-  const menuBasePrice = item.menuItem.price + temperaturePrice;
+  // 전체 가격 (메뉴 + 온도 + 옵션)
+  const totalPrice = item.menuItem.price + temperaturePrice + optionPrice;
 
   // 할인이 적용된 경우
   if (item.discount) {
     if (item.discount.type === DiscountType.FIXED_AMOUNT) {
-      // 고정가격으로 변경 (옵션 가격은 별도 추가)
-      return item.discount.value + optionPrice;
+      // 고정가격으로 변경
+      return item.discount.value;
     } else if (item.discount.type === DiscountType.PERCENTAGE) {
-      // 메뉴 기본 가격에만 할인 적용 (최소 0원)
-      const discountedMenuPrice = Math.max(
+      // 전체 가격에 할인 적용 (최소 0원)
+      const discountedPrice = Math.max(
         0,
-        menuBasePrice * (1 - item.discount.value / 100)
+        totalPrice * (1 - item.discount.value / 100)
       );
-      // 할인된 메뉴 가격 + 옵션 가격
-      return discountedMenuPrice + optionPrice;
+      return discountedPrice;
     }
   }
 
-  // 할인 없는 경우: 메뉴 기본 가격 + 옵션 가격
-  return menuBasePrice + optionPrice;
+  // 할인 없는 경우: 전체 가격
+  return totalPrice;
 };

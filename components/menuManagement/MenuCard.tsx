@@ -59,15 +59,16 @@ export default function MenuCard({ menu, onEdit, onDelete }: MenuCardProps) {
           <Text className='text-gray-900 text-base font-semibold'>
             {menu.name}
           </Text>
-          {menu.temperatureRestriction && (
-            <View className='ml-2 bg-gray-100 px-2 py-1 rounded'>
-              <Text className='text-gray-600 text-xs font-medium'>
-                {menu.temperatureRestriction === 'HOT_ONLY'
-                  ? '🔥 HOT ONLY'
-                  : '🧊 ICE ONLY'}
-              </Text>
-            </View>
-          )}
+          {menu.temperatureRestriction &&
+            menu.temperatureRestriction !== 'NONE' && (
+              <View className='ml-2 bg-gray-100 px-2 py-1 rounded'>
+                <Text className='text-gray-600 text-xs font-medium'>
+                  {menu.temperatureRestriction === 'HOT_ONLY'
+                    ? '🔥 HOT ONLY'
+                    : '🧊 ICE ONLY'}
+                </Text>
+              </View>
+            )}
         </View>
 
         {/* 카테고리 */}

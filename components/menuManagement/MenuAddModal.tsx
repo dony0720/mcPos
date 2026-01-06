@@ -333,103 +333,63 @@ export default function MenuAddModal({
               )}
             </View>
 
-            {/* 온도 제한 옵션 */}
+            {/* 온도 옵션 */}
             <View className='mb-4'>
               <Text className='text-sm font-medium text-gray-700 mb-3'>
-                온도 제한 (선택사항)
+                온도 옵션
               </Text>
               <Controller
                 control={control}
                 name='temperatureRestriction'
                 render={({ field: { onChange, value } }) => (
-                  <View className='flex-row gap-4'>
-                    {/* HOT ONLY */}
-                    <TouchableOpacity
+                  <View className='flex-row flex-wrap gap-3'>
+                    {/* HOT만 */}
+                    <Pressable
+                      onPress={() => onChange('HOT_ONLY')}
                       className={clsx(
-                        'flex-1 border rounded-lg px-4 py-3 flex-row items-center',
-                        value === 'HOT_ONLY'
-                          ? 'border-orange-500 bg-orange-50'
-                          : 'border-gray-300'
+                        'w-[48%] h-20 border rounded-lg items-center justify-center',
+                        {
+                          'border-black bg-gray-100': value === 'HOT_ONLY',
+                          'border-gray-300 bg-white': value !== 'HOT_ONLY',
+                        }
                       )}
-                      onPress={() =>
-                        onChange(value === 'HOT_ONLY' ? undefined : 'HOT_ONLY')
-                      }
                     >
-                      <View
-                        className={clsx(
-                          'w-5 h-5 rounded border-2 mr-3 items-center justify-center',
-                          value === 'HOT_ONLY'
-                            ? 'border-orange-500 bg-orange-500'
-                            : 'border-gray-300'
-                        )}
-                      >
-                        {value === 'HOT_ONLY' && (
-                          <Text className='text-white text-xs font-bold'>
-                            ✓
-                          </Text>
-                        )}
-                      </View>
-                      <View className='flex-row items-center'>
-                        <Text className='mr-1'>🔥</Text>
-                        <Text
-                          className={clsx(
-                            'text-sm font-medium',
-                            value === 'HOT_ONLY'
-                              ? 'text-orange-500'
-                              : 'text-gray-700'
-                          )}
-                        >
-                          HOT ONLY
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
+                      <Text className='text-2xl mb-1'>🔥</Text>
+                      <Text className='font-medium text-sm'>HOT만</Text>
+                    </Pressable>
 
-                    {/* ICE ONLY */}
-                    <TouchableOpacity
+                    {/* ICE만 */}
+                    <Pressable
+                      onPress={() => onChange('ICE_ONLY')}
                       className={clsx(
-                        'flex-1 border rounded-lg px-4 py-3 flex-row items-center',
-                        value === 'ICE_ONLY'
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-300'
+                        'w-[48%] h-20 border rounded-lg items-center justify-center',
+                        {
+                          'border-black bg-gray-100': value === 'ICE_ONLY',
+                          'border-gray-300 bg-white': value !== 'ICE_ONLY',
+                        }
                       )}
-                      onPress={() =>
-                        onChange(value === 'ICE_ONLY' ? undefined : 'ICE_ONLY')
-                      }
                     >
-                      <View
-                        className={clsx(
-                          'w-5 h-5 rounded border-2 mr-3 items-center justify-center',
-                          value === 'ICE_ONLY'
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
-                        )}
-                      >
-                        {value === 'ICE_ONLY' && (
-                          <Text className='text-white text-xs font-bold'>
-                            ✓
-                          </Text>
-                        )}
-                      </View>
-                      <View className='flex-row items-center'>
-                        <Text className='mr-1'>🧊</Text>
-                        <Text
-                          className={clsx(
-                            'text-sm font-medium',
-                            value === 'ICE_ONLY'
-                              ? 'text-blue-500'
-                              : 'text-gray-700'
-                          )}
-                        >
-                          ICE ONLY
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
+                      <Text className='text-2xl mb-1'>🧊</Text>
+                      <Text className='font-medium text-sm'>ICE만</Text>
+                    </Pressable>
+
+                    {/* 온도없음 */}
+                    <Pressable
+                      onPress={() => onChange('NONE')}
+                      className={clsx(
+                        'w-[48%] h-20 border rounded-lg items-center justify-center',
+                        {
+                          'border-black bg-gray-100': value === 'NONE',
+                          'border-gray-300 bg-white': value !== 'NONE',
+                        }
+                      )}
+                    >
+                      <Text className='text-2xl mb-1'>❌</Text>
+                      <Text className='font-medium text-sm'>온도없음</Text>
+                    </Pressable>
                   </View>
                 )}
               />
-              <Text className='text-xs text-gray-500 mt-2'>
-                선택하지 않으면 HOT, ICE 모두 선택 가능합니다.
-              </Text>
             </View>
 
             {/* 이미지 선택 */}

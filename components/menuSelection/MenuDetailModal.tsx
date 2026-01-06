@@ -90,8 +90,12 @@ export default function MenuDetailModal({
           {/* 모달 헤더 */}
           <View className='flex-row justify-between items-center mb-4'>
             <Text className='text-xl font-bold'>메뉴 옵션 선택</Text>
-            <TouchableOpacity onPress={onClose}>
-              <Text className='text-gray-500 text-lg'>✕</Text>
+            <TouchableOpacity
+              onPress={onClose}
+              className='p-3'
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text className='text-gray-500 text-4xl'>✕</Text>
             </TouchableOpacity>
           </View>
 

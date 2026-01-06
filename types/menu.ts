@@ -3,7 +3,7 @@ import { DiscountType } from './enums';
 
 export type MenuCategory = string;
 export type Temperature = 'HOT' | 'ICE';
-export type TemperatureRestriction = 'HOT_ONLY' | 'ICE_ONLY';
+export type TemperatureRestriction = 'HOT_ONLY' | 'ICE_ONLY' | 'NONE';
 
 export interface MenuOption {
   name: string;
@@ -45,7 +45,11 @@ export interface MenuGridProps {
 
 export interface MenuDetailModalProps extends ModalProps {
   menuItem: MenuItem | null;
-  onAddItem?: (menuItem: MenuItem, options: string[], quantity?: number) => void;
+  onAddItem?: (
+    menuItem: MenuItem,
+    options: string[],
+    quantity?: number
+  ) => void;
 }
 
 export interface MenuInfoCardProps {

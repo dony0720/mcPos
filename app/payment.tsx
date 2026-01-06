@@ -76,7 +76,7 @@ export default function Payment() {
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<CashRegisterPaymentId>(PaymentMethod.CASH);
+    useState<CashRegisterPaymentId | null>(null);
   const [selectedOrderMethod, setSelectedOrderMethod] =
     useState<OrderReceiptMethodId>(OrderReceiptMethodEnum.DINE_IN);
 
@@ -89,7 +89,6 @@ export default function Payment() {
   // 현금 결제 관련 상태
   const [receivedAmount, setReceivedAmount] = useState(0);
   const [changeAmount, setChangeAmount] = useState(0);
-  const [shouldOpenPickupModal, setShouldOpenPickupModal] = useState(false);
 
   // 쿠폰 결제 관련 상태
   const [couponAmount, setCouponAmount] = useState(0);
@@ -106,6 +105,15 @@ export default function Payment() {
 
   // 결제 방법별 세부 정보 생성
   const createPaymentDetails = (): PaymentDetails => {
+    // 결제수단이 선택되지 않은 경우 기본값
+    if (!selectedPaymentMethod) {
+      return {
+        type: PaymentDetailsType.CASH,
+        receivedAmount: 0,
+        changeAmount: 0,
+      };
+    }
+
     switch (selectedPaymentMethod) {
       case PaymentMethod.CASH:
         return {
@@ -155,6 +163,11 @@ export default function Payment() {
       ledger?: number;
     } = {};
 
+    // 결제수단이 선택되지 않은 경우 기본값
+    if (!selectedPaymentMethod) {
+      return breakdown;
+    }
+
     switch (selectedPaymentMethod) {
       case PaymentMethod.CASH:
         breakdown.cash = totalAmount;
@@ -200,16 +213,28 @@ export default function Payment() {
         items: orderItems.map(item => {
           const unitPrice = calculateDiscountedUnitPrice(item);
 
-          // 옵션을 간단한 텍스트로 포맷팅
-          const formattedOptions =
-            item.options.length > 0 ? item.options : undefined;
+          // 온도와 옵션을 합쳐서 표시
+          const allOptions: string[] = [];
+
+          // 온도가 있으면 첫 번째 옵션으로 추가
+          if (
+            item.menuItem.temperatureRestriction !== 'NONE' &&
+            item.menuItem.temperature
+          ) {
+            allOptions.push(item.menuItem.temperature);
+          }
+
+          // 나머지 옵션 추가
+          if (item.options.length > 0) {
+            allOptions.push(...item.options);
+          }
 
           return {
-            name: `${item.menuItem.name} (${item.menuItem.temperature})`,
+            name: item.menuItem.name,
             quantity: item.quantity,
             unitPrice: unitPrice,
             totalPrice: unitPrice * item.quantity,
-            options: formattedOptions,
+            options: allOptions.length > 0 ? allOptions : undefined,
           };
         }),
         summary: {
@@ -247,7 +272,12 @@ export default function Payment() {
   };
 
   // 결제 방법 이름 변환
-  const getPaymentMethodName = (method: CashRegisterPaymentId): string => {
+  const getPaymentMethodName = (
+    method: CashRegisterPaymentId | null
+  ): string => {
+    if (!method) {
+      return '미선택';
+    }
     switch (method) {
       case PaymentMethod.CASH:
         return '현금';
@@ -359,25 +389,48 @@ export default function Payment() {
     }
   };
 
-  // 결제 처리 핸들러
-  const handlePaymentPress = () => {
-    if (selectedPaymentMethod === PaymentMethod.CASH) {
+  // 결제 수단 선택 핸들러 (선택 시 바로 모달 열기)
+  const handlePaymentMethodPress = (method: CashRegisterPaymentId) => {
+    // 결제 수단 변경
+    setSelectedPaymentMethod(method);
+
+    // 이전 결제 수단의 데이터 초기화
+    if (method !== PaymentMethod.CASH && method !== PaymentMethod.COUPON) {
+      setReceivedAmount(0);
+      setChangeAmount(0);
+    }
+    if (method !== PaymentMethod.COUPON) {
+      setCouponAmount(0);
+      setRemainingAmount(0);
+    }
+    if (method !== PaymentMethod.LEDGER) {
+      setSelectedLedger(null);
+      setPhoneLastDigits('');
+    }
+
+    // 결제 수단에 따라 모달 열기
+    if (method === PaymentMethod.CASH) {
       // 현금 결제: 받은 금액 입력 모달 열기
       openModal('cashAmount');
-    } else if (selectedPaymentMethod === PaymentMethod.COUPON) {
+    } else if (method === PaymentMethod.COUPON) {
       // 쿠폰 결제: 쿠폰 금액 입력 모달 열기
       openModal('couponAmount');
-    } else if (selectedPaymentMethod === PaymentMethod.LEDGER) {
+    } else if (method === PaymentMethod.LEDGER) {
       // 장부 결제: 핸드폰 뒷자리 입력 모달 열기
       setModalType('phone');
       setIsLedgerFirstStep(true);
       setModalErrorMessage(''); // 에러 메시지 초기화
       openModal('numberInput');
-    } else {
-      setModalType('pickup');
-      setIsLedgerFirstStep(false);
-      openModal('numberInput');
     }
+    // 계좌이체는 모달 없이 바로 선택만
+  };
+
+  // 결제하기 버튼 핸들러 (수령번호 입력)
+  const handlePaymentPress = () => {
+    // 수령번호 입력 모달 열기 (결제수단 체크 없이 바로 진행)
+    setModalType('pickup');
+    setIsLedgerFirstStep(false);
+    openModal('numberInput');
   };
 
   // 쿠폰 결제: 쿠폰 금액 확인 핸들러
@@ -389,10 +442,8 @@ export default function Payment() {
     if (remaining > 0) {
       // 남은 금액이 있으면 현금 결제 모달 열기
       setShouldOpenCashModal(true);
-    } else {
-      // 쿠폰으로 전액 결제 완료 또는 초과 결제시 바로 수령번호 모달 열기
-      setShouldOpenPickupModal(true);
     }
+    // 수령번호는 "결제하기" 버튼을 눌러야 입력
   };
 
   // 현금 결제: 받은 금액 확인 핸들러
@@ -400,9 +451,7 @@ export default function Payment() {
     setReceivedAmount(received);
     setChangeAmount(change);
     closeModal();
-
-    // 다음 수령번호 모달을 열기 위한 플래그 설정
-    setShouldOpenPickupModal(true);
+    // 수령번호는 "결제하기" 버튼을 눌러야 입력
   };
 
   // 쿠폰 결제 후 현금 모달 열기를 위한 useEffect
@@ -412,16 +461,6 @@ export default function Payment() {
       setShouldOpenCashModal(false);
     }
   }, [shouldOpenCashModal, openModal]);
-
-  // 수령번호 모달 열기를 위한 useEffect
-  useEffect(() => {
-    if (shouldOpenPickupModal) {
-      setModalType('pickup');
-      setIsLedgerFirstStep(false);
-      openModal('numberInput');
-      setShouldOpenPickupModal(false);
-    }
-  }, [shouldOpenPickupModal, openModal]);
 
   const handleModalConfirm = (number: string) => {
     if (isLedgerFirstStep) {
@@ -452,9 +491,9 @@ export default function Payment() {
 
         setSelectedLedger(ledger);
         setIsLedgerFirstStep(false);
-        setModalType('pickup');
-        // 수령 번호 입력을 위해 모달 유지 (자동으로 수령 번호 모드로 전환)
-        return false;
+        closeModal();
+        // 수령 번호는 "결제하기" 버튼을 눌러야 입력
+        return true;
       } else {
         // 일치하는 장부가 여러 개인 경우 선택 모달 표시
         setIsLedgerSelectionModalVisible(true);
@@ -476,7 +515,7 @@ export default function Payment() {
       const transactionId = addTransaction({
         type: TransactionType.ORDER,
         orderItems: orderItems,
-        paymentMethod: selectedPaymentMethod,
+        paymentMethod: selectedPaymentMethod || PaymentMethod.CASH,
         orderMethod: selectedOrderMethod,
         totalAmount: totalAmount,
         pickupNumber: number,
@@ -562,8 +601,7 @@ export default function Payment() {
     setSelectedLedger(ledger);
     setIsLedgerSelectionModalVisible(false); // 장부 선택 모달 닫기
     setIsLedgerFirstStep(false);
-    setModalType('pickup');
-    openModal('numberInput'); // 수령번호 입력 모달 열기
+    // 수령 번호는 "결제하기" 버튼을 눌러야 입력
   };
 
   return (
@@ -618,7 +656,7 @@ export default function Payment() {
           {/* 결제 방법 선택 섹션 */}
           <PaymentMethodSelector
             selectedPaymentMethod={selectedPaymentMethod}
-            onPaymentMethodPress={setSelectedPaymentMethod}
+            onPaymentMethodPress={handlePaymentMethodPress}
           />
 
           {/* 주문 방법 선택 섹션 */}

@@ -74,13 +74,31 @@ export default function ReceiptModal({
           ),
         },
         items:
-          transaction.orderItems?.map(item => ({
-            name: `${item.menuItem.name} (${item.menuItem.temperature})`,
-            quantity: item.quantity,
-            unitPrice: item.menuItem.price,
-            totalPrice: item.menuItem.price * item.quantity,
-            options: item.options.length > 0 ? item.options : undefined,
-          })) || [],
+          transaction.orderItems?.map(item => {
+            // 온도와 옵션을 합쳐서 표시
+            const allOptions: string[] = [];
+
+            // 온도가 있으면 첫 번째 옵션으로 추가
+            if (
+              item.menuItem.temperatureRestriction !== 'NONE' &&
+              item.menuItem.temperature
+            ) {
+              allOptions.push(item.menuItem.temperature);
+            }
+
+            // 나머지 옵션 추가
+            if (item.options.length > 0) {
+              allOptions.push(...item.options);
+            }
+
+            return {
+              name: item.menuItem.name,
+              quantity: item.quantity,
+              unitPrice: item.menuItem.price,
+              totalPrice: item.menuItem.price * item.quantity,
+              options: allOptions.length > 0 ? allOptions : undefined,
+            };
+          }) || [],
         summary: {
           subtotal: transaction.totalAmount,
           discount: 0, // 할인은 이미 아이템 가격에 반영됨

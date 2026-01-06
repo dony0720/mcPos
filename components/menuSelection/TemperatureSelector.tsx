@@ -14,6 +14,11 @@ export default function TemperatureSelector({
   setSelectedTemperature,
   temperatureRestriction,
 }: TemperatureSelectorProps) {
+  // 온도 옵션이 없는 경우 렌더링하지 않음
+  if (temperatureRestriction === 'NONE') {
+    return null;
+  }
+
   // 온도 옵션 데이터
   const allTemperatures: {
     value: Temperature;

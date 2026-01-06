@@ -17,10 +17,10 @@ export default function CategoryTabs({
       <View className='h-[45px] flex flex-row'>
         {/* 카테고리 탭 버튼들 */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View className='flex-row gap-6 relative'>
+          <View className='flex-row gap-20 relative'>
             {/* 전체 카테고리 */}
             <Pressable
-              className='flex-1 py-3 flex justify-center items-center w-[120px]'
+              className='flex-1 py-3 flex justify-center items-center'
               onPress={() => onSelectCategory('ALL')}
             >
               <Text
@@ -43,7 +43,7 @@ export default function CategoryTabs({
                   role='tablist'
                   key={category.id}
                   onPress={() => onSelectCategory(category.id)}
-                  className='flex-1 py-3 flex justify-center items-center w-[120px]'
+                  className='flex-1 py-3 flex justify-center items-center'
                 >
                   <Text
                     className={clsx('text-[16px] font-bold', {
