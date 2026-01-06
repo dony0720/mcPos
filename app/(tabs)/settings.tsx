@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 import { AdminProtectedRoute } from '../../components';
+import { useSettingsStore } from '../../stores';
 
 /**
  * 설정 화면 컴포넌트
@@ -12,6 +13,7 @@ import { AdminProtectedRoute } from '../../components';
  */
 export default function Settings() {
   const router = useRouter();
+  const { receiptCopies, setReceiptCopies } = useSettingsStore();
 
   // 설정 메뉴 아이템들
   const settingMenuItems = [
@@ -64,6 +66,7 @@ export default function Settings() {
 
           {/* 설정 컨텐츠 영역 */}
           <ScrollView className='flex-1 box-border px-[5%] py-4'>
+            {/* 관리 메뉴 */}
             <View className='flex flex-col gap-5'>
               {settingMenuItems.map(item => (
                 <TouchableOpacity
@@ -98,6 +101,43 @@ export default function Settings() {
                   </View>
                 </TouchableOpacity>
               ))}
+            </View>
+
+            {/* 영수증 설정 섹션 */}
+            <View className='mt-8'>
+              <Text className='text-xl font-bold text-gray-800 mb-4'>
+                영수증 설정
+              </Text>
+              <View className='bg-white border border-gray-200 rounded-xl p-6 shadow-sm'>
+                <View className='flex-row items-center justify-between'>
+                  <View className='flex-1 mr-4'>
+                    <Text className='text-lg font-bold text-gray-800 mb-1'>
+                      영수증 출력 매수
+                    </Text>
+                    <Text className='text-sm text-gray-500'>
+                      결제 시 영수증을 {receiptCopies}장 출력합니다
+                    </Text>
+                  </View>
+                  <View className='flex-row items-center gap-3'>
+                    <Text
+                      className={`text-base font-medium ${receiptCopies === 1 ? 'text-primaryGreen' : 'text-gray-400'}`}
+                    >
+                      1장
+                    </Text>
+                    <Switch
+                      value={receiptCopies === 2}
+                      onValueChange={value => setReceiptCopies(value ? 2 : 1)}
+                      trackColor={{ false: '#D1D5DB', true: '#10B981' }}
+                      thumbColor='#FFFFFF'
+                    />
+                    <Text
+                      className={`text-base font-medium ${receiptCopies === 2 ? 'text-primaryGreen' : 'text-gray-400'}`}
+                    >
+                      2장
+                    </Text>
+                  </View>
+                </View>
+              </View>
             </View>
 
             {/* 추가 설정 섹션을 위한 여백 */}

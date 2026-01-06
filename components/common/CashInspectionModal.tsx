@@ -67,8 +67,8 @@ export default function CashInspectionModal({
       setShowSettlementConfirmModal(true);
     } else {
       // 시재 점검 모드: 스토어에 저장 → onConfirm 호출
-      onConfirm(cashData);
-      onClose();
+    onConfirm(cashData);
+    onClose();
     }
   };
 
@@ -202,157 +202,157 @@ export default function CashInspectionModal({
 
   return (
     <>
-      <Modal visible={visible} transparent={true} onRequestClose={onClose}>
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View className='flex-1 bg-black/50 justify-center items-center p-4'>
-            <TouchableWithoutFeedback>
-              <View className='bg-white rounded-2xl w-full max-w-4xl h-[80%]'>
-                {/* 모달 헤더 */}
-                <View className='flex-row items-center justify-between p-6 border-b border-gray-200'>
-                  <Text className='text-2xl font-bold text-gray-900'>
+    <Modal visible={visible} transparent={true} onRequestClose={onClose}>
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View className='flex-1 bg-black/50 justify-center items-center p-4'>
+          <TouchableWithoutFeedback>
+            <View className='bg-white rounded-2xl w-full max-w-4xl h-[80%]'>
+              {/* 모달 헤더 */}
+              <View className='flex-row items-center justify-between p-6 border-b border-gray-200'>
+                <Text className='text-2xl font-bold text-gray-900'>
                     {mode === 'settlement' ? '일일 정산' : '시재 점검'}
-                  </Text>
-                  <Pressable
-                    onPress={onClose}
-                    className='w-8 h-8 items-center justify-center'
-                  >
-                    <Ionicons name='close' size={24} color='#6B7280' />
-                  </Pressable>
-                </View>
+                </Text>
+                <Pressable
+                  onPress={onClose}
+                  className='w-8 h-8 items-center justify-center'
+                >
+                  <Ionicons name='close' size={24} color='#6B7280' />
+                </Pressable>
+              </View>
 
-                {/* 모달 내용 */}
-                <View className='flex-1 p-6'>
-                  <Text className='text-lg font-medium text-gray-700 mb-4'>
+              {/* 모달 내용 */}
+              <View className='flex-1 p-6'>
+                <Text className='text-lg font-medium text-gray-700 mb-4'>
                     {mode === 'settlement'
                       ? '일일 정산 금액을 확인하고 정산을 완료하세요'
                       : '현재 현금 서랍 현황을 확인하고 수정하세요'}
-                  </Text>
+                </Text>
 
-                  {/* 현금 서랍 현황 수정 */}
-                  <ScrollView
-                    className='flex-1 max-h-full'
-                    showsVerticalScrollIndicator={true}
-                    nestedScrollEnabled={true}
-                  >
-                    <View className='flex-row flex-wrap gap-4 justify-between'>
-                      {cashData.map((item, index) => (
-                        <View
-                          key={index}
-                          className='bg-gray-50 border border-gray-200 rounded-xl p-4 my-2 w-[48%] max-w-[350px]'
-                        >
-                          {/* 권종 정보 */}
-                          <View className='flex-row items-center justify-between mb-3'>
-                            <Text className='text-xl font-bold text-gray-800'>
-                              {item.title}
-                            </Text>
-                            <View className='flex-row items-center gap-1'>
-                              <View className='w-2 h-2 rounded-full bg-gray-400'></View>
-                              <Text className='text-sm font-medium uppercase text-gray-500'>
-                                {item.type}
-                              </Text>
-                            </View>
-                          </View>
-
-                          {/* 수량 입력 */}
-                          <View className='flex-row justify-between items-center mb-3'>
-                            <Text className='text-sm font-medium text-gray-600'>
-                              수량
-                            </Text>
-                            <TextInput
-                              className='border border-gray-300 bg-white text-gray-800 rounded-lg px-3 py-2 text-center text-lg font-medium w-20'
-                              value={item.quantity.toString()}
-                              onChangeText={text =>
-                                handleQuantityChange(index, text)
-                              }
-                              keyboardType='numeric'
-                              placeholder='0'
-                            />
-                          </View>
-
-                          {/* 금액 표시 */}
-                          <View className='flex-row justify-between items-center'>
-                            <Text className='text-sm text-gray-600'>금액</Text>
-                            <Text className='text-lg font-bold text-gray-800'>
-                              {formatAmount(item.quantity, item.unitValue)}원
-                            </Text>
-                          </View>
-                        </View>
-                      ))}
-
-                      {/* 총 현금 보유액 카드 */}
-                      <View className='bg-blue-50 border-2 border-blue-300 rounded-xl p-4 my-2 w-[48%] max-w-[350px]'>
-                        {/* 제목 */}
+                {/* 현금 서랍 현황 수정 */}
+                <ScrollView
+                  className='flex-1 max-h-full'
+                  showsVerticalScrollIndicator={true}
+                  nestedScrollEnabled={true}
+                >
+                  <View className='flex-row flex-wrap gap-4 justify-between'>
+                    {cashData.map((item, index) => (
+                      <View
+                        key={index}
+                        className='bg-gray-50 border border-gray-200 rounded-xl p-4 my-2 w-[48%] max-w-[350px]'
+                      >
+                        {/* 권종 정보 */}
                         <View className='flex-row items-center justify-between mb-3'>
-                          <Text className='text-xl font-bold text-blue-800'>
-                            총 보유액
+                          <Text className='text-xl font-bold text-gray-800'>
+                            {item.title}
                           </Text>
                           <View className='flex-row items-center gap-1'>
-                            <View className='w-2 h-2 rounded-full bg-blue-500'></View>
-                            <Text className='text-sm font-medium uppercase text-blue-600'>
-                              합계
+                            <View className='w-2 h-2 rounded-full bg-gray-400'></View>
+                            <Text className='text-sm font-medium uppercase text-gray-500'>
+                              {item.type}
                             </Text>
                           </View>
                         </View>
 
-                        {/* 권종 개수 */}
+                        {/* 수량 입력 */}
                         <View className='flex-row justify-between items-center mb-3'>
-                          <Text className='text-sm font-medium text-blue-600'>
-                            권종 개수
+                          <Text className='text-sm font-medium text-gray-600'>
+                            수량
                           </Text>
-                          <Text className='text-lg font-medium text-blue-800'>
-                            {cashData.length}개 권종
-                          </Text>
+                          <TextInput
+                            className='border border-gray-300 bg-white text-gray-800 rounded-lg px-3 py-2 text-center text-lg font-medium w-20'
+                            value={item.quantity.toString()}
+                            onChangeText={text =>
+                              handleQuantityChange(index, text)
+                            }
+                            keyboardType='numeric'
+                            placeholder='0'
+                          />
                         </View>
 
-                        {/* 총 금액 표시 */}
+                        {/* 금액 표시 */}
                         <View className='flex-row justify-between items-center'>
-                          <Text className='text-sm text-blue-600'>총액</Text>
-                          <Text className='text-lg font-bold text-blue-800'>
-                            {getTotalAmount()}원
+                          <Text className='text-sm text-gray-600'>금액</Text>
+                          <Text className='text-lg font-bold text-gray-800'>
+                            {formatAmount(item.quantity, item.unitValue)}원
                           </Text>
                         </View>
                       </View>
+                    ))}
+
+                    {/* 총 현금 보유액 카드 */}
+                    <View className='bg-blue-50 border-2 border-blue-300 rounded-xl p-4 my-2 w-[48%] max-w-[350px]'>
+                      {/* 제목 */}
+                      <View className='flex-row items-center justify-between mb-3'>
+                        <Text className='text-xl font-bold text-blue-800'>
+                          총 보유액
+                        </Text>
+                        <View className='flex-row items-center gap-1'>
+                          <View className='w-2 h-2 rounded-full bg-blue-500'></View>
+                          <Text className='text-sm font-medium uppercase text-blue-600'>
+                            합계
+                          </Text>
+                        </View>
+                      </View>
+
+                      {/* 권종 개수 */}
+                      <View className='flex-row justify-between items-center mb-3'>
+                        <Text className='text-sm font-medium text-blue-600'>
+                          권종 개수
+                        </Text>
+                        <Text className='text-lg font-medium text-blue-800'>
+                          {cashData.length}개 권종
+                        </Text>
+                      </View>
+
+                      {/* 총 금액 표시 */}
+                      <View className='flex-row justify-between items-center'>
+                        <Text className='text-sm text-blue-600'>총액</Text>
+                        <Text className='text-lg font-bold text-blue-800'>
+                          {getTotalAmount()}원
+                        </Text>
+                      </View>
                     </View>
-                  </ScrollView>
-                </View>
+                  </View>
+                </ScrollView>
+              </View>
 
-                {/* 모달 푸터 */}
-                <View className='flex-row gap-3 p-6 border-t border-gray-200'>
-                  <Pressable
-                    onPress={handleCancel}
-                    className='flex-1 bg-gray-100 rounded-xl p-4 items-center'
-                  >
-                    <Text className='text-gray-700 font-medium text-lg'>
-                      취소
-                    </Text>
-                  </Pressable>
+              {/* 모달 푸터 */}
+              <View className='flex-row gap-3 p-6 border-t border-gray-200'>
+                <Pressable
+                  onPress={handleCancel}
+                  className='flex-1 bg-gray-100 rounded-xl p-4 items-center'
+                >
+                  <Text className='text-gray-700 font-medium text-lg'>
+                    취소
+                  </Text>
+                </Pressable>
 
-                  <Pressable
+                <Pressable
                     onPress={handleConfirm}
-                    disabled={isPrinting}
-                    className={`flex-1 ${
+                  disabled={isPrinting}
+                  className={`flex-1 ${
                       isPrinting ? 'bg-gray-400' : 'bg-green-500'
-                    } rounded-xl p-4 items-center`}
-                  >
-                    <View className='flex-row items-center gap-2'>
+                  } rounded-xl p-4 items-center`}
+                >
+                  <View className='flex-row items-center gap-2'>
                       {isPrinting && (
                         <Ionicons name='hourglass' size={18} color='white' />
                       )}
-                      <Text className='text-white font-medium text-lg'>
+                    <Text className='text-white font-medium text-lg'>
                         {isPrinting
                           ? '처리 중...'
                           : mode === 'settlement'
                             ? '정산 완료'
                             : '확인'}
-                      </Text>
-                    </View>
-                  </Pressable>
-                </View>
+                    </Text>
+                  </View>
+                </Pressable>
               </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+    </Modal>
 
       {/* 일일 정산 확인 모달 */}
       <Modal

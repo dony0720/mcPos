@@ -29,6 +29,7 @@ import {
   useCashStore,
   useLedgerStore,
   useOrderStore,
+  useSettingsStore,
   useTransactionStore,
 } from '../stores';
 import {
@@ -71,6 +72,9 @@ export default function Payment() {
 
   // 장부 관리 스토어
   const { getLedgersByPhoneLastDigits, useLedger } = useLedgerStore();
+
+  // 설정 스토어
+  const { receiptCopies } = useSettingsStore();
 
   // 간단한 상태 관리
   const [isAllChecked, setIsAllChecked] = useState(false);
@@ -254,8 +258,8 @@ export default function Payment() {
         },
       };
 
-      // 영수증 2장 출력
-      for (let i = 0; i < 2; i++) {
+      // 영수증 출력 (설정에 따라 1장 또는 2장)
+      for (let i = 0; i < receiptCopies; i++) {
         const result = await printerService.printReceipt(receiptData);
 
         if (!result.success) {
@@ -263,7 +267,7 @@ export default function Payment() {
             '영수증 출력 실패',
             result.message || `${i + 1}번째 영수증 출력에 실패했습니다.`
           );
-          break; // 첫 번째 출력 실패 시 중단
+          break; // 출력 실패 시 중단
         }
       }
     } catch {
