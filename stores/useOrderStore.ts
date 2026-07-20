@@ -11,15 +11,47 @@ export const useOrderStore = create<OrderState>(set => ({
 
   // 메뉴 아이템 추가
   addItem: (menuItem: MenuItem, options: string[], quantity: number = 1) => {
-    const newItem: OrderItem = {
-      id: Date.now().toString(),
-      menuItem,
-      quantity,
-      options,
-    };
-
     set(state => {
-      const newOrderItems = [...state.orderItems, newItem];
+      // 같은 메뉴+옵션+온도 조합이 있는지 확인
+      const existingItemIndex = state.orderItems.findIndex(item => {
+        // 메뉴 ID가 같고
+        const isSameMenu = item.menuItem.id === menuItem.id;
+        // 온도가 같고
+        const isSameTemperature =
+          item.menuItem.temperature === menuItem.temperature;
+        // 할인이 없고 (할인된 항목은 별도 관리)
+        const hasNoDiscount = !item.discount;
+        // 옵션이 같은지 확인 (순서 무관)
+        const isSameOptions =
+          item.options.length === options.length &&
+          item.options.every(opt => options.includes(opt)) &&
+          options.every(opt => item.options.includes(opt));
+
+        return (
+          isSameMenu && isSameTemperature && hasNoDiscount && isSameOptions
+        );
+      });
+
+      let newOrderItems;
+
+      if (existingItemIndex !== -1) {
+        // 기존 항목의 수량 증가
+        newOrderItems = state.orderItems.map((item, index) =>
+          index === existingItemIndex
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      } else {
+        // 새 항목 추가
+        const newItem: OrderItem = {
+          id: Date.now().toString(),
+          menuItem,
+          quantity,
+          options,
+        };
+        newOrderItems = [...state.orderItems, newItem];
+      }
+
       return {
         orderItems: newOrderItems,
         totalAmount: calculateTotalPrice(newOrderItems),
