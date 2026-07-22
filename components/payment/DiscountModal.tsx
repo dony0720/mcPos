@@ -34,7 +34,12 @@ export default function DiscountModal({
   };
 
   return (
-    <Modal visible={visible} transparent={true} onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent={true}
+      onRequestClose={onClose}
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
+    >
       <TouchableWithoutFeedback onPress={onClose}>
         <View className='flex-1 bg-black/50 justify-center items-center p-4'>
           <TouchableWithoutFeedback>

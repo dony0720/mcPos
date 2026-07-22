@@ -157,7 +157,12 @@ export default function ReceiptModal({
   };
 
   return (
-    <Modal transparent={true} visible={visible} onRequestClose={onClose}>
+    <Modal
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
+    >
       <View className='flex-1 justify-center items-center bg-black/50 px-8'>
         <View className='bg-white rounded-2xl p-6 w-full max-w-md h-[70%]'>
           {/* 모달 헤더 */}

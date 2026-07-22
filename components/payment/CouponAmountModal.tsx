@@ -57,6 +57,7 @@ export default function CouponAmountModal({
       visible={visible}
       transparent={true}
       animationType='none'
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
       onRequestClose={handleClose}
     >
       <Pressable

@@ -178,7 +178,12 @@ export default function MenuAddModal({
   };
 
   return (
-    <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
+    <Modal
+      transparent={true}
+      visible={visible}
+      onRequestClose={handleClose}
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
+    >
       <View className='flex-1 justify-center items-center bg-black/50'>
         <View className='bg-white rounded-2xl w-4/5 h-4/5 max-w-lg max-h-[1600px] '>
           {/* 헤더 */}

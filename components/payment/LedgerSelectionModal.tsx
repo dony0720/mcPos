@@ -39,6 +39,7 @@ export default function LedgerSelectionModal({
       visible={visible}
       transparent={true}
       animationType='fade'
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
       onRequestClose={onClose}
     >
       <Pressable

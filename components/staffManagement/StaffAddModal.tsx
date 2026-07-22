@@ -62,7 +62,12 @@ export default function StaffAddModal({
   };
 
   return (
-    <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
+    <Modal
+      transparent={true}
+      visible={visible}
+      onRequestClose={handleClose}
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
+    >
       <View className='flex-1 justify-center items-center bg-black/50'>
         <View className='bg-white rounded-2xl w-4/5 h-[30%] max-w-md max-h-[600px]'>
           {/* 헤더 */}

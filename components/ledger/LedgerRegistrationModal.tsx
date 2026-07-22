@@ -93,7 +93,12 @@ export default function LedgerRegistrationModal({
   };
 
   return (
-    <Modal transparent={true} visible={visible} onRequestClose={handleClose}>
+    <Modal
+      transparent={true}
+      visible={visible}
+      onRequestClose={handleClose}
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
+    >
       <View className='flex-1 justify-center items-center bg-black/50'>
         <View className='bg-white rounded-2xl p-6 w-4/5 max-w-md h-[70%] flex flex-col'>
           {/* 헤더 영역 */}

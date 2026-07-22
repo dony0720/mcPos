@@ -18,7 +18,12 @@ export default function DeleteConfirmModal({
   if (!item) return null;
 
   return (
-    <Modal transparent={true} visible={visible} onRequestClose={onClose}>
+    <Modal
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
+    >
       <View className='flex-1 justify-center items-center bg-black/50'>
         <View className='bg-white rounded-2xl p-6 w-[90%] max-w-md'>
           {/* 헤더 */}

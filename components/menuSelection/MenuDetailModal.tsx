@@ -84,7 +84,12 @@ export default function MenuDetailModal({
   if (!menuItem) return null;
 
   return (
-    <Modal transparent={true} visible={visible} onRequestClose={onClose}>
+    <Modal
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
+    >
       <View className='flex-1 w-full h-full box-border px-[10%] justify-center items-center bg-black/50 '>
         <View className='bg-white rounded-lg w-full h-[60%] box-border p-6 max-w-[600px]'>
           {/* 모달 헤더 */}

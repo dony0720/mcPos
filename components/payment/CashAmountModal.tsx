@@ -57,6 +57,7 @@ export default function CashAmountModal({
       visible={visible}
       transparent={true}
       animationType='none'
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
       onRequestClose={handleClose}
     >
       <Pressable

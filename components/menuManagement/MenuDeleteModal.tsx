@@ -22,7 +22,12 @@ export default function MenuDeleteModal({
   if (!menuItem) return null;
 
   return (
-    <Modal transparent={true} visible={visible} onRequestClose={onClose}>
+    <Modal
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
+    >
       <View className='flex-1 justify-center items-center bg-black/50'>
         <View className='bg-white rounded-2xl w-4/5 max-w-md p-6'>
           {/* 헤더 */}

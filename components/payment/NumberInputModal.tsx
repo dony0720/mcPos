@@ -86,6 +86,7 @@ export default function NumberInputModal({
       visible={visible}
       transparent={true}
       animationType='none'
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
       onRequestClose={handleClose}
     >
       <Pressable

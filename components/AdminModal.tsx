@@ -62,6 +62,7 @@ export default function AdminModal({
       animationType='fade'
       transparent={true}
       visible={visible}
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
       onRequestClose={handleClose}
     >
       <View className='flex-1 justify-center items-center bg-black/50'>

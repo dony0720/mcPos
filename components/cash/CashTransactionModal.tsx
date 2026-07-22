@@ -75,7 +75,12 @@ export default function CashTransactionModal({
   const iconColor = isDeposit ? '#10B981' : '#EF4444';
 
   return (
-    <Modal visible={visible} transparent={true} onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent={true}
+      onRequestClose={onClose}
+      supportedOrientations={['landscape', 'landscape-left', 'landscape-right']}
+    >
       <TouchableWithoutFeedback onPress={onClose}>
         <View className='flex-1 bg-black/50 justify-center items-center p-4'>
           <TouchableWithoutFeedback>
