@@ -52,10 +52,6 @@ export interface PaymentMenuItemProps {
   price: string;
 }
 
-export interface DiscountModalProps extends ModalProps {
-  onSelectDiscount: (discount: Discount) => void;
-}
-
 export interface NumberInputModalProps extends ModalProps {
   onConfirm: (number: string) => boolean;
   type?: NumberInputType;
@@ -79,11 +75,6 @@ export interface KeypadProps {
   onBackspace: () => void;
   maxLength?: number;
   currentInput?: string;
-}
-
-export interface DiscountSectionProps {
-  onDiscountSelect: (discount: Discount | null) => void;
-  onDiscountDelete: () => void;
 }
 
 // ===== 유틸리티 타입들 =====

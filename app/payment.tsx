@@ -1,6 +1,8 @@
 // payment.tsx - 퍼블리싱 작업용 간소화된 결제 페이지
 
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import clsx from 'clsx';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -15,7 +17,7 @@ import {
 import {
   CashAmountModal,
   CouponAmountModal,
-  DiscountSection,
+  DiscountStepModal,
   LedgerSelectionModal,
   NumberInputModal,
   OrderMethodSelector,
@@ -76,9 +78,10 @@ export default function Payment() {
   // 설정 스토어
   const { receiptCopies } = useSettingsStore();
 
-  // 간단한 상태 관리
+  // 주문 아이템 삭제용 선택 상태 (왼쪽 주문 요약 패널)
   const [isAllChecked, setIsAllChecked] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<CashRegisterPaymentId | null>(null);
   const [selectedOrderMethod, setSelectedOrderMethod] =
@@ -106,6 +109,9 @@ export default function Payment() {
     useState(false);
 
   const paymentButtonAnimation = useButtonAnimation();
+
+  // 할인이 적용된 아이템 개수 ("할인 적용" 버튼에 요약 표시용)
+  const discountedItemCount = orderItems.filter(item => item.discount).length;
 
   // 결제 방법별 세부 정보 생성
   const createPaymentDetails = (): PaymentDetails => {
@@ -322,7 +328,7 @@ export default function Payment() {
     router.push('/(tabs)');
   };
 
-  // 전체 선택/해제 핸들러
+  // 전체 선택/해제 핸들러 (주문 아이템 삭제용)
   const handleAllCheckboxPress = () => {
     if (isAllChecked) {
       // 전체 해제
@@ -336,7 +342,7 @@ export default function Payment() {
     }
   };
 
-  // 개별 아이템 체크박스 핸들러
+  // 개별 아이템 체크박스 핸들러 (주문 아이템 삭제용)
   const handleItemCheckboxPress = (itemId: string) => {
     const newCheckedItems = new Set(checkedItems);
 
@@ -366,36 +372,23 @@ export default function Payment() {
     setIsAllChecked(false);
   };
 
-  const handleDiscountSelect = (discount: Discount | null) => {
-    if (discount && checkedItems.size > 0) {
-      const selectedItemIds = Array.from(checkedItems);
-      applyDiscount(selectedItemIds, {
-        id: discount.id,
-        name: discount.name,
-        value: discount.value,
-        type: discount.type,
-      });
-
-      // 할인 적용 후 선택 해제
-      setCheckedItems(new Set());
-      setIsAllChecked(false);
-    }
+  // 할인 단계에서 선택된 아이템들에 할인 적용
+  const handleApplyDiscount = (itemIds: string[], discount: Discount) => {
+    applyDiscount(itemIds, {
+      id: discount.id,
+      name: discount.name,
+      value: discount.value,
+      type: discount.type,
+    });
   };
 
-  const handleDiscountDelete = () => {
-    if (checkedItems.size > 0) {
-      const selectedItemIds = Array.from(checkedItems);
-      removeDiscount(selectedItemIds);
-
-      // 할인 제거 후 선택 해제
-      setCheckedItems(new Set());
-      setIsAllChecked(false);
-    }
+  // 할인 단계에서 선택된 아이템들의 할인 제거
+  const handleRemoveDiscountItems = (itemIds: string[]) => {
+    removeDiscount(itemIds);
   };
 
-  // 결제 수단 선택 핸들러 (선택 시 바로 모달 열기)
-  const handlePaymentMethodPress = (method: CashRegisterPaymentId) => {
-    // 결제 수단 변경
+  // 결제 수단 선택 핸들러 (선택만, 단계 진행은 "결제하기"를 눌러야 시작)
+  const handleSelectPaymentMethod = (method: CashRegisterPaymentId) => {
     setSelectedPaymentMethod(method);
 
     // 이전 결제 수단의 데이터 초기화
@@ -411,27 +404,39 @@ export default function Payment() {
       setSelectedLedger(null);
       setPhoneLastDigits('');
     }
-
-    // 결제 수단에 따라 모달 열기
-    if (method === PaymentMethod.CASH) {
-      // 현금 결제: 받은 금액 입력 모달 열기
-      openModal('cashAmount');
-    } else if (method === PaymentMethod.COUPON) {
-      // 쿠폰 결제: 쿠폰 금액 입력 모달 열기
-      openModal('couponAmount');
-    } else if (method === PaymentMethod.LEDGER) {
-      // 장부 결제: 핸드폰 뒷자리 입력 모달 열기
-      setModalType('phone');
-      setIsLedgerFirstStep(true);
-      setModalErrorMessage(''); // 에러 메시지 초기화
-      openModal('numberInput');
-    }
-    // 계좌이체는 모달 없이 바로 선택만
   };
 
-  // 결제하기 버튼 핸들러 (수령번호 입력)
-  const handlePaymentPress = () => {
-    // 수령번호 입력 모달 열기 (결제수단 체크 없이 바로 진행)
+  // "할인 적용" 버튼 - 필요할 때만 여는 온디맨드 할인 모달
+  const handleOpenDiscountModal = () => {
+    openModal('discountStep');
+  };
+
+  // "결제하기" 버튼 - 단계별 결제 진행 시작 (결제수단 세부입력부터)
+  const handleStartPayment = () => {
+    if (!selectedPaymentMethod) {
+      return;
+    }
+    goToMethodDetailStep();
+  };
+
+  // 결제수단에 따라 세부입력 단계로 진입 (계좌이체는 입력 없이 바로 수령번호 단계)
+  const goToMethodDetailStep = () => {
+    if (selectedPaymentMethod === PaymentMethod.CASH) {
+      openModal('cashAmount');
+    } else if (selectedPaymentMethod === PaymentMethod.COUPON) {
+      openModal('couponAmount');
+    } else if (selectedPaymentMethod === PaymentMethod.LEDGER) {
+      setModalType('phone');
+      setIsLedgerFirstStep(true);
+      setModalErrorMessage('');
+      openModal('numberInput');
+    } else {
+      goToPickupStep();
+    }
+  };
+
+  // 수령번호 입력 단계로 진행 (마지막 단계)
+  const goToPickupStep = () => {
     setModalType('pickup');
     setIsLedgerFirstStep(false);
     openModal('numberInput');
@@ -444,10 +449,12 @@ export default function Payment() {
     closeModal();
 
     if (remaining > 0) {
-      // 남은 금액이 있으면 현금 결제 모달 열기
+      // 남은 금액이 있으면 현금 결제 단계로 진행
       setShouldOpenCashModal(true);
+    } else {
+      // 쿠폰으로 전액 결제되면 바로 수령번호 단계로 진행
+      goToPickupStep();
     }
-    // 수령번호는 "결제하기" 버튼을 눌러야 입력
   };
 
   // 현금 결제: 받은 금액 확인 핸들러
@@ -455,7 +462,8 @@ export default function Payment() {
     setReceivedAmount(received);
     setChangeAmount(change);
     closeModal();
-    // 수령번호는 "결제하기" 버튼을 눌러야 입력
+    // 현금 결제(또는 쿠폰+현금 결제) 완료 후 수령번호 단계로 진행
+    goToPickupStep();
   };
 
   // 쿠폰 결제 후 현금 모달 열기를 위한 useEffect
@@ -496,7 +504,8 @@ export default function Payment() {
         setSelectedLedger(ledger);
         setIsLedgerFirstStep(false);
         closeModal();
-        // 수령 번호는 "결제하기" 버튼을 눌러야 입력
+        // 장부 확인 완료 → 수령번호 단계로 진행
+        goToPickupStep();
         return true;
       } else {
         // 일치하는 장부가 여러 개인 경우 선택 모달 표시
@@ -605,7 +614,8 @@ export default function Payment() {
     setSelectedLedger(ledger);
     setIsLedgerSelectionModalVisible(false); // 장부 선택 모달 닫기
     setIsLedgerFirstStep(false);
-    // 수령 번호는 "결제하기" 버튼을 눌러야 입력
+    // 장부 선택 완료 → 수령번호 단계로 진행
+    goToPickupStep();
   };
 
   return (
@@ -623,7 +633,7 @@ export default function Payment() {
 
         <View className='h-[1px] bg-white/10 my-6' />
 
-        {/* 전체 선택 컨트롤 */}
+        {/* 전체 선택 컨트롤 - 잘못 담긴 아이템 삭제용 */}
         <SelectAllCheckbox
           isChecked={isAllChecked}
           onCheckboxPress={handleAllCheckboxPress}
@@ -657,7 +667,7 @@ export default function Payment() {
         </ScrollView>
       </View>
 
-      {/* 오른쪽: 결제 수단 및 옵션 패널 */}
+      {/* 오른쪽: 결제 수단 및 주문 방식 선택 패널 */}
       <View className='flex-1 h-full px-11 pt-11 pb-8 flex flex-col'>
         <Text className='text-[22px] font-pretendard-bold text-[#191f28] mb-6'>
           결제 수단을 선택하세요
@@ -667,7 +677,7 @@ export default function Payment() {
           {/* 결제 방법 선택 섹션 */}
           <PaymentMethodSelector
             selectedPaymentMethod={selectedPaymentMethod}
-            onPaymentMethodPress={handlePaymentMethodPress}
+            onPaymentMethodPress={handleSelectPaymentMethod}
           />
 
           {/* 주문 방법 선택 섹션 */}
@@ -676,15 +686,28 @@ export default function Payment() {
             onOrderMethodPress={setSelectedOrderMethod}
           />
 
-          {/* 할인 적용 섹션 */}
-          <DiscountSection
-            onDiscountSelect={handleDiscountSelect}
-            onDiscountDelete={handleDiscountDelete}
-            hasSelectedItems={checkedItems.size > 0}
-          />
+          {/* 할인 적용 - 필요할 때만 여는 온디맨드 버튼 */}
+          <Pressable
+            onPress={handleOpenDiscountModal}
+            className='w-full rounded-2xl border border-gray-200 mt-6 px-4 py-4 flex-row items-center justify-between'
+          >
+            <View className='flex-row items-center gap-2'>
+              <Ionicons name='pricetag-outline' size={18} color='#03b26c' />
+              <Text className='text-base font-pretendard-bold text-[#191f28]'>
+                할인 적용
+              </Text>
+            </View>
+            {discountedItemCount > 0 ? (
+              <Text className='text-primaryGreen text-sm font-pretendard-semibold'>
+                {discountedItemCount}개 항목 적용됨
+              </Text>
+            ) : (
+              <Ionicons name='chevron-forward' size={18} color='#8b95a1' />
+            )}
+          </Pressable>
         </ScrollView>
 
-        {/* 취소 · 최종 결제 버튼 */}
+        {/* 취소 · 결제하기(단계별 진행 시작) 버튼 */}
         <View className='flex-row gap-3 mt-6'>
           <Pressable
             onPress={handleBack}
@@ -698,23 +721,45 @@ export default function Payment() {
           <Pressable
             onPressIn={paymentButtonAnimation.onPressIn}
             onPressOut={paymentButtonAnimation.onPressOut}
-            onPress={handlePaymentPress}
+            onPress={handleStartPayment}
+            disabled={!selectedPaymentMethod}
             className='flex-1'
           >
             <Animated.View
-              className='h-[62px] bg-primaryGreen flex items-center justify-center rounded-2xl'
+              className={clsx(
+                'h-[62px] flex items-center justify-center rounded-2xl',
+                {
+                  'bg-primaryGreen': !!selectedPaymentMethod,
+                  'bg-gray-200': !selectedPaymentMethod,
+                }
+              )}
               style={{
                 transform: [{ scale: paymentButtonAnimation.scaleAnim }],
               }}
             >
-              <Text className='text-white text-lg font-pretendard-bold'>
+              <Text
+                className={clsx('text-lg font-pretendard-bold', {
+                  'text-white': !!selectedPaymentMethod,
+                  'text-gray-400': !selectedPaymentMethod,
+                })}
+              >
                 {totalAmount.toLocaleString()}원 결제하기
               </Text>
             </Animated.View>
           </Pressable>
         </View>
 
-        {/* 현금 결제: 받은 금액 입력 모달 */}
+        {/* 할인 적용 (온디맨드) */}
+        <DiscountStepModal
+          visible={isModalOpen('discountStep')}
+          orderItems={orderItems}
+          onApplyDiscount={handleApplyDiscount}
+          onRemoveDiscount={handleRemoveDiscountItems}
+          onDone={closeModal}
+          onClose={closeModal}
+        />
+
+        {/* 1단계(현금): 받은 금액 입력 */}
         <CashAmountModal
           visible={isModalOpen('cashAmount')}
           totalAmount={remainingAmount > 0 ? remainingAmount : totalAmount}
@@ -722,7 +767,7 @@ export default function Payment() {
           onConfirm={handleCashAmountConfirm}
         />
 
-        {/* 쿠폰 결제: 쿠폰 금액 입력 모달 */}
+        {/* 1단계(쿠폰): 쿠폰 금액 입력 */}
         <CouponAmountModal
           visible={isModalOpen('couponAmount')}
           totalAmount={totalAmount}
@@ -730,7 +775,7 @@ export default function Payment() {
           onConfirm={handleCouponAmountConfirm}
         />
 
-        {/* 번호 입력 모달 */}
+        {/* 1단계(장부) / 2단계(수령번호): 번호 입력 */}
         <NumberInputModal
           visible={isModalOpen('numberInput')}
           onClose={() => {
@@ -743,7 +788,7 @@ export default function Payment() {
           onInputChange={() => setModalErrorMessage('')}
         />
 
-        {/* 장부 선택 모달 */}
+        {/* 1단계(장부): 장부 선택 */}
         <LedgerSelectionModal
           visible={isLedgerSelectionModalVisible}
           onClose={() => setIsLedgerSelectionModalVisible(false)}

@@ -1,7 +1,6 @@
 export { default as CashAmountModal } from './CashAmountModal';
 export { default as CouponAmountModal } from './CouponAmountModal';
-export { default as DiscountModal } from './DiscountModal';
-export { default as DiscountSection } from './DiscountSection';
+export { default as DiscountStepModal } from './DiscountStepModal';
 export { default as Keypad } from './Keypad';
 export { default as LedgerSelectionModal } from './LedgerSelectionModal';
 export { default as NumberInputModal } from './NumberInputModal';
