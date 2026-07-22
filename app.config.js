@@ -10,7 +10,7 @@ const config = {
     name: process.env.APP_NAME || "mcPos",
     slug: "mcPos",
     version: process.env.APP_VERSION || "1.0.0",
-    orientation: "portrait",
+    orientation: "landscape_left",
     icon: "./assets/images/icon.png",
     userInterfaceStyle: "light",
     splash: {
