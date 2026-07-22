@@ -60,5 +60,18 @@ target 'mcPos' do
         end
       end
     end
+
+    # react_native_post_install forces C++20 project-wide, which trips up
+    # the pinned `fmt` pod's consteval-detection macros on this Xcode/clang
+    # (fmt computes FMT_USE_CONSTEVAL itself from __cplusplus and ignores
+    # a command-line -D override). Building just the `fmt` target as C++17
+    # keeps fmt on its non-consteval code path without touching anything else.
+    installer.pods_project.targets.each do |target|
+      if target.name == 'fmt'
+        target.build_configurations.each do |config|
+          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        end
+      end
+    end
   end
 end
