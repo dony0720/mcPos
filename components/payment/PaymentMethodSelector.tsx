@@ -19,51 +19,61 @@ export default function PaymentMethodSelector({
   selectedPaymentMethod,
   onPaymentMethodPress,
 }: CashRegisterPaymentSelectorProps) {
-  /**
-   * 타입 안전한 아이콘 렌더링 함수
-   * @param iconName - PaymentIconName 타입의 아이콘 이름
-   * @param selected - 선택된 상태 여부
-   */
   const renderIcon = (iconName: PaymentIconName, selected: boolean) => {
     return (
       <Ionicons
         name={iconName as keyof typeof Ionicons.glyphMap}
-        size={24}
-        color={selected ? '#000000' : '#6B7280'}
+        size={20}
+        color={selected ? '#fff' : '#8b95a1'}
       />
     );
   };
   return (
-    // 결제 방법 선택 섹션 - 현금, 이체, 쿠폰, 장부 중 선택
+    // 결제 방법 선택 섹션 - 현금, 이체, 쿠폰, 장부 중 선택 (카드 그리드)
     <View>
       {/* 섹션 제목 */}
-      <Text className='text-2xl font-medium mt-6 mb-6'>결제수단</Text>
+      <Text className='text-lg font-pretendard-bold text-[#191f28] mb-3'>
+        결제수단
+      </Text>
 
-      {/* 결제 방법 선택 버튼들 */}
-      <View className='w-full flex flex-row gap-4'>
-        {CASH_REGISTER_PAYMENTS.map((method: CashRegisterPayment) => (
-          <Pressable
-            key={method.id}
-            onPress={() => onPaymentMethodPress(method.id)}
-            className={clsx(
-              'flex-1 h-24 rounded-lg border flex items-center justify-center gap-2',
-              {
-                'border-black bg-gray-100': selectedPaymentMethod === method.id,
-                'border-gray-300 bg-white': selectedPaymentMethod !== method.id,
-              }
-            )}
-          >
-            {renderIcon(method.icon, selectedPaymentMethod === method.id)}
-            <Text
-              className={clsx('text-lg font-medium', {
-                'text-black': selectedPaymentMethod === method.id,
-                'text-gray-500': selectedPaymentMethod !== method.id,
-              })}
+      {/* 결제 방법 선택 카드들 */}
+      <View className='w-full flex-row flex-wrap gap-3'>
+        {CASH_REGISTER_PAYMENTS.map((method: CashRegisterPayment) => {
+          const selected = selectedPaymentMethod === method.id;
+          return (
+            <Pressable
+              key={method.id}
+              onPress={() => onPaymentMethodPress(method.id)}
+              className={clsx(
+                'w-[48%] h-[92px] rounded-2xl border-2 px-5 py-4 justify-between',
+                {
+                  'border-primaryGreen bg-[#f0faf6]': selected,
+                  'border-gray-200 bg-white': !selected,
+                }
+              )}
             >
-              {method.name}
-            </Text>
-          </Pressable>
-        ))}
+              <View
+                className={clsx(
+                  'w-9 h-9 rounded-[10px] flex items-center justify-center',
+                  {
+                    'bg-primaryGreen': selected,
+                    'bg-gray-100': !selected,
+                  }
+                )}
+              >
+                {renderIcon(method.icon, selected)}
+              </View>
+              <Text
+                className={clsx('text-base font-pretendard-bold', {
+                  'text-primaryGreen': selected,
+                  'text-gray-500': !selected,
+                })}
+              >
+                {method.name}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
     </View>
   );

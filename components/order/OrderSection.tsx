@@ -9,9 +9,11 @@ import OrderItem from './OrderItem';
 
 export default function OrderSection({
   items,
+  itemCount,
   totalAmount,
   onUpdateQuantity,
   onRemoveItem,
+  onClearAll,
 }: OrderSectionProps) {
   const paymentAnimation = useButtonAnimation();
   const router = useRouter();
@@ -20,75 +22,105 @@ export default function OrderSection({
     router.push('/payment');
   };
 
+  // 할인 전 상품금액 합계 및 할인 금액 계산
+  const subtotal = items.reduce(
+    (sum, item) =>
+      sum + calculateMenuUnitPrice(item.menuItem, item.options) * item.quantity,
+    0
+  );
+  const discountAmount = Math.max(0, subtotal - totalAmount);
+
   return (
-    <View className='w-full flex-[7] box-border px-[5%] flex flex-col gap-2'>
-      <View className='w-full h-full box-border py-4 flex flex-row gap-2'>
-        <View className='w-[70%] bg-gray-100 rounded-lg p-4'>
-          <ScrollView
-            className='flex-1'
-            showsVerticalScrollIndicator={false}
-            contentContainerClassName='gap-4'
-          >
-            {items.map(item => {
-              // 할인이 적용된 총 가격 계산
-              const itemTotalPrice = calculateItemPrice(item);
+    <View className='w-[404px] h-full bg-white flex flex-col'>
+      {/* 주문서 헤더 */}
+      <View className='flex-row items-baseline gap-2 px-6 pt-5 pb-3 border-b border-gray-100'>
+        <Text className='font-pretendard-bold text-gray-900 text-xl'>
+          주문서
+        </Text>
+        <Text className='font-pretendard-bold text-primaryGreen text-base'>
+          총 {itemCount}개
+        </Text>
+        <Pressable className='ml-auto' onPress={onClearAll}>
+          <Text className='text-gray-400 font-pretendard text-sm'>
+            전체삭제
+          </Text>
+        </Pressable>
+      </View>
 
-              // 할인 정보가 있는 경우 원가격 계산
-              let originalTotalPrice = null;
-              if (item.discount) {
-                const originalUnitPrice = calculateMenuUnitPrice(
-                  item.menuItem,
-                  item.options
-                );
-                originalTotalPrice = originalUnitPrice * item.quantity;
+      {/* 장바구니 리스트 */}
+      <ScrollView className='flex-1 px-6' showsVerticalScrollIndicator={false}>
+        {items.map(item => {
+          const itemTotalPrice = calculateItemPrice(item);
+
+          let originalTotalPrice = null;
+          if (item.discount) {
+            const originalUnitPrice = calculateMenuUnitPrice(
+              item.menuItem,
+              item.options
+            );
+            originalTotalPrice = originalUnitPrice * item.quantity;
+          }
+
+          return (
+            <OrderItem
+              key={item.id}
+              menuName={`${item.menuItem.name} (${item.menuItem.temperature})`}
+              options={item.options}
+              quantity={item.quantity}
+              price={`${itemTotalPrice.toLocaleString()}원`}
+              discount={item.discount}
+              originalPrice={
+                originalTotalPrice
+                  ? `${originalTotalPrice.toLocaleString()}원`
+                  : undefined
               }
+              onIncrease={() => onUpdateQuantity(item.id, 1)}
+              onDecrease={() => onUpdateQuantity(item.id, -1)}
+              onRemove={() => onRemoveItem(item.id)}
+            />
+          );
+        })}
+      </ScrollView>
 
-              return (
-                <OrderItem
-                  key={item.id}
-                  menuName={`${item.menuItem.name} (${item.menuItem.temperature})`}
-                  options={item.options}
-                  quantity={item.quantity}
-                  price={`${itemTotalPrice.toLocaleString()}원`}
-                  discount={item.discount}
-                  originalPrice={
-                    originalTotalPrice
-                      ? `${originalTotalPrice.toLocaleString()}원`
-                      : undefined
-                  }
-                  onIncrease={() => onUpdateQuantity(item.id, 1)}
-                  onDecrease={() => onUpdateQuantity(item.id, -1)}
-                  onRemove={() => onRemoveItem(item.id)}
-                />
-              );
-            })}
-          </ScrollView>
+      {/* 합계 및 결제 버튼 */}
+      <View className='px-6 pt-4 pb-6 border-t border-gray-100'>
+        <View className='flex-row justify-between mb-2'>
+          <Text className='text-gray-500 text-[15px]'>상품금액</Text>
+          <Text className='text-gray-500 text-[15px]'>
+            {subtotal.toLocaleString()}원
+          </Text>
         </View>
-        <View className='w-[30%] h-full rounded-lg px-4'>
-          <View className='w-full h-full flex flex-col justify-between gap-4'>
-            <View className='w-full flex gap-2 text-gray-500'>
-              <Text className='text-2xl'>총 결제 금액</Text>
-              <Text className='text-4xl font-bold'>
-                {totalAmount.toLocaleString()}원
-              </Text>
-            </View>
-            <Pressable
-              className='w-full h-[90px]'
-              onPressIn={paymentAnimation.onPressIn}
-              onPressOut={paymentAnimation.onPressOut}
-              onPress={handlePaymentPress}
-            >
-              <Animated.View
-                className='w-full h-full bg-primaryGreen rounded-lg flex items-center justify-center'
-                style={{
-                  transform: [{ scale: paymentAnimation.scaleAnim }],
-                }}
-              >
-                <Text className='text-white text-3xl font-bold'>결제하기</Text>
-              </Animated.View>
-            </Pressable>
-          </View>
+        <View className='flex-row justify-between mb-4'>
+          <Text className='text-gray-500 text-[15px]'>할인</Text>
+          <Text className='text-[#f04452] text-[15px]'>
+            −{discountAmount.toLocaleString()}원
+          </Text>
         </View>
+        <View className='flex-row justify-between items-baseline mb-5'>
+          <Text className='font-pretendard-bold text-gray-900 text-lg'>
+            결제금액
+          </Text>
+          <Text className='font-pretendard-bold text-gray-900 text-[26px]'>
+            {totalAmount.toLocaleString()}원
+          </Text>
+        </View>
+        <Pressable
+          className='w-full h-[60px]'
+          onPressIn={paymentAnimation.onPressIn}
+          onPressOut={paymentAnimation.onPressOut}
+          onPress={handlePaymentPress}
+        >
+          <Animated.View
+            className='w-full h-full bg-primaryGreen rounded-2xl flex items-center justify-center'
+            style={{
+              transform: [{ scale: paymentAnimation.scaleAnim }],
+            }}
+          >
+            <Text className='text-white text-lg font-pretendard-bold'>
+              결제하기
+            </Text>
+          </Animated.View>
+        </Pressable>
       </View>
     </View>
   );

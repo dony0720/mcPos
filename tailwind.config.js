@@ -6,7 +6,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primaryGreen: "#2CC56F",
+        primaryGreen: "#03b26c",
+      },
+      fontFamily: {
+        pretendard: ["Pretendard-Regular"],
+        "pretendard-semibold": ["Pretendard-SemiBold"],
+        "pretendard-bold": ["Pretendard-Bold"],
       },
     },
   },

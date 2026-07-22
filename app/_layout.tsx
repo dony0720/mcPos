@@ -1,12 +1,24 @@
 import '../global.css';
 
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import React from 'react';
+import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ToastProvider } from '../components';
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    'Pretendard-Regular': require('../assets/fonts/Pretendard-Regular.otf'),
+    'Pretendard-SemiBold': require('../assets/fonts/Pretendard-SemiBold.otf'),
+    'Pretendard-Bold': require('../assets/fonts/Pretendard-Bold.otf'),
+  });
+
+  if (!fontsLoaded) {
+    return <View className='flex-1 bg-white' />;
+  }
+
   return (
     <GestureHandlerRootView className='flex-1'>
       <Stack

@@ -40,10 +40,10 @@ export default function MenuGrid({
       <ScrollView
         className='flex-1'
         showsVerticalScrollIndicator={false}
-        contentContainerClassName='flex-row flex-wrap gap-7'
+        contentContainerClassName='flex-row flex-wrap gap-4'
       >
         {filteredMenuItems.map(item => (
-          <View key={item.id} className='w-[31%]'>
+          <View key={item.id} className='w-[23%]'>
             <MenuItemComponent
               id={item.id}
               name={item.name}

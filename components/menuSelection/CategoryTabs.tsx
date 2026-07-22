@@ -14,53 +14,51 @@ export default function CategoryTabs({
 
   return (
     <View className='w-full box-border px-[5%]'>
-      <View className='h-[45px] flex flex-row'>
-        {/* 카테고리 탭 버튼들 */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View className='flex-row gap-20 relative'>
-            {/* 전체 카테고리 */}
-            <Pressable
-              className='flex-1 py-3 flex justify-center items-center'
-              onPress={() => onSelectCategory('ALL')}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View className='flex-row gap-2 py-3'>
+          {/* 전체 카테고리 */}
+          <Pressable
+            className={clsx(
+              'px-[18px] py-[10px] rounded-xl',
+              selectedCategory === 'ALL' ? 'bg-primaryGreen' : 'bg-white'
+            )}
+            onPress={() => onSelectCategory('ALL')}
+          >
+            <Text
+              className={clsx(
+                'text-[15px] font-pretendard-bold',
+                selectedCategory === 'ALL' ? 'text-white' : 'text-gray-500'
+              )}
             >
-              <Text
+              전체
+            </Text>
+          </Pressable>
+          {categories
+            .filter(category => category.id !== 'All' && category.id !== 'ALL')
+            .map(category => (
+              <Pressable
+                role='tablist'
+                key={category.id}
+                onPress={() => onSelectCategory(category.id)}
                 className={clsx(
-                  'text-[16px] font-bold',
-                  selectedCategory === 'ALL'
-                    ? 'text-primaryGreen'
-                    : 'text-gray-500'
+                  'px-[18px] py-[10px] rounded-xl',
+                  selectedCategory === category.id
+                    ? 'bg-primaryGreen'
+                    : 'bg-white'
                 )}
               >
-                전체
-              </Text>
-            </Pressable>
-            {categories
-              .filter(
-                category => category.id !== 'All' && category.id !== 'ALL'
-              )
-              .map(category => (
-                <Pressable
-                  role='tablist'
-                  key={category.id}
-                  onPress={() => onSelectCategory(category.id)}
-                  className='flex-1 py-3 flex justify-center items-center'
+                <Text
+                  className={clsx('text-[15px] font-pretendard-bold', {
+                    'text-white': selectedCategory === category.id,
+                    'text-gray-500': selectedCategory !== category.id,
+                  })}
                 >
-                  <Text
-                    className={clsx('text-[16px] font-bold', {
-                      'text-primaryGreen': selectedCategory === category.id,
-                      'text-gray-500': selectedCategory !== category.id,
-                    })}
-                  >
-                    {category.name}
-                  </Text>
-                </Pressable>
-              ))}
-          </View>
-        </ScrollView>
-        {/* 탭 인디케이터 */}
-        {/* 회색 구분선 */}
-        <View className='absolute bottom-0 w-full border-t border-gray-300' />
-      </View>
+                  {category.name}
+                </Text>
+              </Pressable>
+            ))}
+        </View>
+      </ScrollView>
     </View>
   );
 }

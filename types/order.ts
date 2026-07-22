@@ -4,9 +4,11 @@ import { MenuItem, OrderItem } from './menu';
 // 주문 섹션 Props 타입
 export interface OrderSectionProps {
   items: OrderItem[];
+  itemCount: number;
   totalAmount: number;
   onUpdateQuantity: (itemId: string, change: number) => void;
   onRemoveItem: (itemId: string) => void;
+  onClearAll: () => void;
 }
 
 // 개별 주문 아이템 Props 타입

@@ -609,26 +609,30 @@ export default function Payment() {
   };
 
   return (
-    <View className='h-full w-full bg-white flex flex-col'>
-      <View className='flex-1 max-w-7xl mx-auto w-full'>
-        {/* 상단 헤더 섹션 */}
+    <View className='h-full w-full bg-white flex-row'>
+      {/* 왼쪽: 어두운 주문 요약 패널 */}
+      <View className='w-[420px] h-full bg-[#191f28] px-8 pt-8 pb-6 flex flex-col'>
         <PaymentHeader onBack={handleBack} />
 
-        {/* 전체 선택 체크박스 섹션 */}
+        <Text className='text-[#b0b8c1] text-sm font-pretendard-semibold mt-7'>
+          결제할 금액
+        </Text>
+        <Text className='text-white text-[44px] font-pretendard-bold mt-1'>
+          {totalAmount.toLocaleString()}원
+        </Text>
+
+        <View className='h-[1px] bg-white/10 my-6' />
+
+        {/* 전체 선택 컨트롤 */}
         <SelectAllCheckbox
           isChecked={isAllChecked}
           onCheckboxPress={handleAllCheckboxPress}
           onDeletePress={handleDeleteSelected}
           hasSelectedItems={checkedItems.size > 0}
-          title='결제 정보'
         />
 
-        {/* 주문 메뉴 목록 섹션 */}
-        <ScrollView
-          className='w-full h-[50%] px-[5%] box-border overflow-hidden'
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ gap: 16, paddingVertical: 16 }}
-        >
+        {/* 주문 메뉴 목록 */}
+        <ScrollView className='flex-1' showsVerticalScrollIndicator={false}>
           {orderItems.map(item => {
             // 할인이 적용된 단위 가격 계산
             const unitPrice = calculateDiscountedUnitPrice(item);
@@ -647,16 +651,19 @@ export default function Payment() {
                 menuName={menuName}
                 options={item.options.join(', ')}
                 price={`${itemTotalPrice.toLocaleString()}원`}
-                menuImage={item.menuItem.image || ''}
               />
             );
           })}
         </ScrollView>
+      </View>
 
-        {/* 구분선 */}
-        <View className='w-full h-[1px] bg-gray-300' />
+      {/* 오른쪽: 결제 수단 및 옵션 패널 */}
+      <View className='flex-1 h-full px-11 pt-11 pb-8 flex flex-col'>
+        <Text className='text-[22px] font-pretendard-bold text-[#191f28] mb-6'>
+          결제 수단을 선택하세요
+        </Text>
 
-        <View className='w-full h-[50%] px-[5%] pb-10 box-border flex flex-col justify-between'>
+        <ScrollView className='flex-1' showsVerticalScrollIndicator={false}>
           {/* 결제 방법 선택 섹션 */}
           <PaymentMethodSelector
             selectedPaymentMethod={selectedPaymentMethod}
@@ -675,64 +682,76 @@ export default function Payment() {
             onDiscountDelete={handleDiscountDelete}
             hasSelectedItems={checkedItems.size > 0}
           />
+        </ScrollView>
 
-          {/* 최종 결제 버튼 섹션 */}
+        {/* 취소 · 최종 결제 버튼 */}
+        <View className='flex-row gap-3 mt-6'>
+          <Pressable
+            onPress={handleBack}
+            className='w-[140px] h-[62px] rounded-2xl bg-gray-100 flex items-center justify-center'
+          >
+            <Text className='text-[#4e5968] text-lg font-pretendard-bold'>
+              취소
+            </Text>
+          </Pressable>
+
           <Pressable
             onPressIn={paymentButtonAnimation.onPressIn}
             onPressOut={paymentButtonAnimation.onPressOut}
             onPress={handlePaymentPress}
+            className='flex-1'
           >
             <Animated.View
-              className='w-full h-16 sm:h-20 lg:h-24 min-h-16 max-h-28 bg-primaryGreen flex items-center justify-center rounded-lg'
+              className='h-[62px] bg-primaryGreen flex items-center justify-center rounded-2xl'
               style={{
                 transform: [{ scale: paymentButtonAnimation.scaleAnim }],
               }}
             >
-              <Text className='text-white text-3xl font-bold'>
+              <Text className='text-white text-lg font-pretendard-bold'>
                 {totalAmount.toLocaleString()}원 결제하기
               </Text>
             </Animated.View>
           </Pressable>
-
-          {/* 현금 결제: 받은 금액 입력 모달 */}
-          <CashAmountModal
-            visible={isModalOpen('cashAmount')}
-            totalAmount={remainingAmount > 0 ? remainingAmount : totalAmount}
-            onClose={closeModal}
-            onConfirm={handleCashAmountConfirm}
-          />
-
-          {/* 쿠폰 결제: 쿠폰 금액 입력 모달 */}
-          <CouponAmountModal
-            visible={isModalOpen('couponAmount')}
-            totalAmount={totalAmount}
-            onClose={closeModal}
-            onConfirm={handleCouponAmountConfirm}
-          />
-
-          {/* 번호 입력 모달 */}
-          <NumberInputModal
-            visible={isModalOpen('numberInput')}
-            onClose={() => {
-              setModalErrorMessage(''); // 에러 메시지 초기화
-              closeModal();
-            }}
-            onConfirm={handleModalConfirm}
-            type={modalType}
-            errorMessage={modalErrorMessage}
-            onInputChange={() => setModalErrorMessage('')}
-          />
-
-          {/* 장부 선택 모달 */}
-          <LedgerSelectionModal
-            visible={isLedgerSelectionModalVisible}
-            onClose={() => setIsLedgerSelectionModalVisible(false)}
-            onSelect={handleLedgerSelect}
-            ledgers={getLedgersByPhoneLastDigits(phoneLastDigits)}
-            phoneLastDigits={phoneLastDigits}
-            totalAmount={totalAmount}
-          />
         </View>
+
+        {/* 현금 결제: 받은 금액 입력 모달 */}
+        <CashAmountModal
+          visible={isModalOpen('cashAmount')}
+          totalAmount={remainingAmount > 0 ? remainingAmount : totalAmount}
+          onClose={closeModal}
+          onConfirm={handleCashAmountConfirm}
+        />
+
+        {/* 쿠폰 결제: 쿠폰 금액 입력 모달 */}
+        <CouponAmountModal
+          visible={isModalOpen('couponAmount')}
+          totalAmount={totalAmount}
+          onClose={closeModal}
+          onConfirm={handleCouponAmountConfirm}
+        />
+
+        {/* 번호 입력 모달 */}
+        <NumberInputModal
+          visible={isModalOpen('numberInput')}
+          onClose={() => {
+            setModalErrorMessage(''); // 에러 메시지 초기화
+            closeModal();
+          }}
+          onConfirm={handleModalConfirm}
+          type={modalType}
+          errorMessage={modalErrorMessage}
+          onInputChange={() => setModalErrorMessage('')}
+        />
+
+        {/* 장부 선택 모달 */}
+        <LedgerSelectionModal
+          visible={isLedgerSelectionModalVisible}
+          onClose={() => setIsLedgerSelectionModalVisible(false)}
+          onSelect={handleLedgerSelect}
+          ledgers={getLedgersByPhoneLastDigits(phoneLastDigits)}
+          phoneLastDigits={phoneLastDigits}
+          totalAmount={totalAmount}
+        />
       </View>
     </View>
   );

@@ -21,8 +21,15 @@ export default function MenuSelection() {
   const { openModal, closeModal, isModalOpen } = useModal(); // 모달 관리
 
   // Zustand 스토어 사용
-  const { orderItems, totalAmount, addItem, updateQuantity, removeItem } =
-    useOrderStore();
+  const {
+    orderItems,
+    itemCount,
+    totalAmount,
+    addItem,
+    updateQuantity,
+    removeItem,
+    clearOrder,
+  } = useOrderStore();
   const { isAdminAuthenticated, login, logout } = useAuthStore();
 
   // 카테고리 상태 관리 (로컬 상태)
@@ -64,66 +71,70 @@ export default function MenuSelection() {
   };
 
   return (
-    <View className='h-full w-full bg-white flex flex-col'>
-      <View className='flex-1 max-w-7xl mx-auto w-full flex flex-col'>
-        {/* 헤더 섹션 - 로고와 관리자 모드 버튼이 포함된 상단 헤더 */}
-        <View className='w-full h-[80px] box-border px-[5%] mt-[25px] flex flex-row justify-between items-center '>
-          {/* 로고 */}
-          <McPos width={100} height={100} />
+    <View className='h-full w-full bg-[#f2f4f6] flex flex-col'>
+      {/* 헤더 섹션 - 로고, 영업중 배지, 관리자 모드 버튼이 포함된 상단 헤더 */}
+      <View className='w-full h-[68px] bg-white box-border px-[28px] flex flex-row items-center gap-3 border-b border-[#f2f4f6]'>
+        {/* 로고 */}
+        <McPos width={64} height={64} />
 
-          {/* 관리자 모드 버튼 */}
-          <Pressable
-            role='button'
-            onPressIn={adminAnimation.onPressIn}
-            onPressOut={adminAnimation.onPressOut}
-            onPress={handleAdminPress}
+        {/* 영업중 배지 */}
+        <View className='bg-[#f0faf6] px-[10px] py-[5px] rounded-lg'>
+          <Text className='text-primaryGreen text-[13px] font-pretendard-semibold'>
+            영업중
+          </Text>
+        </View>
+
+        {/* 관리자 모드 버튼 */}
+        <Pressable
+          role='button'
+          className='ml-auto'
+          onPressIn={adminAnimation.onPressIn}
+          onPressOut={adminAnimation.onPressOut}
+          onPress={handleAdminPress}
+        >
+          <Animated.View
+            className='flex justify-center items-center bg-primaryGreen rounded-xl w-[150px] h-[40px]'
+            style={{
+              transform: [{ scale: adminAnimation.scaleAnim }],
+            }}
           >
-            <Animated.View
-              className='flex justify-center items-center bg-primaryGreen rounded-lg w-[150px] h-[40px]'
-              style={{
-                transform: [{ scale: adminAnimation.scaleAnim }],
-              }}
-            >
-              <Text className='text-white text-[16px] font-bold'>
-                {isAdminAuthenticated ? '로그아웃' : '관리자 모드'}
-              </Text>
-            </Animated.View>
-          </Pressable>
+            <Text className='text-white text-[15px] font-pretendard-bold'>
+              {isAdminAuthenticated ? '로그아웃' : '관리자 모드'}
+            </Text>
+          </Animated.View>
+        </Pressable>
+      </View>
+
+      {/* 본문: 좌측 메뉴 그리드 / 우측 주문서 패널 2컬럼 */}
+      <View className='flex-1 flex flex-row min-h-0'>
+        {/* 좌측: 카테고리 탭 + 메뉴 그리드 */}
+        <View className='flex-1 flex flex-col min-w-0 pt-4'>
+          <CategoryTabs
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
+          <View className='flex-1'>
+            <MenuGrid selectedCategory={selectedCategory} onAddItem={addItem} />
+          </View>
         </View>
 
-        {/* 메뉴 선택 섹션 */}
-        {/* 음료 카테고리 탭 */}
-        <CategoryTabs
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-        />
-
-        {/* 메뉴 아이템 그리드 - 선택된 카테고리의 메뉴들을 표시 */}
-        <View className='flex-[13]'>
-          <MenuGrid selectedCategory={selectedCategory} onAddItem={addItem} />
-        </View>
-
-        {/* 주문 내역 섹션 */}
-        {/* 주문 내역 제목 */}
-        <Text className='w-full box-border px-[5%] text-2xl font-bold mt-4'>
-          주문 내역
-        </Text>
-
-        {/* 선택된 메뉴들의 주문 내역 및 결제 버튼 */}
+        {/* 우측: 고정폭 주문서 패널 */}
         <OrderSection
           items={orderItems}
+          itemCount={itemCount}
           totalAmount={totalAmount}
           onUpdateQuantity={updateQuantity}
           onRemoveItem={removeItem}
-        />
-
-        {/* 모달 섹션 - 관리자 인증을 위한 비밀번호 입력 모달 */}
-        <AdminModal
-          visible={isModalOpen('admin')}
-          onClose={handleCloseAdminModal}
-          onConfirm={handleAdminConfirm}
+          onClearAll={clearOrder}
         />
       </View>
+
+      {/* 모달 섹션 - 관리자 인증을 위한 비밀번호 입력 모달 */}
+      <AdminModal
+        visible={isModalOpen('admin')}
+        onClose={handleCloseAdminModal}
+        onConfirm={handleAdminConfirm}
+      />
     </View>
   );
 }

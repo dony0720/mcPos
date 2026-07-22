@@ -27,11 +27,13 @@ export default function DiscountSection({
   return (
     <>
       {/* 할인 적용 섹션 - 할인 쿠폰이나 할인율 적용 */}
-      <View className='w-full h-24 rounded-lg flex flex-row items-center justify-between border border-gray-300 my-6 box-border p-4'>
+      <View className='w-full rounded-2xl flex-row items-center justify-between border border-gray-200 mt-6 p-4'>
         {/* 할인 정보 표시 */}
-        <View className='flex gap-2 '>
-          <Text className='text-xl '>할인 적용</Text>
-          <Text className='text-gray-600'>
+        <View className='gap-1'>
+          <Text className='text-base font-pretendard-bold text-[#191f28]'>
+            할인 적용
+          </Text>
+          <Text className='text-[#8b95a1] text-xs font-pretendard'>
             {hasSelectedItems
               ? '선택된 메뉴에 할인을 적용할 수 있습니다'
               : '할인을 적용하려면 메뉴를 선택하세요'}
@@ -39,26 +41,26 @@ export default function DiscountSection({
         </View>
 
         {/* 할인 관련 버튼들 */}
-        <View className='flex flex-row items-center gap-3'>
+        <View className='flex-row items-center gap-3'>
           {/* 할인 선택 버튼 - 할인 모달 열기 */}
           <Pressable
             onPress={() => hasSelectedItems && openModal('discount')}
             disabled={!hasSelectedItems}
             className={clsx(
-              'w-32 h-12 max-w-[128px] rounded-lg border flex flex-row items-center justify-center gap-2',
+              'h-11 px-4 rounded-xl border flex-row items-center justify-center gap-2',
               {
                 'border-primaryGreen bg-white': hasSelectedItems,
-                'border-gray-300 bg-gray-100': !hasSelectedItems,
+                'border-gray-200 bg-gray-100': !hasSelectedItems,
               }
             )}
           >
             <Ionicons
               name='pricetag-outline'
-              size={18}
-              color={hasSelectedItems ? '#2CC56F' : '#9CA3AF'}
+              size={16}
+              color={hasSelectedItems ? '#03b26c' : '#9CA3AF'}
             />
             <Text
-              className={clsx('text-base font-medium', {
+              className={clsx('text-sm font-pretendard-semibold', {
                 'text-primaryGreen': hasSelectedItems,
                 'text-gray-400': !hasSelectedItems,
               })}
@@ -72,20 +74,20 @@ export default function DiscountSection({
             onPress={() => hasSelectedItems && handleDiscountDelete()}
             disabled={!hasSelectedItems}
             className={clsx(
-              'w-32 h-12 max-w-[128px] rounded-lg border flex flex-row items-center justify-center gap-2',
+              'h-11 px-4 rounded-xl border flex-row items-center justify-center gap-2',
               {
-                'border-red-400 bg-white': hasSelectedItems,
-                'border-gray-300 bg-gray-100': !hasSelectedItems,
+                'border-red-300 bg-white': hasSelectedItems,
+                'border-gray-200 bg-gray-100': !hasSelectedItems,
               }
             )}
           >
             <Ionicons
               name='close-circle-outline'
-              size={18}
+              size={16}
               color={hasSelectedItems ? '#F87171' : '#9CA3AF'}
             />
             <Text
-              className={clsx('text-base font-medium', {
+              className={clsx('text-sm font-pretendard-semibold', {
                 'text-red-400': hasSelectedItems,
                 'text-gray-400': !hasSelectedItems,
               })}

@@ -17,9 +17,9 @@ export default function MenuItem({
   return (
     <View key={id} className='w-full box-border'>
       <TouchableOpacity onPress={onPress} className='w-full'>
-        <View className='w-full flex flex-col rounded-lg gap-2'>
+        <View className='w-full flex flex-col bg-white rounded-[18px] p-3 gap-[10px]'>
           {/* 메뉴 아이콘 섹션 */}
-          <View className='bg-gray-100 rounded-lg aspect-square flex items-center justify-center overflow-hidden'>
+          <View className='bg-[#f0faf6] rounded-xl aspect-square flex items-center justify-center overflow-hidden'>
             {image ? (
               <Image
                 source={{ uri: image }}
@@ -33,8 +33,12 @@ export default function MenuItem({
 
           {/* 메뉴 정보 섹션 */}
           <View className='px-1'>
-            <Text className='font-semibold text-2xl'>{name}</Text>
-            <Text className='text-gray-600 text-xl mt-1'>{price}</Text>
+            <Text className='font-pretendard-bold text-lg text-gray-900'>
+              {name}
+            </Text>
+            <Text className='font-pretendard-semibold text-gray-600 text-base mt-1'>
+              {price}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>

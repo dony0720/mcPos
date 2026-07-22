@@ -50,7 +50,6 @@ export interface PaymentMenuItemProps {
   menuName: string;
   options: string;
   price: string;
-  menuImage: string;
 }
 
 export interface DiscountModalProps extends ModalProps {
@@ -69,7 +68,6 @@ export interface SelectAllCheckboxProps {
   onCheckboxPress: () => void;
   onDeletePress: () => void;
   hasSelectedItems: boolean;
-  title?: string;
 }
 
 export interface PaymentHeaderProps {
